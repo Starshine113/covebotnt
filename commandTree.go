@@ -5,11 +5,12 @@ import (
 )
 
 func commandTree(command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-	if command == "ping" {
+	switch command {
+	case "ping":
 		commandPing(s, m)
-	} else if command == "help" {
+	case "help":
 		commandHelp(args, s, m)
-	} else if command == "setstatus" {
+	case "setstatus":
 		commandSetStatus(args, s, m)
 	}
 }
