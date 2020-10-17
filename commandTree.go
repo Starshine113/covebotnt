@@ -12,5 +12,7 @@ func commandTree(command string, args []string, s *discordgo.Session, m *discord
 		commandHelp(args, s, m)
 	case "setstatus":
 		commandSetStatus(args, s, m)
+	case "starboard":
+		commandStarboard(args, s, m)
 	}
 }

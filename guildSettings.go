@@ -5,40 +5,39 @@ import (
 )
 
 type guildSettings struct {
+	Prefix     string
 	Starboard  starboardSettings
 	Moderation modSettings
 	Gatekeeper gatekeeperSettings
 }
 type starboardSettings struct {
-	StarboardID      uint64
+	StarboardID      string
 	ReactLimit       int
 	Emoji            string
 	SenderCanReact   bool
 	ReactToStarboard bool
 }
 type modSettings struct {
-	ModRoles    []uint64
-	HelperRoles []uint64
-	ModLog      uint64
-	MuteRole    uint64
-	PauseRole   uint64
+	ModRoles    []string
+	HelperRoles []string
+	ModLog      string
+	MuteRole    string
+	PauseRole   string
 }
 type gatekeeperSettings struct {
-	GatekeeperRoles   []uint64
-	MemberRoles       []uint64
-	GatekeeperChannel uint64
+	GatekeeperRoles   []string
+	MemberRoles       []string
+	GatekeeperChannel string
 	GatekeeperMessage string
-	WelcomeChannel    uint64
+	WelcomeChannel    string
 	WelcomeMessage    string
 }
 
-func updateSettingsForGuild(guildID uint64) error {
+func updateSettingsForGuild(guildID string) error {
 	return nil
 }
 
-func getSettingsAll() (map[uint64]guildSettings, error) {
-	settings := make(map[uint64]guildSettings)
-
+func getSettingsAll() (settings map[string]guildSettings, err error) {
 	// get starboard settings
 	rows, err := db.Query(context.Background(), "select * from guild_settings")
 	if err != nil {
@@ -48,25 +47,28 @@ func getSettingsAll() (map[uint64]guildSettings, error) {
 
 	for rows.Next() {
 		var (
-			guildID, starboardChannel        uint64
+			guildID, prefix string
+
+			starboardChannel                 string
 			reactLimit                       int
 			emoji                            string
 			senderCanReact, reactToStarboard bool
 
-			modRoles, helperRoles       []uint64
-			modLog, muteRole, pauseRole uint64
+			modRoles, helperRoles       []string
+			modLog, muteRole, pauseRole string
 
-			gatekeeperRoles, memberRoles      []uint64
-			gatekeeperChannel, welcomeChannel uint64
+			gatekeeperRoles, memberRoles      []string
+			gatekeeperChannel, welcomeChannel string
 			gatekeeperMessage, welcomeMessage string
 		)
 		rows.Scan(
-			&guildID, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
+			&guildID, &prefix, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
 			&modRoles, &helperRoles, &modLog, &muteRole, &pauseRole,
 			&gatekeeperRoles, &memberRoles, &gatekeeperChannel,
 			&gatekeeperMessage, &welcomeChannel, &welcomeMessage,
 		)
 		settings[guildID] = guildSettings{
+			Prefix:     prefix,
 			Starboard:  starboardSettings{starboardChannel, reactLimit, emoji, senderCanReact, reactToStarboard},
 			Moderation: modSettings{modRoles, helperRoles, modLog, muteRole, pauseRole},
 			Gatekeeper: gatekeeperSettings{gatekeeperRoles, memberRoles, gatekeeperChannel,

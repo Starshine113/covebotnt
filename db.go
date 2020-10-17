@@ -13,39 +13,41 @@ var initDBSql = `create type modaction as enum ('warn', 'mute', 'unmute', 'pause
 
 create table if not exists guild_settings
 (
-    guild_id			bigint primary key,
-    starboard_channel	bigint not null default 0,
+	guild_id			text primary key,
+	prefix				text default '',
+
+    starboard_channel	text not null default '0',
     react_limit			int not null default 100,
 	emoji				text not null default '⭐',
     sender_can_react	boolean default false,
 	react_to_starboard	boolean default true,
 	
-	mod_roles			bigint[] not null default array[0],
-	helper_roles		bigint[] not null default array[0],
-	mod_log				bigint not null default 0,
-	mute_role			bigint not null default 0,
-	pause_role			bigint not null default 0,
+	mod_roles			text[] not null default array['0'],
+	helper_roles		text[] not null default array['0'],
+	mod_log				text not null default '0',
+	mute_role			text not null default '0',
+	pause_role			text not null default '0',
 
-	gatekeeper_roles	bigint[] not null default array[0],
-	member_roles		bigint[] not null default array[0],
-	gatekeeper_channel	bigint not null default 0,
+	gatekeeper_roles	text[] not null default array['0'],
+	member_roles		text[] not null default array['0'],
+	gatekeeper_channel	text not null default '0',
 	gatekeeper_message	text not null default 'Please wait to be approved, {mention}.',
-	welcome_channel		bigint not null default 0,
+	welcome_channel		text not null default '0',
 	welcome_message		text not null default 'Welcome to {guild}, {mention}!'
 );
 
 create table if not exists starboard_messages
 (
-    message_id				bigint primary key,
-    channel_id				bigint,
-    server_id				bigint not null references guild_settings (guild_id) on delete cascade,
-    starboard_message_id	bigint
+    message_id				text primary key,
+    channel_id				text not null,
+    server_id				text not null references guild_settings (guild_id) on delete cascade,
+    starboard_message_id	text
 );
 
 create table if not exists starboard_blacklisted_channels
 (
-    channel_id	bigint primary key,
-    server_id	bigint not null references guild_settings (guild_id) on delete cascade
+    channel_id	text primary key,
+    server_id	text not null references guild_settings (guild_id) on delete cascade
 );
 
 create table if not exists info
