@@ -8,10 +8,10 @@ import (
 
 // Ping command: replies with latency and message edit time
 func commandPing(s *discordgo.Session, m *discordgo.MessageCreate) {
+	heartbeat := s.HeartbeatLatency().String()
+
 	// get current time
 	cmdStart := time.Now()
-
-	heartbeat := s.HeartbeatLatency().String()
 
 	// send initial message
 	message, err := s.ChannelMessageSend(m.ChannelID, "Pong!\nHeartbeat: "+heartbeat)

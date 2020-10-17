@@ -17,13 +17,12 @@ type botConfig struct {
 	} `toml:"bot"`
 }
 
-func getConfig() botConfig {
+func getConfig() (config botConfig, err error) {
 	configFile, err := ioutil.ReadFile("config.toml")
 	if err != nil {
-		panic(err)
+		return config, err
 	}
-	config := botConfig{}
-	toml.Unmarshal(configFile, &config)
+	err = toml.Unmarshal(configFile, &config)
 	sugar.Infof("Loaded configuration file.")
-	return config
+	return config, err
 }
