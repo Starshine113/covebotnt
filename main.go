@@ -12,8 +12,8 @@ import (
 
 var (
 	config           botConfig
-	globalSettings   map[uint64]guildSettings
-	channelBlacklist map[uint64][]uint64
+	globalSettings   map[string]guildSettings
+	channelBlacklist map[string][]string
 	db               *pgxpool.Pool
 )
 
