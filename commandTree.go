@@ -5,14 +5,20 @@ import (
 )
 
 func commandTree(command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+	var err error
+
 	switch command {
 	case "ping":
-		commandPing(s, m)
+		err = commandPing(s, m)
 	case "help":
-		commandHelp(args, s, m)
+		err = commandHelp(args, s, m)
 	case "setstatus":
-		commandSetStatus(args, s, m)
+		err = commandSetStatus(args, s, m)
 	case "starboard":
-		commandStarboard(args, s, m)
+		err = commandStarboard(args, s, m)
+	}
+
+	if err != nil {
+		sugar.Errorf("Error running command %v", err)
 	}
 }
