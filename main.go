@@ -6,48 +6,96 @@ import (
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 )
 
 var (
-	config            = getConfig()
-	db                = initDB()
-	globalSettings, _ = getSettingsAll()
-	channelBlacklist  = getBlacklistAll()
+	config           botConfig
+	globalSettings   map[uint64]guildSettings
+	channelBlacklist map[uint64][]uint64
+	db               *pgxpool.Pool
 )
 
 var (
-	logger, _ = zap.NewDevelopment()
-	sugar     = logger.Sugar()
-	dg, _     = discordgo.New("Bot " + config.Auth.Token)
+	logger *zap.Logger
+	sugar  *zap.SugaredLogger
+	dg     *discordgo.Session
 )
 
+func loadDB() (err error) {
+	db, err = initDB()
+	if err != nil {
+		return err
+	}
+	channelBlacklist = getBlacklistAll()
+	globalSettings, err = getSettingsAll()
+
+	return err
+}
+
+// basic initialisation routines
+func initialise() (err error) {
+	// initialise logger
+	logger, err = zap.NewDevelopment()
+	if err != nil {
+		return err
+	}
+	sugar = logger.Sugar()
+
+	// load config
+	config, err = getConfig()
+	if err != nil {
+		return err
+	}
+
+	// get discord session
+	dg, err = discordgo.New("Bot " + config.Auth.Token)
+	if err != nil {
+		return err
+	}
+
+	// open database connection and load state
+	err = loadDB()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func main() {
-	defer logger.Sync()
-
-	// add message create handler for commands
-	dg.AddHandler(messageCreateCommand)
-
-	// set intents
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions)
-
-	err := dg.Open()
+	// run all init routines
+	err := initialise()
 	if err != nil {
 		panic(err)
 	}
 
+	// add message create handler for commands
+	dg.AddHandler(messageCreateCommand)
+
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions)
+
+	err = dg.Open()
+	if err != nil {
+		panic(err)
+	}
+
+	// Defer this to make sure that things are always cleanly shutdown even in the event of a crash
+	defer func() {
+		dg.Close()
+		sugar.Infof("Disconnected from Discord.")
+		db.Close()
+		sugar.Infof("Closed database connection.")
+
+		logger.Sync()
+	}()
+
 	sugar.Infof("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
-	dg.UpdateStatus(0, config.Bot.Prefixes[0]+"help")
+	err = dg.UpdateStatus(0, "testing, use "+config.Bot.Prefixes[0]+"help")
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
 	sugar.Infof("Interrupt signal received. Shutting down...")
-	dg.Close()
-	sugar.Infof("Disconnected from Discord.")
-	db.Close()
-	sugar.Infof("Closed database connection.")
-
-	os.Exit(0)
 }

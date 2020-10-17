@@ -1,7 +1,6 @@
-[auth]
-token = 'secretDiscordToken'
-database_url = 'postgresql://starbot:starbot@localhost/starbot'
-
 [bot]
-prefixes = ["t--", "t."]
-bot_owners = ["0"]
+bot_admins = ["0", "0", "0"]
+prefixes = ["!"]
+[auth]
+token = 'secretDiscordString'
+database_url = 'postgresql://starbot:starbot@localhost/starbot'

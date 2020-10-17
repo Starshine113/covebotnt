@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 )
 
@@ -81,7 +80,7 @@ func addChannelsToBlacklist(guildID string, channels []string) error {
 			return err
 		}
 		if commandTag.RowsAffected() == 0 {
-			return errors.New("Channel " + fmt.Sprint(channel) + " (guild " + fmt.Sprint(guildID) + ") was not added to the blacklist.")
+			return fmt.Errorf("Channel %v (Guilld %v) was not added to the blacklist", channel, guildID)
 		}
 	}
 
