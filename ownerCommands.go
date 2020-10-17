@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandSetStatus(args []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+func commandSetStatus(args []string, s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	// this command needs bot owner permissions
 	perms := checkOwner(m.Author.ID)
 	if perms != nil {
@@ -23,5 +24,9 @@ func commandSetStatus(args []string, s *discordgo.Session, m *discordgo.MessageC
 	// set the status to the specified string
 	status := strings.Join(args, " ")
 	dg.UpdateStatus(0, status)
-	s.ChannelMessageSend(m.ChannelID, "Set status to `+"+status+"`")
+	_, err = s.ChannelMessageSend(m.ChannelID, "Set status to `+"+status+"`")
+	if err != nil {
+		return fmt.Errorf("SetStatus: %v", err)
+	}
+	return
 }
