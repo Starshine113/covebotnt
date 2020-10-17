@@ -5,9 +5,8 @@ import (
 	"fmt"
 )
 
-func getBlacklistAll() map[uint64][]uint64 {
-	channelBlacklist := make(map[uint64][]uint64)
-	var guilds []uint64
+func getBlacklistAll() (channelBlacklist map[string][]string) {
+	var guilds []string
 
 	guildRows, err := db.Query(context.Background(), "select distinct server_id from starboard_blacklisted_channels")
 	if err != nil {
@@ -16,13 +15,13 @@ func getBlacklistAll() map[uint64][]uint64 {
 	defer guildRows.Close()
 
 	for guildRows.Next() {
-		var guild uint64
+		var guild string
 		err = guildRows.Scan(&guild)
 		guilds = append(guilds, guild)
 	}
 
 	for _, guild := range guilds {
-		var channels []uint64
+		var channels []string
 
 		channelRows, err := db.Query(context.Background(), "select channel_id from starboard_blacklisted_channels where server_id=$1", guild)
 		if err != nil {
@@ -31,7 +30,7 @@ func getBlacklistAll() map[uint64][]uint64 {
 		defer channelRows.Close()
 
 		for channelRows.Next() {
-			var channel uint64
+			var channel string
 			err = channelRows.Scan(&channel)
 			if err != nil {
 				panic(err)
@@ -44,8 +43,8 @@ func getBlacklistAll() map[uint64][]uint64 {
 	return channelBlacklist
 }
 
-func getBlacklistForGuild(guildID uint64) error {
-	var channels []uint64
+func getBlacklistForGuild(guildID string) error {
+	var channels []string
 
 	channelRows, err := db.Query(context.Background(), "select channel_id from starboard_blacklisted_channels where server_id=$1", guildID)
 	if err != nil {
@@ -54,7 +53,7 @@ func getBlacklistForGuild(guildID uint64) error {
 	defer channelRows.Close()
 
 	for channelRows.Next() {
-		var channel uint64
+		var channel string
 		err = channelRows.Scan(&channel)
 		if err != nil {
 			return err
@@ -66,7 +65,7 @@ func getBlacklistForGuild(guildID uint64) error {
 	return nil
 }
 
-func addChannelsToBlacklist(guildID uint64, channels []uint64) error {
+func addChannelsToBlacklist(guildID string, channels []string) error {
 	for _, channel := range channelBlacklist[guildID] {
 		for i, newChannel := range channels {
 			if channel == newChannel {
@@ -92,7 +91,7 @@ func addChannelsToBlacklist(guildID uint64, channels []uint64) error {
 	return nil
 }
 
-func removeFromSlice(s []uint64, i int) []uint64 {
+func removeFromSlice(s []string, i int) []string {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }

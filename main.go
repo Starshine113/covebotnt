@@ -73,6 +73,8 @@ func main() {
 	// add message create handler for commands
 	dg.AddHandler(messageCreateCommand)
 
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions)
+
 	err = dg.Open()
 	if err != nil {
 		panic(err)
