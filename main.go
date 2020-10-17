@@ -95,6 +95,9 @@ func main() {
 
 	sugar.Infof("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
 	err = dg.UpdateStatus(0, "testing, use "+config.Bot.Prefixes[0]+"help")
+	if err != nil {
+		sugar.Errorw("UpdateStatus Error", "Error", err)
+	}
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
