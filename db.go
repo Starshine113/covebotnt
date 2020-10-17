@@ -60,7 +60,7 @@ insert into info (schema_version) values (1);`
 func initDB() (*pgxpool.Pool, error) {
 	db, err := pgxpool.Connect(context.Background(), config.Auth.DatabaseURL)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to connect to database: %v", err)
+		return nil, fmt.Errorf("Unable to connect to database: %w", err)
 	}
 	if err := initDBIfNotInitialised(db); err != nil {
 		fmt.Fprintf(os.Stderr, "[%v] There was an error while initialising the database: %v\n", time.Now().Format(time.RFC3339), err)
