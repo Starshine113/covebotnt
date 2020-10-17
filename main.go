@@ -28,13 +28,16 @@ func main() {
 	// add message create handler for commands
 	dg.AddHandler(messageCreateCommand)
 
+	// set intents
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions)
+
 	err := dg.Open()
 	if err != nil {
 		panic(err)
 	}
 
 	sugar.Infof("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
-	dg.UpdateStatus(0, "testing, use "+config.Bot.Prefixes[0]+"help")
+	dg.UpdateStatus(0, config.Bot.Prefixes[0]+"help")
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
