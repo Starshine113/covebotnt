@@ -12,8 +12,8 @@ import (
 
 var (
 	config           botConfig
-	globalSettings   map[uint64]guildSettings
-	channelBlacklist map[uint64][]uint64
+	globalSettings   map[string]guildSettings
+	channelBlacklist map[string][]string
 	db               *pgxpool.Pool
 )
 
@@ -72,6 +72,9 @@ func main() {
 
 	// add message create handler for commands
 	dg.AddHandler(messageCreateCommand)
+
+	// add guild create handler to initialise data
+	dg.AddHandler(guildCreate)
 
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions)
 
