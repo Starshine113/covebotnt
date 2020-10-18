@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 
+	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -31,6 +35,22 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		// run commandTree
-		commandTree(command, args, s, m)
+		ctx, err := cbctx.Context(command, args, s, m, &cbdb.Db{db})
+		if err != nil {
+			sugar.Errorf("Error getting context: %v", err)
+			return
+		}
+		commandTree(ctx)
+		return
+	}
+
+	// if not, check if the message *started* with a bot mention
+	botUser, err := s.User("@me")
+	if err != nil {
+		sugar.Errorf("Error fetching bot user: %v", err)
+	}
+	match, _ := regexp.MatchString(fmt.Sprintf("^<@!?%v>", botUser.ID), m.Content)
+	if match {
+		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current prefix is `%v`", prefix))
 	}
 }

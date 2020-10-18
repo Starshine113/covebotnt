@@ -1,29 +1,53 @@
 package main
 
 import (
-	"github.com/bwmarrin/discordgo"
+	"fmt"
+
+	"github.com/Starshine113/covebotnt/cbctx"
 )
+
+var allCommands string = `
+All commands
+============
+|-- ping
+|-- help
+|-- setstatus <-replace|-append> <status string|-clear>
+|-- starboard
+|   |-- channel <channel>
+|   |-- limit <int>
+|-- modroles
+|-- echo [-channel <channel>] <message string>
+|-- prefix [prefix string]
+|-- commands`
 
 const successEmoji, errorEmoji string = "✅", "❌"
 
-func commandTree(command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+func commandTree(ctx *cbctx.Ctx) {
 	var err error
+	if err != nil {
+		sugar.Errorf("Error getting context: %v", err)
+	}
 
-	switch command {
+	switch ctx.Command {
 	case "ping":
-		err = commandPing(s, m)
+		err = commandPing(ctx)
 	case "help":
-		err = commandHelp(args, s, m)
+		ctx.AdditionalParams = []interface{}{config}
+		err = commandHelp(ctx)
 	case "setstatus":
-		err = commandSetStatus(args, s, m)
+		err = commandSetStatus(ctx)
 	case "starboard":
-		err = commandStarboard(args, s, m)
+		err = commandStarboard(ctx)
 	case "modroles":
-		err = commandModRoles(args, s, m)
+		err = commandModRoles(ctx.Args, ctx.Session, ctx.Message)
 	case "echo":
-		err = commandEcho(args, s, m)
+		err = commandEcho(ctx.Args, ctx.Session, ctx.Message)
 	case "prefix":
-		err = commandPrefix(args, s, m)
+		err = commandPrefix(ctx.Args, ctx.Session, ctx.Message)
+	case "commands":
+		_, err = ctx.Send(fmt.Sprintf("```%v```", allCommands))
+	case "steal":
+		err = commandSteal(ctx)
 	}
 
 	if err != nil {

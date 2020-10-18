@@ -4,60 +4,61 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandStarboard(args []string, s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
+func commandStarboard(ctx *cbctx.Ctx) (err error) {
 	// this command needs the mod role or administrator perms
-	perms := checkModRole(s, m.Author.ID, m.GuildID, false)
+	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, false)
 	if perms != nil {
-		commandError(perms, s, m)
+		commandError(perms, ctx.Session, ctx.Message)
 		return nil
 	}
 
-	guild, err := s.Guild(m.GuildID)
+	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
 	if err != nil {
-		commandError(err, s, m)
+		commandError(err, ctx.Session, ctx.Message)
 		return nil
 	}
 
-	if len(args) == 0 {
-		_, err = s.ChannelMessageSendEmbed(m.ChannelID, currentStarboardSettings(guild))
+	if len(ctx.Args) == 0 {
+		_, err = ctx.Send(currentStarboardSettings(guild))
 		if err != nil {
 			return fmt.Errorf("Starboard: %w", err)
 		}
 	}
-	if len(args) == 2 {
-		if args[0] == "channel" {
-			channel, err := parseChannel(s, args[1], m.GuildID)
+	if len(ctx.Args) == 2 {
+		if ctx.Args[0] == "channel" {
+			channel, err := ctx.ParseChannel(ctx.Args[1])
 			if err != nil {
-				commandError(err, s, m)
+				commandError(err, ctx.Session, ctx.Message)
 				return nil
 			}
-			err = setStarboardChannel(channel.ID, m.GuildID)
+			err = setStarboardChannel(channel.ID, ctx.Message.GuildID)
 			if err != nil {
-				commandError(err, s, m)
+				commandError(err, ctx.Session, ctx.Message)
 				return nil
 			}
-			_, err = s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+			_, err = ctx.Send(&discordgo.MessageEmbed{
 				Title:       "Starboard channel changed",
 				Description: "Changed the starboard channel for " + guild.Name + " to " + channel.Mention(),
 			})
 			if err != nil {
 				return err
 			}
-		} else if args[0] == "limit" {
-			limit, err := strconv.ParseInt(args[1], 10, 0)
+		} else if ctx.Args[0] == "limit" {
+			limit, err := strconv.ParseInt(ctx.Args[1], 10, 0)
 			if err != nil {
-				commandError(err, s, m)
+				commandError(err, ctx.Session, ctx.Message)
 				return nil
 			}
-			err = setStarboardLimit(int(limit), m.GuildID)
+			err = setStarboardLimit(int(limit), ctx.Message.GuildID)
 			if err != nil {
-				commandError(err, s, m)
+				commandError(err, ctx.Session, ctx.Message)
 				return nil
 			}
-			_, err = s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+			_, err = ctx.Send(&discordgo.MessageEmbed{
 				Title:       "Starboard limit changed",
 				Description: "Changed the starboard limit for " + guild.Name + " to " + fmt.Sprint(limit),
 			})
