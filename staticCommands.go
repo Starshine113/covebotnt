@@ -31,12 +31,14 @@ func commandHelp(args []string, s *discordgo.Session, m *discordgo.MessageCreate
 	if len(args) == 0 {
 		embed := &discordgo.MessageEmbed{
 			Title:       "CoveBotn't help",
-			Description: "CoveBotn't is a general purpose bot, with a gatekeeper, moderation commands, and starboard functionality.",
+			Description: "CoveBotn't is a general purpose bot, with ~~a gatekeeper, moderation commands, and~~ starboard functionality.",
 			Color:       0x21a1a8,
 			Footer: &discordgo.MessageEmbedFooter{
-				Text: "Created by Starshine System (Starshine ☀✨#5000) | CoveBotn't v0.1",
+				Text: "Created by Starshine System (Starshine ☀✨#5000) | CoveBotn't v0.3",
 			},
 			Fields: []*discordgo.MessageEmbedField{
+				{Name: "Source code", Value: "CoveBotn't is licensed under the GNU AGPLv3. The source code can be found [here](https://github.com/Starshine113/covebotnt).", Inline: false},
+				{Name: "Invite", Value: "Invite the bot with [this](" + config.Bot.Invite + ") link.", Inline: false},
 				{Name: "Basic commands", Value: "`ping`: show the bot's latency\n`help`: show this help page", Inline: false},
 			},
 		}

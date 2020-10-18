@@ -33,11 +33,51 @@ type gatekeeperSettings struct {
 	WelcomeMessage    string
 }
 
-func updateSettingsForGuild(guildID string) error {
+func initSettingsForGuild(guildID string) (err error) {
+	_, err = db.Exec(context.Background(), "insert into guild_settings (guild_id) values ($1)", guildID)
+	if err != nil {
+		return err
+	}
+	err = getSettingsForGuild(guildID)
+	return err
+}
+
+func getSettingsForGuild(guildID string) (err error) {
+	var (
+		prefix string
+
+		starboardChannel                 string
+		reactLimit                       int
+		emoji                            string
+		senderCanReact, reactToStarboard bool
+
+		modRoles, helperRoles       []string
+		modLog, muteRole, pauseRole string
+
+		gatekeeperRoles, memberRoles      []string
+		gatekeeperChannel, welcomeChannel string
+		gatekeeperMessage, welcomeMessage string
+	)
+
+	row := db.QueryRow(context.Background(), "select * from guild_settings where guild_id=$1", guildID)
+
+	row.Scan(&guildID, &prefix, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
+		&modRoles, &helperRoles, &modLog, &muteRole, &pauseRole,
+		&gatekeeperRoles, &memberRoles, &gatekeeperChannel,
+		&gatekeeperMessage, &welcomeChannel, &welcomeMessage)
+
+	globalSettings[guildID] = guildSettings{
+		Prefix:     prefix,
+		Starboard:  starboardSettings{starboardChannel, reactLimit, emoji, senderCanReact, reactToStarboard},
+		Moderation: modSettings{modRoles, helperRoles, modLog, muteRole, pauseRole},
+		Gatekeeper: gatekeeperSettings{gatekeeperRoles, memberRoles, gatekeeperChannel,
+			gatekeeperMessage, welcomeChannel, welcomeMessage}}
+
 	return nil
 }
 
-func getSettingsAll() (settings map[string]guildSettings, err error) {
+func getSettingsAll() (map[string]guildSettings, error) {
+	settings := make(map[string]guildSettings)
 	// get starboard settings
 	rows, err := db.Query(context.Background(), "select * from guild_settings")
 	if err != nil {
@@ -76,8 +116,4 @@ func getSettingsAll() (settings map[string]guildSettings, err error) {
 	}
 
 	return settings, err
-}
-
-func setStarboardChannel(guildID int, channelID int) error {
-	return nil
 }

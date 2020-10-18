@@ -1,6 +1,10 @@
 [bot]
 bot_admins = ["0", "0", "0"]
-prefixes = ["!"]
+prefixes = ["?"]
+# custom status
+[bot.custom_status]
+override = false # if set to false, status follows the default "<prefix>help | in <n> guilds"
+status = "testing"
 [auth]
 token = 'secretDiscordString'
 database_url = 'postgresql://starbot:starbot@localhost/starbot'

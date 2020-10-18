@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,6 +16,8 @@ var (
 	globalSettings   map[string]guildSettings
 	channelBlacklist map[string][]string
 	db               *pgxpool.Pool
+
+	messageIDMap, starboardMsgIDMap map[string]string
 )
 
 var (
@@ -35,8 +38,7 @@ func loadDB() (err error) {
 }
 
 // basic initialisation routines
-func initialise() (err error) {
-	// initialise logger
+func initialise(token, databaseURL string) (err error) {
 	logger, err = zap.NewDevelopment()
 	if err != nil {
 		return err
@@ -47,6 +49,13 @@ func initialise() (err error) {
 	config, err = getConfig()
 	if err != nil {
 		return err
+	}
+
+	if token != "" {
+		config.Auth.Token = token
+	}
+	if databaseURL != "" {
+		config.Auth.DatabaseURL = databaseURL
 	}
 
 	// get discord session
@@ -60,12 +69,22 @@ func initialise() (err error) {
 	if err != nil {
 		return err
 	}
+
+	// get starboard messages
+	messageIDMap, starboardMsgIDMap, err = getStarboardMessages()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func main() {
+	token := flag.String("token", "", "Override the token in config.toml")
+	databaseURL := flag.String("db", "", "Override the database URL in config.toml")
+	flag.Parse()
+
 	// run all init routines
-	err := initialise()
+	err := initialise(*token, *databaseURL)
 	if err != nil {
 		panic(err)
 	}
@@ -74,9 +93,18 @@ func main() {
 	dg.AddHandler(messageCreateCommand)
 
 	// add guild create handler to initialise data
-	dg.AddHandler(guildCreate)
+	dg.AddHandler(guildJoin)
 
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions)
+	// add reaction add/remove handler for starboard
+	dg.AddHandler(starboardReactionAdd)
+	dg.AddHandler(starboardReactionRemove)
+	// add message delete handler for starboard
+	dg.AddHandler(starboardMessageDelete)
+
+	// add ready handler
+	dg.AddHandler(onReady)
+
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsGuildMembers)
 
 	err = dg.Open()
 	if err != nil {
@@ -94,10 +122,6 @@ func main() {
 	}()
 
 	sugar.Infof("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
-	err = dg.UpdateStatus(0, "testing, use "+config.Bot.Prefixes[0]+"help")
-	if err != nil {
-		sugar.Errorw("UpdateStatus Error", "Error", err)
-	}
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)

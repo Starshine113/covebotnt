@@ -7,35 +7,18 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandGetUser(args []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-	perms := checkOwner(m.Author.ID)
-	if perms != nil {
-		commandError(perms, s, m)
-		return
-	}
-	if len(args) != 1 {
-		commandError(&errorNotEnoughArgs{2, len(args)}, s, m)
-		return
-	}
-	user, err := parseUser(s, args[0])
-	if err != nil {
-		commandError(err, s, m)
-	}
-	s.ChannelMessageSend(m.ChannelID, user.Username)
-}
-
-func commandSetStatus(args []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+func commandSetStatus(args []string, s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	// this command needs bot owner permissions
 	perms := checkOwner(m.Author.ID)
 	if perms != nil {
 		commandError(perms, s, m)
-		return
+		return nil
 	}
 
 	// this command needs at least 2 arguments
 	if len(args) < 2 {
 		commandError(&errorNotEnoughArgs{2, len(args)}, s, m)
-		return
+		return nil
 	}
 
 	// check the first arg -- boolean between -replace and -append
@@ -45,7 +28,7 @@ func commandSetStatus(args []string, s *discordgo.Session, m *discordgo.MessageC
 		config.Bot.CustomStatus.Override = false
 	} else {
 		commandError(&errorMissingRequiredArgs{"<-replace/-append> [-clear] <status string>", "<-replace/-append>"}, s, m)
-		return
+		return nil
 	}
 
 	// set custom status to the specified string
@@ -64,15 +47,16 @@ func commandSetStatus(args []string, s *discordgo.Session, m *discordgo.MessageC
 	if config.Bot.CustomStatus.Override {
 		newStatus = config.Bot.CustomStatus.Status
 	}
-	err := dg.UpdateStatus(0, newStatus)
+	err = dg.UpdateStatus(0, newStatus)
 	if err != nil {
 		commandError(err, s, m)
-		return
+		return err
 	}
 	_, err = s.ChannelMessageSend(m.ChannelID, "Set status to `"+newStatus+"`")
 	if err != nil {
 		sugar.Errorf("Error when sending message: ", err)
-		return
+		return err
 	}
 	sugar.Infof("Updated status to \"%v\"", newStatus)
+	return nil
 }
