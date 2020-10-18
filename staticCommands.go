@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 // Ping command: replies with latency and message edit time
-func commandPing(s *discordgo.Session, m *discordgo.MessageCreate) {
+func commandPing(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	heartbeat := s.HeartbeatLatency().String()
 
 	// get current time
@@ -16,16 +17,17 @@ func commandPing(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// send initial message
 	message, err := s.ChannelMessageSend(m.ChannelID, "Pong!\nHeartbeat: "+heartbeat)
 	if err != nil {
-		sugar.Errorw("Error in command", "command", "ping", "error", err)
+		return fmt.Errorf("Ping: %w", err)
 	}
 
 	// get time difference, edit message
 	diff := time.Now().Sub(cmdStart).String()
-	_, err = s.ChannelMessageEdit(message.ChannelID, message.ID, message.Content+"\nMessage edit latency: "+diff)
+	_, err = s.ChannelMessageEdit(message.ChannelID, message.ID, message.Content+"\nMessage latency: "+diff)
+	return err
 }
 
 // Help shows the help pages
-func commandHelp(args []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+func commandHelp(args []string, s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	if len(args) == 0 {
 		embed := &discordgo.MessageEmbed{
 			Title:       "CoveBotn't help",
@@ -41,7 +43,8 @@ func commandHelp(args []string, s *discordgo.Session, m *discordgo.MessageCreate
 
 		_, err := s.ChannelMessageSendEmbed(m.ChannelID, embed)
 		if err != nil {
-			sugar.Errorw("Error in command", "command", "help", "error", err)
+			return fmt.Errorf("Help: %w", err)
 		}
 	}
+	return nil
 }
