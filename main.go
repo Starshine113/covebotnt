@@ -57,6 +57,9 @@ func initialise(token, databaseURL string) (err error) {
 	if databaseURL != "" {
 		config.Auth.DatabaseURL = databaseURL
 	}
+	if os.Getenv("CB_DB_URL") != "" {
+		config.Auth.DatabaseURL = os.Getenv("CB_DB_URL")
+	}
 
 	// get discord session
 	dg, err = discordgo.New("Bot " + config.Auth.Token)
