@@ -48,6 +48,8 @@ func commandTree(ctx *cbctx.Ctx) {
 		_, err = ctx.Send(fmt.Sprintf("```%v```", allCommands))
 	case "steal":
 		err = commandSteal(ctx)
+	case "enlarge":
+		err = commandEnlarge(ctx)
 	}
 
 	if err != nil {

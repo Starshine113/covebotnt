@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/bwmarrin/discordgo"
 )
 
 func commandSteal(ctx *cbctx.Ctx) (err error) {
@@ -71,5 +72,38 @@ func commandSteal(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 	_, err = ctx.Send(fmt.Sprintf("Added emoji %v with name %v.", emoji.MessageFormat(), emoji.Name))
+	return err
+}
+
+func commandEnlarge(ctx *cbctx.Ctx) (err error) {
+	if len(ctx.Args) == 0 {
+		_, err = ctx.CommandError(&cbctx.ErrorNotEnoughArgs{1, 0})
+		return err
+	}
+
+	emojiMatch, _ := regexp.Compile("<(?P<animated>a)?:(?P<name>\\w+):(?P<emoteID>\\d{15,})>")
+
+	if emojiMatch.MatchString(ctx.Args[0]) {
+		extension := ".png"
+		groups := emojiMatch.FindStringSubmatch(ctx.Args[0])
+		if groups[1] == "a" {
+			extension = ".gif"
+		}
+		name := groups[2]
+		url := fmt.Sprintf("https://cdn.discordapp.com/emojis/%v%v", groups[3], extension)
+		embed := &discordgo.MessageEmbed{
+			Title:       ":" + name + ":",
+			Description: fmt.Sprintf("<%v:%v:%v\\>", groups[1], groups[2], groups[3]),
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: "ID: " + groups[3],
+			},
+			Image: &discordgo.MessageEmbedImage{
+				URL: url,
+			},
+		}
+		_, err = ctx.Send(embed)
+		return err
+	}
+	_, err = ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{"emoji", "emoji"})
 	return err
 }

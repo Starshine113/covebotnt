@@ -7,6 +7,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+const (
+	SuccessEmoji = "✅"
+	ErrorEmoji   = "❌"
+)
+
 // Ctx is the context for a command
 type Ctx struct {
 	Command          string
