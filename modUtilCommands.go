@@ -3,40 +3,50 @@ package main
 import (
 	"strings"
 
+	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/flagparser"
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandEcho(args []string, s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
-	perms := checkModRole(s, m.Author.ID, m.GuildID, false)
+func commandEcho(ctx *cbctx.Ctx) (err error) {
+	perms := checkModRole(ctx.Session, ctx.Message.Author.ID, ctx.Message.GuildID, false)
 	if perms != nil {
-		commandError(perms, s, m)
+		ctx.CommandError(perms)
 		return nil
 	}
 
-	if len(args) == 0 {
-		commandError(&errorNotEnoughArgs{1, len(args)}, s, m)
+	if len(ctx.Args) == 0 {
+		ctx.CommandError(&errorNotEnoughArgs{1, len(ctx.Args)})
 		return nil
 	}
 
-	channelID := m.ChannelID
+	channelID := ctx.Message.ChannelID
+
+	flagParser, err := flagparser.NewFlagParser(flagparser.String("channel", "chan", "ch"))
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+
+	processedArgs, err := flagParser.Parse(ctx.Args)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	ctx.Args = processedArgs["rest"].([]string)
 
 	// check if the user supplied a -channel argument
-	if args[0] == "-channel" || args[0] == "-chan" || args[0] == "-ch" {
-		if len(args) == 1 {
-			commandError(&errorNotEnoughArgs{2, len(args)}, s, m)
-			return nil
-		}
-		channel, err := parseChannel(s, args[1], m.GuildID)
+	if processedArgs["channel"].(string) != "" {
+		channel, err := ctx.ParseChannel(processedArgs["channel"].(string))
 		if err != nil {
-			commandError(err, s, m)
+			ctx.CommandError(err)
 			return nil
 		}
 		channelID = channel.ID
-		args = args[2:]
 	}
 
-	message := strings.Join(args, " ")
-	_, err = s.ChannelMessageSendComplex(channelID, &discordgo.MessageSend{
+	message := strings.Join(ctx.Args, " ")
+	_, err = ctx.Session.ChannelMessageSendComplex(channelID, &discordgo.MessageSend{
 		Content: message,
 		AllowedMentions: &discordgo.MessageAllowedMentions{
 			Parse: []discordgo.AllowedMentionType{discordgo.AllowedMentionTypeUsers},
@@ -46,13 +56,13 @@ func commandEcho(args []string, s *discordgo.Session, m *discordgo.MessageCreate
 		return err
 	}
 
-	err = s.MessageReactionAdd(m.ChannelID, m.ID, successEmoji)
+	err = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, ctx.Message.ID, cbctx.SuccessEmoji)
 	if err != nil {
 		return nil
 	}
 
-	if channelID != m.ChannelID {
-		_, err = s.ChannelMessageSend(m.ChannelID, successEmoji+" Sent message to <#"+channelID+">")
+	if channelID != ctx.Message.ChannelID {
+		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, cbctx.SuccessEmoji+" Sent message to <#"+channelID+">")
 		if err != nil {
 			return err
 		}

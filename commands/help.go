@@ -1,34 +1,15 @@
-package main
+package commands
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
-// Ping command: replies with latency and message edit time
-func commandPing(ctx *cbctx.Ctx) (err error) {
-	heartbeat := ctx.Session.HeartbeatLatency().String()
-
-	// get current time
-	cmdStart := time.Now()
-
-	// send initial message
-	message, err := ctx.Send("Pong!\nHeartbeat: " + heartbeat)
-	if err != nil {
-		return fmt.Errorf("Ping: %w", err)
-	}
-
-	// get time difference, edit message
-	diff := time.Now().Sub(cmdStart).String()
-	_, err = ctx.Edit(message, message.Content+"\nMessage latency: "+diff)
-	return err
-}
-
 // Help shows the help pages
-func commandHelp(ctx *cbctx.Ctx) (err error) {
+func Help(ctx *cbctx.Ctx) (err error) {
 	if len(ctx.Args) == 0 {
 		embed := &discordgo.MessageEmbed{
 			Title:       "CoveBotn't help",
@@ -39,7 +20,7 @@ func commandHelp(ctx *cbctx.Ctx) (err error) {
 			},
 			Fields: []*discordgo.MessageEmbedField{
 				{Name: "Source code", Value: "CoveBotn't is licensed under the GNU AGPLv3. The source code can be found [here](https://github.com/Starshine113/covebotnt).", Inline: false},
-				{Name: "Invite", Value: "Invite the bot with [this](" + ctx.AdditionalParams[0].(botConfig).Bot.Invite + ") link.", Inline: false},
+				{Name: "Invite", Value: "Invite the bot with [this](" + ctx.AdditionalParams["config"].(structs.BotConfig).Bot.Invite + ") link.", Inline: false},
 				{Name: "Basic commands", Value: "`ping`: show the bot's latency\n`help`: show this help page", Inline: false},
 			},
 		}

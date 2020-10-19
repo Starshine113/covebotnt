@@ -3,6 +3,10 @@ codeberg.org/eviedelta/drc v0.0.0-20201014114604-c0facdfd1b01/go.mod h1:l2pJBwFR
 codeberg.org/eviedelta/trit v0.0.0-20200522120239-e627923758e3/go.mod h1:Z1UZceP3eRfsfiIV/v6Gbb/0cdthSScn0tzEeQh7IwQ=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/Starshine113/flagparser v0.0.0-20201019192311-88c346d9daab h1:8JUZK2L5rrhxvMr9fNFl0D0NeBVsL1LuW7dZpSxsO10=
+github.com/Starshine113/flagparser v0.0.0-20201019192311-88c346d9daab/go.mod h1:f6XMf3rb360o0P5Kdks2DHH+QfVMAy7sZDTyMqy7bDQ=
+github.com/Starshine113/flagparser v0.0.0-20201019200207-9c6d8be6bf04 h1:KupJglFRkw/kQ9lg2IeIR5AIuHOHlqSWT7Ci3hQ1qdc=
+github.com/Starshine113/flagparser v0.0.0-20201019200207-9c6d8be6bf04/go.mod h1:f6XMf3rb360o0P5Kdks2DHH+QfVMAy7sZDTyMqy7bDQ=
 github.com/andersfylling/disgord v0.18.0 h1:IUSLOHk7ll6UeZi64W313KuJjmUtBSe5I8f3CL1w5qk=
 github.com/andersfylling/disgord v0.18.0/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
 github.com/andersfylling/disgord v0.19.0 h1:JavRpnLmSAuAhflRGKhwXCKpzR+qVDt03FubR0m27mU=

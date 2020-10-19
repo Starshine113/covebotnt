@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/commands"
 )
 
 var allCommands string = `
@@ -18,6 +19,8 @@ All commands
 |-- modroles
 |-- echo [-channel <channel>] <message string>
 |-- prefix [prefix string]
+|-- steal <emoji url/emoji> [name string]
+|-- enlarge <emoji>
 |-- commands`
 
 const successEmoji, errorEmoji string = "✅", "❌"
@@ -30,10 +33,10 @@ func commandTree(ctx *cbctx.Ctx) {
 
 	switch ctx.Command {
 	case "ping":
-		err = commandPing(ctx)
+		err = commands.Ping(ctx)
 	case "help":
-		ctx.AdditionalParams = []interface{}{config}
-		err = commandHelp(ctx)
+		ctx.AdditionalParams = map[string]interface{}{"config": config}
+		err = commands.Help(ctx)
 	case "setstatus":
 		err = commandSetStatus(ctx)
 	case "starboard":
@@ -41,7 +44,7 @@ func commandTree(ctx *cbctx.Ctx) {
 	case "modroles":
 		err = commandModRoles(ctx.Args, ctx.Session, ctx.Message)
 	case "echo":
-		err = commandEcho(ctx.Args, ctx.Session, ctx.Message)
+		err = commandEcho(ctx)
 	case "prefix":
 		err = commandPrefix(ctx.Args, ctx.Session, ctx.Message)
 	case "commands":

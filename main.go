@@ -6,13 +6,14 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 )
 
 var (
-	config           botConfig
+	config           structs.BotConfig
 	globalSettings   map[string]guildSettings
 	channelBlacklist map[string][]string
 	db               *pgxpool.Pool

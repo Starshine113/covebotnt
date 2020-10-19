@@ -8,8 +8,12 @@ import (
 )
 
 const (
+	// SuccessEmoji is the emoji used to designate a successful action
 	SuccessEmoji = "✅"
-	ErrorEmoji   = "❌"
+	// ErrorEmoji is the emoji used for errors
+	ErrorEmoji = "❌"
+	// WarnEmoji is the emoji used to warn that a command failed
+	WarnEmoji = "⚠️"
 )
 
 // Ctx is the context for a command
@@ -22,7 +26,7 @@ type Ctx struct {
 	Author           *discordgo.User
 	BotUser          *discordgo.User
 	Database         *cbdb.Db
-	AdditionalParams []interface{}
+	AdditionalParams map[string]interface{}
 }
 
 // Context creates a new Ctx

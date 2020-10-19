@@ -3,14 +3,6 @@
 version: "3"
 
 services:
-  covebotnt:
-    build: .
-    environment:
-      - "CB_DB_URL=postgresql://postgres:postgres@db/postgres"
-    volumes:
-      - "./config.toml:/go/app/src/config.toml:ro"
-    restart: unless-stopped
-
   db:
     image: postgres:12-alpine
     volumes:
@@ -24,6 +16,14 @@ services:
               "-c", "shared_buffers=128MB"]
     environment:
       - "POSTGRES_PASSWORD=postgres"
+    restart: unless-stopped
+
+  covebotnt:
+    build: .
+    environment:
+      - "CB_DB_URL=postgresql://postgres:postgres@db/postgres"
+    volumes:
+      - "./config.toml:/go/app/src/config.toml:ro"
     restart: unless-stopped
 
 volumes:

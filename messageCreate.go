@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -30,8 +31,13 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// get the command(?) and the args
 		command := message[0]
 		args := []string{}
+		var err error
 		if len(message) > 1 {
 			args = message[1:]
+			args, err = combineQuotedItems(args)
+			if err != nil {
+				sugar.Errorf("Error parsing message %v: %v", m.ID, err)
+			}
 		}
 
 		// run commandTree
@@ -53,4 +59,30 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if match {
 		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current prefix is `%v`", prefix))
 	}
+}
+
+func combineQuotedItems(in []string) (out []string, err error) {
+	var matchedQuote bool
+	var beginQuote int
+	for i, item := range in {
+		if matchedQuote {
+			if strings.HasSuffix(item, "\"") {
+				item = strings.Join(in[beginQuote:i+1], " ")
+				item = strings.Trim(item, "\"")
+				matchedQuote = false
+				out = append(out, item)
+			}
+			if matchedQuote && i == len(in)-1 {
+				err = errors.New("unexpected end of input")
+			}
+			continue
+		}
+		if strings.HasPrefix(item, "\"") {
+			matchedQuote = true
+			beginQuote = i
+			continue
+		}
+		out = append(out, item)
+	}
+	return out, err
 }
