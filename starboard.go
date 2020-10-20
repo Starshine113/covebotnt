@@ -8,7 +8,7 @@ import (
 )
 
 func createOrEditMessage(s *discordgo.Session, message *discordgo.Message, guildID string, count int, emoji *discordgo.Emoji) (err error) {
-	embed, err := starboardEmbed(message, guildID)
+	embed, err := starboardEmbed(s, message, guildID)
 	if err != nil {
 		return err
 	}
@@ -49,10 +49,11 @@ func deleteStarboardMessage(s *discordgo.Session, starboardMessage, guildID stri
 	return err
 }
 
-func starboardEmbed(message *discordgo.Message, guildID string) (embed *discordgo.MessageEmbed, err error) {
+func starboardEmbed(s *discordgo.Session, message *discordgo.Message, guildID string) (embed *discordgo.MessageEmbed, err error) {
 	name := message.Author.Username
-	if message.Member != nil {
-		name = message.Member.Nick
+	member, err := s.GuildMember(guildID, message.Author.ID)
+	if err == nil && member.Nick != "" {
+		name = member.Nick
 	}
 	var attachmentLink string
 	if len(message.Attachments) > 0 {
@@ -72,7 +73,7 @@ func starboardEmbed(message *discordgo.Message, guildID string) (embed *discordg
 			Text: "ID: " + message.ID,
 		},
 		Fields: []*discordgo.MessageEmbedField{
-			{Name: "Source", Value: "[Jump!](https://discordapp.com/channels/" + guildID + "/" + message.ChannelID + "/" + message.ID + ")", Inline: false},
+			{Name: "Source", Value: "[Jump to message](https://discordapp.com/channels/" + guildID + "/" + message.ChannelID + "/" + message.ID + ")", Inline: false},
 		},
 		Timestamp: string(message.Timestamp),
 		Color:     0xede21e,
