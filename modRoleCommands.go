@@ -1,93 +1,90 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 
+	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandPrefix(args []string, s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
-	perms := checkModRole(s, m.Author.ID, m.GuildID, false)
-	if perms != nil {
-		commandError(perms, s, m)
-		return nil
-	}
-
-	// if there are no arguments, show the current prefix
-	if len(args) == 0 {
-		if globalSettings[m.GuildID].Prefix == "" {
-			_, err = s.ChannelMessageSend(m.ChannelID, "The current prefix is `"+config.Bot.Prefixes[0]+"` (default).")
-			if err != nil {
-				return err
-			}
-		} else {
-			_, err = s.ChannelMessageSend(m.ChannelID, "The current prefix is `"+globalSettings[m.GuildID].Prefix+"`.")
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	// if there's more than 1 argument, error
-	if len(args) > 1 {
-		commandError(&errorTooManyArguments{1, len(args)}, s, m)
-		return nil
-	}
-
-	// otherwise, set prefix to first argument
-	err = setGuildPrefix(args[0], m.GuildID)
-	if err != nil {
-		commandError(err, s, m)
-		return nil
-	}
-	_, err = s.ChannelMessageSend(m.ChannelID, "Changed prefix to `"+globalSettings[m.GuildID].Prefix+"`.")
+func commandModRoles(ctx *cbctx.Ctx) (err error) {
+	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func commandModRoles(args []string, s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
-	perms := checkAdmin(s, m.Author.ID, m.GuildID)
+	perms := checkAdmin(ctx.Session, ctx.Message.Author.ID, ctx.Message.GuildID)
 	if perms != nil {
-		commandError(perms, s, m)
+		commandError(perms, ctx.Session, ctx.Message)
 		return nil
 	}
 
-	if len(args) >= 1 {
-		switch args[0] {
+	if len(ctx.Args) >= 1 {
+		switch ctx.Args[0] {
 		case "add":
-			_, err := s.ChannelMessageSend(m.ChannelID, "add a role")
+			if len(ctx.Args) != 2 {
+				_, err = ctx.Send(cbctx.ErrorEmoji + "No/too many roles supplied.")
+				return err
+			}
+			err = addModRole(ctx.Message.GuildID, ctx.Args[1])
 			if err != nil {
-				commandError(err, s, m)
+				ctx.CommandError(err)
 				return nil
 			}
+			_, err = ctx.Send(fmt.Sprintf("Added role **%v** to the list of moderator roles.", ctx.Args[0]))
+			return err
 		case "remove", "delete":
-			_, err := s.ChannelMessageSend(m.ChannelID, "remove a role")
-			if err != nil {
-				commandError(err, s, m)
-				return nil
-			}
-		case "list", "get":
-			_, err := s.ChannelMessageSend(m.ChannelID, "list roles")
-			if err != nil {
-				commandError(err, s, m)
-				return nil
-			}
-		}
-	} else {
-		roleEmbed, err := getModRoles(s, m.GuildID)
-		if err != nil {
-			commandError(err, s, m)
-			return nil
-		}
-		_, err = s.ChannelMessageSendEmbed(m.ChannelID, roleEmbed)
-		if err != nil {
-			return fmt.Errorf("ModRoles: %v", err)
+			_, err = ctx.Send("remove a role")
+			return err
 		}
 	}
+	roleEmbed, err := getModRoles(ctx.Session, ctx.Message.GuildID)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	_, err = ctx.Send(roleEmbed)
+	if err != nil {
+		return fmt.Errorf("ModRoles: %v", err)
+	}
+	return nil
+}
+
+func addModRole(guildID, roleID string) (err error) {
+	roles := append(globalSettings[guildID].Moderation.ModRoles, guildID)
+
+	commandTag, err := db.Exec(context.Background(), "update guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
+	if err != nil {
+		return err
+	}
+	if commandTag.RowsAffected() != 1 {
+		return errors.New("no rows affected")
+	}
+	err = getSettingsForGuild(guildID)
+	if err != nil {
+		return err
+	}
+	sugar.Infof("Refreshed the settings for %v", guildID)
+	return nil
+}
+
+func addHelperRole(guildID, roleID string) (err error) {
+	roles := append(globalSettings[guildID].Moderation.HelperRoles, guildID)
+
+	commandTag, err := db.Exec(context.Background(), "update guild_settings helper_roles = $1 where guild_id = $2", roles, guildID)
+	if err != nil {
+		return err
+	}
+	if commandTag.RowsAffected() != 1 {
+		return errors.New("no rows affected")
+	}
+	err = getSettingsForGuild(guildID)
+	if err != nil {
+		return err
+	}
+	sugar.Infof("Refreshed the settings for %v", guildID)
 	return nil
 }
 

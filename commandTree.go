@@ -16,7 +16,7 @@ All commands
 |-- starboard
 |   |-- channel <channel>
 |   |-- limit <int>
-|-- modroles
+|-- modroles <add|remove>
 |-- echo [-channel <channel>] <message string>
 |-- prefix [prefix string]
 |-- steal <emoji url/emoji> [name string]
@@ -45,11 +45,11 @@ func commandTree(ctx *cbctx.Ctx) {
 	case "starboard":
 		err = commandStarboard(ctx)
 	case "modroles":
-		err = commandModRoles(ctx.Args, ctx.Session, ctx.Message)
+		err = commandModRoles(ctx)
 	case "echo":
 		err = commandEcho(ctx)
 	case "prefix":
-		err = commandPrefix(ctx.Args, ctx.Session, ctx.Message)
+		err = commandPrefix(ctx)
 	case "commands":
 		_, err = ctx.Send(fmt.Sprintf("```%v```", allCommands))
 	case "steal":

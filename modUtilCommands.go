@@ -9,6 +9,11 @@ import (
 )
 
 func commandEcho(ctx *cbctx.Ctx) (err error) {
+	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	if err != nil {
+		return err
+	}
+
 	perms := checkModRole(ctx.Session, ctx.Message.Author.ID, ctx.Message.GuildID, false)
 	if perms != nil {
 		ctx.CommandError(perms)
@@ -43,6 +48,11 @@ func commandEcho(ctx *cbctx.Ctx) (err error) {
 			return nil
 		}
 		channelID = channel.ID
+	}
+
+	err = ctx.Session.ChannelTyping(channelID)
+	if err != nil {
+		return err
 	}
 
 	message := strings.Join(ctx.Args, " ")

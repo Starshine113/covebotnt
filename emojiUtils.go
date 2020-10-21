@@ -13,6 +13,11 @@ import (
 )
 
 func commandSteal(ctx *cbctx.Ctx) (err error) {
+	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	if err != nil {
+		return err
+	}
+
 	// this command needs the mod role or administrator perms
 	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, false)
 	if perms != nil {
@@ -76,6 +81,11 @@ func commandSteal(ctx *cbctx.Ctx) (err error) {
 }
 
 func commandEnlarge(ctx *cbctx.Ctx) (err error) {
+	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	if err != nil {
+		return err
+	}
+
 	if len(ctx.Args) == 0 {
 		_, err = ctx.CommandError(&cbctx.ErrorNotEnoughArgs{1, 0})
 		return err

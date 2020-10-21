@@ -8,6 +8,11 @@ import (
 )
 
 func commandSetStatus(ctx *cbctx.Ctx) (err error) {
+	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	if err != nil {
+		return err
+	}
+
 	// this command needs bot owner permissions
 	perms := checkOwner(ctx.Author.ID)
 	if perms != nil {
