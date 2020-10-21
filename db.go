@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -69,6 +70,12 @@ func initDB() (*pgxpool.Pool, error) {
 		os.Exit(1)
 	}
 	sugar.Infof("Connected to database.")
+	// update DB if it's not updated
+	sugar.Infof("Target database version: %v", cbdb.DBVersion)
+	err = updateDB(db)
+	if err != nil {
+		sugar.Panicf("Error updating database: %v", err)
+	}
 	return db, nil
 }
 
@@ -88,5 +95,26 @@ func initDBIfNotInitialised(db *pgxpool.Pool) error {
 		return err
 	}
 	sugar.Infof("Successfully initialised the database.")
+	return nil
+}
+
+func updateDB(db *pgxpool.Pool) (err error) {
+	var dbVersion int
+	err = db.QueryRow(context.Background(), "select schema_version from info").Scan(&dbVersion)
+	if err != nil {
+		return err
+	}
+	initialDBVersion := dbVersion
+	for dbVersion < cbdb.DBVersion {
+		_, err = db.Exec(context.Background(), cbdb.DBVersions[dbVersion-1])
+		if err != nil {
+			return err
+		}
+		dbVersion++
+		sugar.Infof("Updated database to version %v", dbVersion)
+	}
+	if initialDBVersion < cbdb.DBVersion {
+		sugar.Infof("Successfully updated database to target version %v", cbdb.DBVersion)
+	}
 	return nil
 }

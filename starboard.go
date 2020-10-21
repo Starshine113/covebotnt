@@ -51,9 +51,14 @@ func deleteStarboardMessage(s *discordgo.Session, starboardMessage, guildID stri
 
 func starboardEmbed(s *discordgo.Session, message *discordgo.Message, guildID string) (embed *discordgo.MessageEmbed, err error) {
 	name := message.Author.Username
-	member, err := s.GuildMember(guildID, message.Author.ID)
-	if err == nil && member.Nick != "" {
-		name = member.Nick
+	if message.WebhookID == "" {
+		member, err := s.State.Member(guildID, message.Author.ID)
+		if err != nil {
+			member, err = s.GuildMember(guildID, message.Author.ID)
+		}
+		if err == nil && member.Nick != "" {
+			name = member.Nick
+		}
 	}
 	var attachmentLink string
 	if len(message.Attachments) > 0 {

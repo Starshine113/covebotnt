@@ -19,6 +19,7 @@ github.com/auttaja/fastparse v1.0.0 h1:LKz4H6j2M050n0BFGZV9i/6D4zHfbeawXw4yJaD2n
 github.com/auttaja/fastparse v1.0.0/go.mod h1:JJRkYBw609+6Aum/PWRrkQFEVDeLLop+zrD0Mo7jY3I=
 github.com/auttaja/gommand v1.11.1 h1:wn2cHtOPKRgITOgVa2o0yWZIaLoYkjwlMgbwf0TA/Xw=
 github.com/auttaja/gommand v1.11.1/go.mod h1:bO3SQxtESAqQyahfkKZRIMQgkRe55iAjJQ/yeExDqWo=
+github.com/burntsushi/toml v0.3.1 h1:XebFhzi1T+XmBZG9aKnQnA50YOydJUYK7g5SM40w+ik=
 github.com/burntsushi/toml v0.3.1/go.mod h1:tCq67G3LEDB9hykA6+KWl2FPEy0nPcvE8TTBhtOtdGs=
 github.com/bwmarrin/discordgo v0.22.0 h1:uBxY1HmlVCsW1IuaPjpCGT6A2DBwRn0nvOguQIxDdFM=
 github.com/bwmarrin/discordgo v0.22.0/go.mod h1:c1WtWUGN6nREDmzIpyTp/iD3VYt4Fpx+bVyfBG7JE+M=

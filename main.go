@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -17,6 +18,7 @@ var (
 	globalSettings   map[string]guildSettings
 	channelBlacklist map[string][]string
 	db               *pgxpool.Pool
+	pool             *cbdb.Db
 
 	messageIDMap, starboardMsgIDMap map[string]string
 )
@@ -32,6 +34,7 @@ func loadDB() (err error) {
 	if err != nil {
 		return err
 	}
+	pool = &cbdb.Db{Pool: db}
 	channelBlacklist = getBlacklistAll()
 	globalSettings, err = getSettingsAll()
 
@@ -104,6 +107,9 @@ func main() {
 	dg.AddHandler(starboardReactionRemove)
 	// add message delete handler for starboard
 	dg.AddHandler(starboardMessageDelete)
+
+	// add join handler
+	dg.AddHandler(onJoin)
 
 	// add ready handler
 	dg.AddHandler(onReady)

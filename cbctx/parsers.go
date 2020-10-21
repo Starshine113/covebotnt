@@ -86,7 +86,7 @@ func (ctx *Ctx) ParseRole(role string) (*discordgo.Role, error) {
 }
 
 // ParseMember takes a string and attempts to find a member that matches that string
-func (ctx *Ctx) ParseMember(member, guild string) (*discordgo.Member, error) {
+func (ctx *Ctx) ParseMember(member string) (*discordgo.Member, error) {
 	if isID(member) {
 		if strings.HasPrefix(member, "<") {
 			if !strings.HasPrefix(member, "<@") || !strings.HasSuffix(member, ">") {
@@ -97,7 +97,11 @@ func (ctx *Ctx) ParseMember(member, guild string) (*discordgo.Member, error) {
 				member = member[1:]
 			}
 		}
-		return ctx.Session.State.Member(ctx.Message.GuildID, member)
+		m, err := ctx.Session.State.Member(ctx.Message.GuildID, member)
+		if err == discordgo.ErrStateNotFound {
+			m, err = ctx.Session.GuildMember(ctx.Message.GuildID, member)
+		}
+		return m, err
 	}
 
 	member = strings.ToLower(member)

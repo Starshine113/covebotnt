@@ -21,7 +21,10 @@ All commands
 |-- prefix [prefix string]
 |-- steal <emoji url/emoji> [name string]
 |-- enlarge <emoji>
-|-- commands`
+|-- commands
+|-- setnote <user> <note>
+|-- notes <user>
+|-- delnote <id>`
 
 const successEmoji, errorEmoji string = "✅", "❌"
 
@@ -53,6 +56,12 @@ func commandTree(ctx *cbctx.Ctx) {
 		err = commandSteal(ctx)
 	case "enlarge":
 		err = commandEnlarge(ctx)
+	case "notes":
+		err = commandNotes(ctx)
+	case "setnote", "addnote":
+		err = commandSetNote(ctx)
+	case "delnote", "removenote":
+		err = commandDelNote(ctx)
 	}
 
 	if err != nil {
