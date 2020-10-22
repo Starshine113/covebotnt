@@ -24,7 +24,6 @@ func updateStatusLoop(s *discordgo.Session) {
 		if err != nil {
 			sugar.Errorf("Update status error: ", err)
 		}
-		sugar.Debugf("Automatically updated status")
 		time.Sleep(time.Minute)
 	}
 }
