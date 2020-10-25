@@ -43,7 +43,7 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 	joinedTime, _ := user.JoinedAt.Parse()
 	joinedTime = joinedTime.UTC()
 
-	highestRoleName, highestRoleColour, perms, err := getPerms(ctx.Session, ctx.Message.GuildID, user.User.ID)
+	_, highestRoleColour, perms, err := getPerms(ctx.Session, ctx.Message.GuildID, user.User.ID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
@@ -93,11 +93,6 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 		Description: fmt.Sprintf("User information for %v", user.Mention()),
 		Fields: []*discordgo.MessageEmbedField{
 			{
-				Name:   "Highest rank",
-				Value:  highestRoleName,
-				Inline: true,
-			},
-			{
 				Name:   "Created at",
 				Value:  fmt.Sprintf("%v\n(%v ago)", createdTime.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(createdTime))),
 				Inline: true,
@@ -114,7 +109,7 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 			},
 			{
 				Name:   "Permissions",
-				Value:  fmt.Sprintf("`%v`", permString),
+				Value:  fmt.Sprintf("```%v```", permString),
 				Inline: false,
 			},
 		},
@@ -169,7 +164,7 @@ func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName str
 			// if they have the role...
 			if u == r.ID {
 				perms |= r.Permissions
-				if r.Position < highestRolePos {
+				if r.Position > highestRolePos {
 					highestRolePos = r.Position
 					highestRoleName = r.Name
 				}
@@ -180,7 +175,7 @@ func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName str
 		for _, u := range member.Roles {
 			// if they have the role...
 			if u == r.ID {
-				if r.Position < highestRolePos && r.Color != 0 {
+				if r.Position > highestRolePos && r.Color != 0 {
 					highestRolePos = r.Position
 					highestRoleColour = r.Color
 				}
