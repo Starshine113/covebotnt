@@ -53,7 +53,7 @@ func commandModRoles(ctx *cbctx.Ctx) (err error) {
 }
 
 func addModRole(guildID, roleID string) (err error) {
-	roles := append(globalSettings[guildID].Moderation.ModRoles, guildID)
+	roles := append(globalSettings[guildID].Moderation.ModRoles, roleID)
 
 	commandTag, err := db.Exec(context.Background(), "update guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
@@ -71,7 +71,7 @@ func addModRole(guildID, roleID string) (err error) {
 }
 
 func addHelperRole(guildID, roleID string) (err error) {
-	roles := append(globalSettings[guildID].Moderation.HelperRoles, guildID)
+	roles := append(globalSettings[guildID].Moderation.HelperRoles, roleID)
 
 	commandTag, err := db.Exec(context.Background(), "update guild_settings helper_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
