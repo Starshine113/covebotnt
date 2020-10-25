@@ -142,7 +142,7 @@ func prettyDurationString(duration time.Duration) (out string) {
 	if hours != 0 {
 		out += fmt.Sprintf("%v hours, ", hours)
 	}
-	out += fmt.Sprintf("%v minutes ago", minutes)
+	out += fmt.Sprintf("%v minutes", minutes)
 
 	return
 }
@@ -169,7 +169,7 @@ func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName str
 			// if they have the role...
 			if u == r.ID {
 				perms |= r.Permissions
-				if r.Position > highestRolePos {
+				if r.Position < highestRolePos {
 					highestRolePos = r.Position
 					highestRoleName = r.Name
 				}
@@ -180,7 +180,7 @@ func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName str
 		for _, u := range member.Roles {
 			// if they have the role...
 			if u == r.ID {
-				if r.Position > highestRolePos && r.Color != 0 {
+				if r.Position < highestRolePos && r.Color != 0 {
 					highestRolePos = r.Position
 					highestRoleColour = r.Color
 				}
