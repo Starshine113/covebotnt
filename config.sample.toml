@@ -1,6 +1,7 @@
 [bot]
 bot_admins = ["0", "0", "0"]
 prefixes = ["?"]
+allowed_bots = ["204255221017214977"] # list of bots allowed to run commands
 # custom status
 [bot.custom_status]
 override = false # if set to false, status follows the default "<prefix>help | in <n> guilds"

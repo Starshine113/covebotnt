@@ -10,6 +10,7 @@ type BotConfig struct {
 		Prefixes     []string `toml:"prefixes"`
 		BotOwners    []string `toml:"bot_owners"`
 		Invite       string   `toml:"invite"`
+		AllowedBots  []string `toml:"allowed_bots"`
 		CustomStatus struct {
 			Override bool   `toml:"override"`
 			Status   string `toml:"status"`

@@ -16,7 +16,15 @@ import (
 func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// if message was sent by a bot return; not only to ignore bots, but also to make sure PluralKit users don't trigger commands twice.
 	if m.Author.Bot {
-		return
+		allowed := false
+		for _, bot := range config.Bot.AllowedBots {
+			if bot == m.Author.ID {
+				allowed = true
+			}
+		}
+		if allowed != true {
+			return
+		}
 	}
 
 	// get prefix for the guild

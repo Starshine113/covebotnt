@@ -55,5 +55,11 @@ func commandExport(ctx *cbctx.Ctx) (err error) {
 		Content: "Here you go!",
 		Files:   []*discordgo.File{&file},
 	})
+
+	err = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, ctx.Message.ID, cbctx.SuccessEmoji)
+	if err != nil {
+		return nil
+	}
+
 	return
 }
