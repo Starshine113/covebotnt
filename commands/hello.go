@@ -33,6 +33,8 @@ func Hello(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
+	time.Sleep(1 * time.Second)
+
 	resp, err := http.Get(fmt.Sprintf("https://api.pluralkit.me/v%v/msg/%v", pkAPIversion, ctx.Message.ID))
 	if err != nil {
 		ctx.CommandError(err)
