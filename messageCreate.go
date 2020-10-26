@@ -56,20 +56,27 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// if not, check if the message starts with a bot mention
-	match, _ := regexp.MatchString(fmt.Sprintf("^<@!?%v>", botUser.ID), m.Content)
-	if match {
-		hello, _ := regexp.MatchString("hello$", m.Content)
-		if hello {
-			ctx, err := cbctx.Context(prefix, "hello", []string{}, s, m, &cbdb.Db{Pool: db})
-			if err != nil {
-				sugar.Errorf("Error getting context: %v", err)
-				return
-			}
-			commandTree(ctx)
+	// if not, check if the message contains a bot mention, and ends with "hello"
+	match, _ := regexp.MatchString(fmt.Sprintf("<@!?%v>.*hello$", botUser.ID), m.Content)
+	match2, _ := regexp.MatchString(fmt.Sprintf("%vhello$", regexp.QuoteMeta(prefix)), m.Content)
+	if match || match2 {
+		ctx, err := cbctx.Context(prefix, "hello", []string{}, s, m, &cbdb.Db{Pool: db})
+		if err != nil {
+			sugar.Errorf("Error getting context: %v", err)
 			return
 		}
+		commandTree(ctx)
+		return
+	}
+
+	match, _ = regexp.MatchString(fmt.Sprintf("^<@!?%v>", botUser.ID), m.Content)
+	if match {
 		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current prefix is `%v`", prefix))
+		if err != nil {
+			sugar.Errorf("Error sending message: %v", err)
+			return
+		}
+		return
 	}
 }
 
