@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"math"
+	"sort"
 	"strings"
 	"time"
 
@@ -12,25 +13,27 @@ import (
 
 // UserInfo returns user info, formatted nicely
 func UserInfo(ctx *cbctx.Ctx) (err error) {
+	err = ctx.TriggerTyping()
+	if err != nil {
+		return err
+	}
+
 	user, err := ctx.ParseMember(ctx.Author.ID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
 	}
 	if len(ctx.Args) == 1 {
-		user, err = ctx.ParseMember(ctx.Args[1])
+		user, err = ctx.ParseMember(ctx.Args[0])
 		if err != nil {
 			ctx.CommandError(err)
 			return nil
 		}
 	}
-	var roleList []string
-	for _, role := range user.Roles {
-		roleList = append(roleList, fmt.Sprintf("<@&%v>", role))
-	}
-	roles := strings.Join(roleList, ", ")
-	if len(roles) >= 2000 {
-		roles = "Too many to list"
+
+	msg, err := ctx.Send("Working, please wait...")
+	if err != nil {
+		return err
 	}
 
 	createdTime, err := discordgo.SnowflakeTimestamp(user.User.ID)
@@ -43,7 +46,7 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 	joinedTime, _ := user.JoinedAt.Parse()
 	joinedTime = joinedTime.UTC()
 
-	_, highestRoleColour, perms, err := getPerms(ctx.Session, ctx.Message.GuildID, user.User.ID)
+	highestRoleName, highestRoleColour, perms, rls, err := getPerms(ctx.Session, ctx.Message.GuildID, user.User.ID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
@@ -71,10 +74,33 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 		permStrings = append(permStrings, "Manage Messages")
 	}
 
+	var roles string
+	for _, role := range rls {
+		roles += role.Mention() + ", "
+	}
+	roles = roles[:len(roles)-2]
+	if len(roles) >= 1000 {
+		roles = "Too many to list"
+	}
+
 	permString := strings.Join(permStrings, ", ")
 	if len(permString) >= 950 {
 		permString = permString[:950]
 		permString += "..."
+	}
+
+	guildCreated, err := discordgo.SnowflakeTimestamp(ctx.Message.GuildID)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	guildCreated = guildCreated.UTC()
+	timeSinceCreation := joinedTime.Sub(guildCreated)
+	days, _ := math.Modf(timeSinceCreation.Hours() / 24)
+
+	nickname := user.User.Username
+	if user.Nick != "" {
+		nickname = user.Nick
 	}
 
 	embed := &discordgo.MessageEmbed{
@@ -93,13 +119,33 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 		Description: fmt.Sprintf("User information for %v", user.Mention()),
 		Fields: []*discordgo.MessageEmbedField{
 			{
+				Name:   "Avatar",
+				Value:  fmt.Sprintf("[Link](%v)", user.User.AvatarURL("1024")),
+				Inline: true,
+			},
+			{
+				Name:   "Highest rank",
+				Value:  highestRoleName,
+				Inline: true,
+			},
+			{
+				Name:   "Username",
+				Value:  user.User.String(),
+				Inline: true,
+			},
+			{
+				Name:   "Nickname",
+				Value:  nickname,
+				Inline: true,
+			},
+			{
 				Name:   "Created at",
 				Value:  fmt.Sprintf("%v\n(%v ago)", createdTime.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(createdTime))),
 				Inline: true,
 			},
 			{
 				Name:   "Joined at",
-				Value:  fmt.Sprintf("%v\n(%v ago)", joinedTime.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(joinedTime))),
+				Value:  fmt.Sprintf("%v\n(%v ago)\n%v days after the server was created", joinedTime.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(joinedTime)), days),
 				Inline: true,
 			},
 			{
@@ -115,7 +161,11 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 		},
 	}
 
-	_, err = ctx.Send(embed)
+	content := ""
+	_, err = ctx.Edit(msg, &discordgo.MessageEdit{
+		Content: &content,
+		Embed:   embed,
+	})
 	return
 }
 
@@ -142,45 +192,37 @@ func prettyDurationString(duration time.Duration) (out string) {
 	return
 }
 
-func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName string, highestRoleColour, perms int, err error) {
-	// get the guild
-	guild, err := s.Guild(guildID)
-	if err != nil {
-		return
-	}
-
+func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName string, highestRoleColour, perms int, roles sortRoleByPos, err error) {
 	// get the member
 	member, err := s.GuildMember(guildID, userID)
 	if err != nil {
 		return
 	}
 
-	var highestRolePos int
-
-	// iterate through all guild roles
-	for _, r := range guild.Roles {
-		// iterate through member roles
-		for _, u := range member.Roles {
-			// if they have the role...
-			if u == r.ID {
-				perms |= r.Permissions
-				if r.Position > highestRolePos {
-					highestRolePos = r.Position
-					highestRoleName = r.Name
-				}
-			}
+	rls := make(sortRoleByPos, len(member.Roles))
+	for i, x := range member.Roles {
+		r, err := s.State.Role(guildID, x)
+		if err != nil {
+			return highestRoleName, highestRoleColour, perms, rls, err
 		}
-		highestRolePos = 0
-		// do it again
-		for _, u := range member.Roles {
-			// if they have the role...
-			if u == r.ID {
-				if r.Position > highestRolePos && r.Color != 0 {
-					highestRolePos = r.Position
-					highestRoleColour = r.Color
-				}
-			}
+		rls[i] = r
+	}
+	sort.Sort(rls)
+
+	for _, role := range rls {
+		perms |= role.Permissions
+	}
+	highestRoleName = rls[0].Name
+	for _, role := range rls {
+		if role.Color != 0 {
+			return highestRoleName, role.Color, perms, rls, nil
 		}
 	}
 	return
 }
+
+type sortRoleByPos []*discordgo.Role
+
+func (a sortRoleByPos) Len() int           { return len(a) }
+func (a sortRoleByPos) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortRoleByPos) Less(i, j int) bool { return a[i].Position > a[j].Position }

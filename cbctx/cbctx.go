@@ -18,6 +18,7 @@ const (
 
 // Ctx is the context for a command
 type Ctx struct {
+	GuildPrefix      string
 	Command          string
 	Args             []string
 	Session          *discordgo.Session
@@ -30,8 +31,8 @@ type Ctx struct {
 }
 
 // Context creates a new Ctx
-func Context(command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate, db *cbdb.Db) (ctx *Ctx, err error) {
-	ctx = &Ctx{Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db}
+func Context(guildPrefix string, command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate, db *cbdb.Db) (ctx *Ctx, err error) {
+	ctx = &Ctx{GuildPrefix: guildPrefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db}
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {
@@ -79,4 +80,10 @@ func (ctx *Ctx) Edit(message *discordgo.Message, arg interface{}) (msg *discordg
 		err = errors.New("don't know what to do with that type")
 	}
 	return msg, err
+}
+
+// TriggerTyping triggers typing in the channel the command was invoked in.
+func (ctx *Ctx) TriggerTyping() (err error) {
+	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	return
 }

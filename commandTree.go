@@ -64,6 +64,8 @@ func commandTree(ctx *cbctx.Ctx) {
 		err = commandDelNote(ctx)
 	case "i", "info", "userinfo", "profile":
 		err = commands.UserInfo(ctx)
+	case "serverinfo", "guildinfo":
+		err = commands.GuildInfo(ctx)
 	}
 
 	if err != nil {

@@ -41,7 +41,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		// run commandTree
-		ctx, err := cbctx.Context(command, args, s, m, &cbdb.Db{db})
+		ctx, err := cbctx.Context(prefix, command, args, s, m, &cbdb.Db{db})
 		if err != nil {
 			sugar.Errorf("Error getting context: %v", err)
 			return
