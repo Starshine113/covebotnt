@@ -66,6 +66,8 @@ func commandTree(ctx *cbctx.Ctx) {
 		err = commands.UserInfo(ctx)
 	case "serverinfo", "guildinfo":
 		err = commands.GuildInfo(ctx)
+	case "hello", "hi":
+		err = commands.Hello(ctx)
 	}
 
 	if err != nil {

@@ -73,6 +73,9 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 	if perms&discordgo.PermissionManageMessages == discordgo.PermissionManageMessages {
 		permStrings = append(permStrings, "Manage Messages")
 	}
+	if len(permStrings) == 0 {
+		permStrings = []string{"No special permissions"}
+	}
 
 	var roles string
 	for _, role := range rls {

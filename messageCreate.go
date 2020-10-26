@@ -8,6 +8,7 @@ import (
 
 	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/etc"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -21,12 +22,17 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// get prefix for the guild
 	prefix := getPrefix(m.GuildID)
 
+	botUser, err := s.User("@me")
+	if err != nil {
+		sugar.Errorf("Error fetching bot user: %v", err)
+	}
+
 	// check if the message might be a command
-	if strings.HasPrefix(strings.ToLower(m.Content), strings.ToLower(prefix)) {
+	if etc.HasAnyPrefix(strings.ToLower(m.Content), strings.ToLower(prefix)) {
 		// split command(?) into a slice
 		message := strings.Split(m.Content, " ")
 		// remove prefix from command(?)
-		message[0] = strings.TrimPrefix(strings.ToLower(message[0]), strings.ToLower(prefix))
+		message[0] = etc.TrimPrefixesSpace(strings.ToLower(message[0]), strings.ToLower(prefix))
 
 		// get the command(?) and the args
 		command := message[0]
@@ -41,7 +47,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		// run commandTree
-		ctx, err := cbctx.Context(prefix, command, args, s, m, &cbdb.Db{db})
+		ctx, err := cbctx.Context(prefix, command, args, s, m, &cbdb.Db{Pool: db})
 		if err != nil {
 			sugar.Errorf("Error getting context: %v", err)
 			return
@@ -50,13 +56,19 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// if not, check if the message *started* with a bot mention
-	botUser, err := s.User("@me")
-	if err != nil {
-		sugar.Errorf("Error fetching bot user: %v", err)
-	}
+	// if not, check if the message starts with a bot mention
 	match, _ := regexp.MatchString(fmt.Sprintf("^<@!?%v>", botUser.ID), m.Content)
 	if match {
+		hello, _ := regexp.MatchString("hello$", m.Content)
+		if hello {
+			ctx, err := cbctx.Context(prefix, "hello", []string{}, s, m, &cbdb.Db{Pool: db})
+			if err != nil {
+				sugar.Errorf("Error getting context: %v", err)
+				return
+			}
+			commandTree(ctx)
+			return
+		}
 		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current prefix is `%v`", prefix))
 	}
 }
