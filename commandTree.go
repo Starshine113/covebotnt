@@ -68,6 +68,8 @@ func commandTree(ctx *cbctx.Ctx) {
 		err = commands.GuildInfo(ctx)
 	case "hello", "hi":
 		err = commands.Hello(ctx)
+	case "export":
+		err = commandExport(ctx)
 	}
 
 	if err != nil {
