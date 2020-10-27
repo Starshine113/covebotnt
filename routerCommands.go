@@ -67,14 +67,6 @@ func addUserCommands() {
 		Permissions: crouter.PermLevelNone,
 		Command:     levels.CommandLevel,
 	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "leaderboard",
-		Description: "Show the server's leaderboard",
-		Usage:       "leaderboard [page]",
-		Permissions: crouter.PermLevelNone,
-		Command:     levels.CommandLeaderboard,
-	})
 }
 
 func addHelperCommands() {
@@ -93,6 +85,14 @@ func addHelperCommands() {
 		Usage:       "setnote <user> <note>",
 		Permissions: crouter.PermLevelHelper,
 		Command:     commandSetNote,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "leaderboard",
+		Description: "Show the server's leaderboard",
+		Usage:       "leaderboard [page]",
+		Permissions: crouter.PermLevelHelper,
+		Command:     levels.CommandLeaderboard,
 	})
 }
 
