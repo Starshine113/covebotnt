@@ -9,3 +9,4 @@ status = "testing"
 [auth]
 token = 'secretDiscordString'
 database_url = 'postgresql://starbot:starbot@localhost/starbot'
+bolt_path = "bolt.db" # path to the Bolt databse, relative to current directory
