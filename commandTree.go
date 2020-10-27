@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"github.com/Starshine113/covebotnt/levels"
+
 	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/commands"
 )
@@ -38,7 +40,7 @@ func commandTree(ctx *cbctx.Ctx) {
 	case "ping":
 		err = commands.Ping(ctx)
 	case "help":
-		ctx.AdditionalParams = map[string]interface{}{"config": config}
+		ctx.AdditionalParams = map[string]interface{}{"config": config, "botVer": botVersion, "gitVer": string(gitOut)}
 		err = commands.Help(ctx)
 	case "setstatus":
 		err = commandSetStatus(ctx)
@@ -62,7 +64,7 @@ func commandTree(ctx *cbctx.Ctx) {
 		err = commandSetNote(ctx)
 	case "delnote", "removenote":
 		err = commandDelNote(ctx)
-	case "i", "info", "userinfo", "profile":
+	case "i", "info", "userinfo", "profile", "whois":
 		err = commands.UserInfo(ctx)
 	case "serverinfo", "guildinfo":
 		err = commands.GuildInfo(ctx)
@@ -70,6 +72,12 @@ func commandTree(ctx *cbctx.Ctx) {
 		err = commands.Hello(ctx)
 	case "export":
 		err = commandExport(ctx)
+	case "archive":
+		err = commandArchive(ctx)
+	case "level", "lvl":
+		err = levels.CommandLevel(ctx)
+	case "leaderboard":
+		err = levels.CommandLeaderboard(ctx)
 	}
 
 	if err != nil {

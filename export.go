@@ -63,3 +63,39 @@ func commandExport(ctx *cbctx.Ctx) (err error) {
 
 	return
 }
+
+type archive struct {
+	GuildID   string               `json:"guild_id"`
+	ChannelID string               `json:"channel_id"`
+	Timestamp time.Time            `json:"timestamp"`
+	Messages  []*discordgo.Message `json:"messages"`
+}
+
+func commandArchive(ctx *cbctx.Ctx) (err error) {
+	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	if err != nil {
+		return err
+	}
+
+	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, true)
+	if perms != nil {
+		commandError(perms, ctx.Session, ctx.Message)
+		return nil
+	}
+
+	messages, err := ctx.Session.ChannelMessages(ctx.Message.ChannelID, 100, "", "", "")
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+
+	exportB, _ := json.MarshalIndent(archive{
+		GuildID:   ctx.Message.GuildID,
+		ChannelID: ctx.Message.ChannelID,
+		Timestamp: time.Now(),
+		Messages:  messages,
+	}, "", "    ")
+
+	fmt.Println(string(exportB))
+	return nil
+}

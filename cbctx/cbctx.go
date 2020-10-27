@@ -27,12 +27,13 @@ type Ctx struct {
 	Author           *discordgo.User
 	BotUser          *discordgo.User
 	Database         *cbdb.Db
+	BoltDb           *cbdb.BoltDb
 	AdditionalParams map[string]interface{}
 }
 
 // Context creates a new Ctx
-func Context(guildPrefix string, command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate, db *cbdb.Db) (ctx *Ctx, err error) {
-	ctx = &Ctx{GuildPrefix: guildPrefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db}
+func Context(guildPrefix string, command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate, db *cbdb.Db, boltDb *cbdb.BoltDb) (ctx *Ctx, err error) {
+	ctx = &Ctx{GuildPrefix: guildPrefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb}
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {

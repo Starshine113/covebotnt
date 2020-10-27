@@ -1,3 +1,5 @@
 .vscode
 config.toml
 covebotnt
+*.code-workspace
+*.db

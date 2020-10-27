@@ -9,6 +9,7 @@ import (
 	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/etc"
+	"github.com/Starshine113/covebotnt/levels"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -26,6 +27,8 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 	}
+
+	levels.MessageCreate(s, m, levelCache, boltDb)
 
 	// get prefix for the guild
 	prefix := getPrefix(m.GuildID)
@@ -55,7 +58,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		// run commandTree
-		ctx, err := cbctx.Context(prefix, command, args, s, m, &cbdb.Db{Pool: db})
+		ctx, err := cbctx.Context(prefix, command, args, s, m, &cbdb.Db{Pool: db}, boltDb)
 		if err != nil {
 			sugar.Errorf("Error getting context: %v", err)
 			return
@@ -68,7 +71,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	match, _ := regexp.MatchString(fmt.Sprintf("<@!?%v>.*hello$", botUser.ID), m.Content)
 	match2, _ := regexp.MatchString(fmt.Sprintf("%vhello$", regexp.QuoteMeta(prefix)), m.Content)
 	if match || match2 {
-		ctx, err := cbctx.Context(prefix, "hello", []string{}, s, m, &cbdb.Db{Pool: db})
+		ctx, err := cbctx.Context(prefix, "hello", []string{}, s, m, &cbdb.Db{Pool: db}, boltDb)
 		if err != nil {
 			sugar.Errorf("Error getting context: %v", err)
 			return

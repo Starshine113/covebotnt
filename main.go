@@ -3,15 +3,21 @@ package main
 import (
 	"flag"
 	"os"
+	"os/exec"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jackc/pgx/v4/pgxpool"
+	bolt "go.etcd.io/bbolt"
 	"go.uber.org/zap"
 )
+
+const botVersion = "0.5"
 
 var (
 	config           structs.BotConfig
@@ -19,6 +25,9 @@ var (
 	channelBlacklist map[string][]string
 	db               *pgxpool.Pool
 	pool             *cbdb.Db
+	boltDb           *cbdb.BoltDb
+	levelCache       *ttlcache.Cache
+	gitOut           []byte
 
 	messageIDMap, starboardMsgIDMap map[string]string
 )
@@ -55,6 +64,16 @@ func initialise(token, databaseURL string) (err error) {
 		return err
 	}
 
+	// open Bolt db
+	bolt, err := bolt.Open(config.Auth.BoltPath, 0666, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		return err
+	}
+	boltDb, err = cbdb.BoltInit(bolt)
+	if err != nil {
+		return err
+	}
+
 	if token != "" {
 		config.Auth.Token = token
 	}
@@ -77,6 +96,11 @@ func initialise(token, databaseURL string) (err error) {
 		return err
 	}
 
+	// create a cache for XP gain
+	levelCache = ttlcache.NewCache()
+	levelCache.SkipTTLExtensionOnHit(true)
+	levelCache.SetTTL(8 * time.Second)
+
 	// get starboard messages
 	messageIDMap, starboardMsgIDMap, err = getStarboardMessages()
 	if err != nil {
@@ -95,6 +119,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	git := exec.Command("git", "rev-parse", "--short", "HEAD")
+	gitOut, _ = git.Output()
 
 	// add message create handler for commands
 	dg.AddHandler(messageCreateCommand)
@@ -129,6 +156,8 @@ func main() {
 		sugar.Infof("Closed database connection.")
 
 		logger.Sync()
+		boltDb.Bolt.Close()
+		levelCache.Close()
 	}()
 
 	sugar.Infof("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")

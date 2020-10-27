@@ -5,6 +5,7 @@ type BotConfig struct {
 	Auth struct {
 		Token       string `toml:"token"`
 		DatabaseURL string `toml:"database_url"`
+		BoltPath    string `toml:"bolt_path"`
 	} `toml:"auth"`
 	Bot struct {
 		Prefixes     []string `toml:"prefixes"`
