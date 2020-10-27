@@ -2,8 +2,10 @@ package cbctx
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/etc"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -32,59 +34,64 @@ type Ctx struct {
 }
 
 // Context creates a new Ctx
-func Context(guildPrefix string, command string, args []string, s *discordgo.Session, m *discordgo.MessageCreate, db *cbdb.Db, boltDb *cbdb.BoltDb) (ctx *Ctx, err error) {
-	ctx = &Ctx{GuildPrefix: guildPrefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb}
+func Context(
+	prefix, messageContent string,
+	s *discordgo.Session,
+	m *discordgo.MessageCreate,
+	db *cbdb.Db,
+	boltDb *cbdb.BoltDb) (ctx *Ctx, err error) {
+
+	botUser, err := s.User("@me")
+	if err != nil {
+		return
+	}
+
+	messageContent = etc.TrimPrefixesSpace(messageContent, prefix, "<@"+botUser.ID+">", "<@!"+botUser.ID+">")
+	message := strings.Split(messageContent, " ")
+	command := message[0]
+	args := []string{}
+	if len(message) > 1 {
+		args = message[1:]
+		args, err = combineQuotedItems(args)
+		if err != nil {
+			return
+		}
+	}
+
+	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb}
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {
 		return ctx, err
 	}
 	ctx.Channel = channel
-
-	botUser, err := s.User("@me")
-	if err != nil {
-		return ctx, err
-	}
 	ctx.BotUser = botUser
 
 	return ctx, nil
 }
 
-// Send a message to the context channel
-func (ctx *Ctx) Send(arg interface{}) (message *discordgo.Message, err error) {
-	switch arg.(type) {
-	case string:
-		message, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, arg.(string))
-	case *discordgo.MessageEmbed:
-		message, err = ctx.Session.ChannelMessageSendEmbed(ctx.Message.ChannelID, arg.(*discordgo.MessageEmbed))
-	case *discordgo.MessageSend:
-		message, err = ctx.Session.ChannelMessageSendComplex(ctx.Message.ChannelID, arg.(*discordgo.MessageSend))
-	default:
-		err = errors.New("don't know what to do with that type")
+func combineQuotedItems(in []string) (out []string, err error) {
+	var matchedQuote bool
+	var beginQuote int
+	for i, item := range in {
+		if matchedQuote {
+			if strings.HasSuffix(item, "\"") {
+				item = strings.Join(in[beginQuote:i+1], " ")
+				item = strings.Trim(item, "\"")
+				matchedQuote = false
+				out = append(out, item)
+			}
+			if matchedQuote && i == len(in)-1 {
+				err = errors.New("unexpected end of input")
+			}
+			continue
+		}
+		if strings.HasPrefix(item, "\"") {
+			matchedQuote = true
+			beginQuote = i
+			continue
+		}
+		out = append(out, item)
 	}
-	return message, err
-}
-
-// Edit a message
-func (ctx *Ctx) Edit(message *discordgo.Message, arg interface{}) (msg *discordgo.Message, err error) {
-	switch arg.(type) {
-	case string:
-		msg, err = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, arg.(string))
-	case *discordgo.MessageEmbed:
-		msg, err = ctx.Session.ChannelMessageEditEmbed(message.ChannelID, message.ID, arg.(*discordgo.MessageEmbed))
-	case *discordgo.MessageEdit:
-		edit := arg.(*discordgo.MessageEdit)
-		edit.ID = message.ID
-		edit.Channel = message.ChannelID
-		msg, err = ctx.Session.ChannelMessageEditComplex(edit)
-	default:
-		err = errors.New("don't know what to do with that type")
-	}
-	return msg, err
-}
-
-// TriggerTyping triggers typing in the channel the command was invoked in.
-func (ctx *Ctx) TriggerTyping() (err error) {
-	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
-	return
+	return out, err
 }

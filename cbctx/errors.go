@@ -47,3 +47,10 @@ type ErrorTooManyArguments struct {
 func (e *ErrorTooManyArguments) Error() string {
 	return fmt.Sprintf("This command requires `%v` arguments, but you supplied `%v` arguments.", e.MaxArgs, e.SuppliedArgs)
 }
+
+// ErrorNotACommand is called when the given string isn't a command.
+type ErrorNotACommand struct{}
+
+func (e *ErrorNotACommand) Error() string {
+	return fmt.Sprintf("the provided input wasn't a command")
+}

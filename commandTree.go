@@ -1,32 +1,11 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/Starshine113/covebotnt/levels"
 
 	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/commands"
 )
-
-var allCommands string = `
-All commands
-============
-|-- ping
-|-- help
-|-- setstatus <-replace|-append> <status string|-clear>
-|-- starboard
-|   |-- channel <channel>
-|   |-- limit <int>
-|-- modroles <add|remove>
-|-- echo [-channel <channel>] <message string>
-|-- prefix [prefix string]
-|-- steal <emoji url/emoji> [name string]
-|-- enlarge <emoji>
-|-- commands
-|-- setnote <user> <note>
-|-- notes <user>
-|-- delnote <id>`
 
 const successEmoji, errorEmoji string = "✅", "❌"
 
@@ -36,48 +15,46 @@ func commandTree(ctx *cbctx.Ctx) {
 		sugar.Errorf("Error getting context: %v", err)
 	}
 
-	switch ctx.Command {
-	case "ping":
+	if ctx.Match("ping") {
 		err = commands.Ping(ctx)
-	case "help":
+	} else if ctx.Match("help") {
 		ctx.AdditionalParams = map[string]interface{}{"config": config, "botVer": botVersion, "gitVer": string(gitOut)}
 		err = commands.Help(ctx)
-	case "setstatus":
+	} else if ctx.Match("setstatus") {
 		err = commandSetStatus(ctx)
-	case "starboard":
+	} else if ctx.Match("starboard", "sb") {
 		err = commandStarboard(ctx)
-	case "modroles":
-		err = commandModRoles(ctx)
-	case "echo":
+	} else if ctx.Match("echo", "say") {
 		err = commandEcho(ctx)
-	case "prefix":
+	} else if ctx.Match("steal", "addemote", "addemoji") {
 		err = commandPrefix(ctx)
-	case "commands":
-		_, err = ctx.Send(fmt.Sprintf("```%v```", allCommands))
-	case "steal":
-		err = commandSteal(ctx)
-	case "enlarge":
+	} else if ctx.Match("enlarge", "emote", "emoji") {
 		err = commandEnlarge(ctx)
-	case "notes":
+	} else if ctx.Match("notes") {
 		err = commandNotes(ctx)
-	case "setnote", "addnote":
+	} else if ctx.Match("setnote", "addnote") {
 		err = commandSetNote(ctx)
-	case "delnote", "removenote":
+	} else if ctx.Match("delnote", "removenote") {
 		err = commandDelNote(ctx)
-	case "i", "info", "userinfo", "profile", "whois":
+	} else if ctx.Match("i", "info", "userinfo", "profile", "whois") {
 		err = commands.UserInfo(ctx)
-	case "serverinfo", "guildinfo":
+	} else if ctx.Match("si", "serverinfo", "guildinfo") {
 		err = commands.GuildInfo(ctx)
-	case "hello", "hi":
+	} else if ctx.Match("hello", "hi", "henlo", "heya", "heyo") {
 		err = commands.Hello(ctx)
-	case "export":
+	} else if ctx.Match("export") {
 		err = commandExport(ctx)
-	case "archive":
-		err = commandArchive(ctx)
-	case "level", "lvl":
+	} else if ctx.Match("archive") {
+		return
+		//err = commandArchive(ctx)
+	} else if ctx.Match("level", "lvl", "rank") {
 		err = levels.CommandLevel(ctx)
-	case "leaderboard":
+	} else if ctx.Match("leaderboard") {
 		err = levels.CommandLeaderboard(ctx)
+	} else if ctx.MatchRegex("^mod[-_]?roles?$") {
+		err = commandModRoles(ctx)
+	} else if ctx.MatchRegex("^helper[-_]?roles?$") {
+		err = commandHelperRoles(ctx)
 	}
 
 	if err != nil {
