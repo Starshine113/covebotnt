@@ -13,13 +13,6 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	// this command needs bot owner permissions
-	perms := checkOwner(ctx.Author.ID)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
-	}
-
 	// this command needs at least 2 arguments
 	if len(ctx.Args) < 2 {
 		commandError(&errorNotEnoughArgs{2, len(ctx.Args)}, ctx.Session, ctx.Message)

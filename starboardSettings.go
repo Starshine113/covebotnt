@@ -14,13 +14,6 @@ func commandStarboard(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	// this command needs the mod role or administrator perms
-	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, false)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
-	}
-
 	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
 	if err != nil {
 		commandError(err, ctx.Session, ctx.Message)

@@ -48,7 +48,7 @@ func checkAdmin(s *discordgo.Session, memberID, guildID string) error {
 			}
 		}
 	}
-	return &errorNoPermissions{"Administrator or ModRole"}
+	return &errorNoPermissions{"Administrator"}
 }
 
 func checkModRole(s *discordgo.Session, memberID, guildID string, checkHelperRoles bool) error {

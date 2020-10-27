@@ -18,13 +18,6 @@ func commandSteal(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	// this command needs the mod role or administrator perms
-	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, false)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
-	}
-
 	if len(ctx.Args) == 0 {
 		commandError(&errorNotEnoughArgs{1, 0}, ctx.Session, ctx.Message)
 		return nil

@@ -15,12 +15,6 @@ func commandModRoles(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	perms := checkAdmin(ctx.Session, ctx.Message.Author.ID, ctx.Message.GuildID)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
-	}
-
 	if len(ctx.Args) >= 1 {
 		switch ctx.Args[0] {
 		case "add":
@@ -75,12 +69,6 @@ func commandHelperRoles(ctx *cbctx.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
-	}
-
-	perms := checkAdmin(ctx.Session, ctx.Message.Author.ID, ctx.Message.GuildID)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
 	}
 
 	if len(ctx.Args) >= 1 {

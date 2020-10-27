@@ -24,12 +24,6 @@ func commandExport(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, true)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
-	}
-
 	notes, err := ctx.Database.AllNotes(ctx.Message.GuildID)
 	if err != nil {
 		ctx.CommandError(err)
@@ -75,12 +69,6 @@ func commandArchive(ctx *cbctx.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
-	}
-
-	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, true)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
 	}
 
 	messages, err := ctx.Session.ChannelMessages(ctx.Message.ChannelID, 100, "", "", "")

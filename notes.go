@@ -17,12 +17,6 @@ func commandNotes(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, true)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
-	}
-
 	if len(ctx.Args) != 1 {
 		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
 			RequiredArgs: "user: id/mention",
@@ -81,12 +75,6 @@ func commandDelNote(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, false)
-	if perms != nil {
-		ctx.CommandError(perms)
-		return nil
-	}
-
 	if len(ctx.Args) != 1 {
 		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
 			RequiredArgs: "id: int",
@@ -115,12 +103,6 @@ func commandSetNote(ctx *cbctx.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
-	}
-
-	perms := checkModRole(ctx.Session, ctx.Author.ID, ctx.Message.GuildID, true)
-	if perms != nil {
-		commandError(perms, ctx.Session, ctx.Message)
-		return nil
 	}
 
 	if len(ctx.Args) <= 1 {

@@ -14,12 +14,6 @@ func commandEcho(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	perms := checkModRole(ctx.Session, ctx.Message.Author.ID, ctx.Message.GuildID, false)
-	if perms != nil {
-		ctx.CommandError(perms)
-		return nil
-	}
-
 	if len(ctx.Args) == 0 {
 		ctx.CommandError(&errorNotEnoughArgs{1, len(ctx.Args)})
 		return nil

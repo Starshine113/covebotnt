@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+
+	"github.com/Starshine113/covebotnt/structs"
 )
 
 type guildSettings struct {
@@ -66,18 +68,18 @@ func getSettingsForGuild(guildID string) (err error) {
 		&gatekeeperRoles, &memberRoles, &gatekeeperChannel,
 		&gatekeeperMessage, &welcomeChannel, &welcomeMessage)
 
-	globalSettings[guildID] = guildSettings{
+	globalSettings[guildID] = structs.GuildSettings{
 		Prefix:     prefix,
-		Starboard:  starboardSettings{starboardChannel, reactLimit, emoji, senderCanReact, reactToStarboard},
-		Moderation: modSettings{modRoles, helperRoles, modLog, muteRole, pauseRole},
-		Gatekeeper: gatekeeperSettings{gatekeeperRoles, memberRoles, gatekeeperChannel,
+		Starboard:  structs.StarboardSettings{starboardChannel, reactLimit, emoji, senderCanReact, reactToStarboard},
+		Moderation: structs.ModSettings{modRoles, helperRoles, modLog, muteRole, pauseRole},
+		Gatekeeper: structs.GatekeeperSettings{gatekeeperRoles, memberRoles, gatekeeperChannel,
 			gatekeeperMessage, welcomeChannel, welcomeMessage}}
 
 	return nil
 }
 
-func getSettingsAll() (map[string]guildSettings, error) {
-	settings := make(map[string]guildSettings)
+func getSettingsAll() (map[string]structs.GuildSettings, error) {
+	settings := make(map[string]structs.GuildSettings)
 	// get starboard settings
 	rows, err := db.Query(context.Background(), "select * from guild_settings")
 	if err != nil {
@@ -107,11 +109,11 @@ func getSettingsAll() (map[string]guildSettings, error) {
 			&gatekeeperRoles, &memberRoles, &gatekeeperChannel,
 			&gatekeeperMessage, &welcomeChannel, &welcomeMessage,
 		)
-		settings[guildID] = guildSettings{
+		settings[guildID] = structs.GuildSettings{
 			Prefix:     prefix,
-			Starboard:  starboardSettings{starboardChannel, reactLimit, emoji, senderCanReact, reactToStarboard},
-			Moderation: modSettings{modRoles, helperRoles, modLog, muteRole, pauseRole},
-			Gatekeeper: gatekeeperSettings{gatekeeperRoles, memberRoles, gatekeeperChannel,
+			Starboard:  structs.StarboardSettings{starboardChannel, reactLimit, emoji, senderCanReact, reactToStarboard},
+			Moderation: structs.ModSettings{modRoles, helperRoles, modLog, muteRole, pauseRole},
+			Gatekeeper: structs.GatekeeperSettings{gatekeeperRoles, memberRoles, gatekeeperChannel,
 				gatekeeperMessage, welcomeChannel, welcomeMessage}}
 	}
 

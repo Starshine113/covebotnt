@@ -10,6 +10,7 @@ import (
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -21,13 +22,14 @@ const botVersion = "0.5"
 
 var (
 	config           structs.BotConfig
-	globalSettings   map[string]guildSettings
+	globalSettings   map[string]structs.GuildSettings
 	channelBlacklist map[string][]string
 	db               *pgxpool.Pool
 	pool             *cbdb.Db
 	boltDb           *cbdb.BoltDb
 	levelCache       *ttlcache.Cache
 	gitOut           []byte
+	router           *crouter.Router
 
 	messageIDMap, starboardMsgIDMap map[string]string
 )
@@ -122,6 +124,14 @@ func main() {
 
 	git := exec.Command("git", "rev-parse", "--short", "HEAD")
 	gitOut, _ = git.Output()
+
+	router = crouter.NewRouter()
+	// add commands
+	addUserCommands()
+	addHelperCommands()
+	addModCommands()
+	addAdminCommands()
+	addOwnerCommands()
 
 	// add message create handler for commands
 	dg.AddHandler(messageCreateCommand)
