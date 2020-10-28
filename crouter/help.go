@@ -101,7 +101,7 @@ func cmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 			},
 			{
 				Name:   "Permission level",
-				Value:  cmd.Permissions.String(),
+				Value:  "`" + cmd.Permissions.String() + "`",
 				Inline: false,
 			},
 		},
