@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/Starshine113/covebotnt/commands"
 	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/covebotnt/levels"
 	"github.com/Starshine113/covebotnt/notes"
 )
 
@@ -59,15 +58,6 @@ func addUserCommands() {
 		Permissions: crouter.PermLevelNone,
 		Command:     commands.Hello,
 	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "lvl",
-		Aliases:     []string{"level", "rank"},
-		Description: "Show your (or another user's) level",
-		Usage:       "lvl [user]",
-		Permissions: crouter.PermLevelNone,
-		Command:     levels.CommandLevel,
-	})
 }
 
 func addHelperCommands() {
@@ -86,14 +76,6 @@ func addHelperCommands() {
 		Usage:       "setnote <user> <note>",
 		Permissions: crouter.PermLevelHelper,
 		Command:     notes.CommandSetNote,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "leaderboard",
-		Description: "Show the server's leaderboard",
-		Usage:       "leaderboard [page]",
-		Permissions: crouter.PermLevelHelper,
-		Command:     levels.CommandLeaderboard,
 	})
 }
 

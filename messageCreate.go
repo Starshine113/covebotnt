@@ -8,7 +8,6 @@ import (
 
 	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/levels"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -26,8 +25,6 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 	}
-
-	levels.MessageCreate(s, m, levelCache, boltDb)
 
 	// get prefix for the guild
 	prefix := getPrefix(m.GuildID)
