@@ -7,7 +7,7 @@ import (
 )
 
 func commandKill(ctx *cbctx.Ctx) (err error) {
-	_, err = ctx.Send("<:blobsob:766276787814531093> Shutting down...")
+	_, err = ctx.Send("Restarting the bot, please wait...")
 	if err != nil {
 		return err
 	}

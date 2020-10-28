@@ -77,25 +77,11 @@ func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err
 
 func cmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 	var aliases string
-	var permLevel string
 
 	if cmd.Aliases == nil {
 		aliases = "N/A"
 	} else {
 		aliases = strings.Join(cmd.Aliases, ", ")
-	}
-
-	switch cmd.Permissions {
-	case PermLevelNone:
-		permLevel = "None"
-	case PermLevelHelper:
-		permLevel = "Helper"
-	case PermLevelMod:
-		permLevel = "Moderator"
-	case PermLevelAdmin:
-		permLevel = "Admin"
-	case PermLevelOwner:
-		permLevel = "Owner"
 	}
 
 	embed := &discordgo.MessageEmbed{
@@ -115,7 +101,7 @@ func cmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 			},
 			{
 				Name:   "Permission level",
-				Value:  permLevel,
+				Value:  cmd.Permissions.String(),
 				Inline: false,
 			},
 		},

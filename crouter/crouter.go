@@ -1,6 +1,10 @@
 package crouter
 
-import "github.com/Starshine113/covebotnt/cbctx"
+import (
+	"fmt"
+
+	"github.com/Starshine113/covebotnt/cbctx"
+)
 
 // PermLevel is the permission level of the command
 type PermLevel int
@@ -17,6 +21,23 @@ const (
 	// PermLevelOwner requires the person to be the bot owner
 	PermLevelOwner
 )
+
+// String gives the string representation of a permission level
+func (p PermLevel) String() string {
+	switch p {
+	case PermLevelNone:
+		return "[0] NONE"
+	case PermLevelHelper:
+		return "[1] HELPER"
+	case PermLevelMod:
+		return "[2] MODERATOR"
+	case PermLevelAdmin:
+		return "[3] ADMIN"
+	case PermLevelOwner:
+		return "[4] OWNER"
+	}
+	return fmt.Sprintf("PermLevel(%d)", p)
+}
 
 // Router is the command router
 type Router struct {
