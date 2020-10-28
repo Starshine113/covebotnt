@@ -12,6 +12,8 @@ import (
 
 // About shows some info about the bot
 func About(ctx *cbctx.Ctx) (err error) {
+	startTime := ctx.AdditionalParams["startTime"].(time.Time).UTC()
+
 	embed := &discordgo.MessageEmbed{
 		Title:       "About CoveBotn't",
 		Description: "CoveBotn't is a general purpose bot, with ~~a gatekeeper~~, moderation commands, and starboard functionality.",
@@ -50,6 +52,11 @@ func About(ctx *cbctx.Ctx) (err error) {
 			{
 				Name:   "Author",
 				Value:  "<@694563574386786314>",
+				Inline: false,
+			},
+			{
+				Name:   "Uptime",
+				Value:  fmt.Sprintf("Up %v\n(Since %v)", prettyDurationString(time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
 				Inline: false,
 			},
 		},

@@ -6,7 +6,7 @@ import (
 
 func commandTree(ctx *cbctx.Ctx) {
 	guildSettings := globalSettings[ctx.Message.GuildID]
-	ctx.AdditionalParams = map[string]interface{}{"config": config, "botVer": botVersion, "gitVer": string(gitOut)}
+	ctx.AdditionalParams = map[string]interface{}{"config": config, "botVer": botVersion, "gitVer": string(gitOut), "startTime": startTime}
 	err := router.Execute(ctx, &guildSettings, config.Bot.BotOwners)
 
 	if err != nil {

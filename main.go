@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const botVersion = "0.5"
+const botVersion = "0.7"
 
 var (
 	config           structs.BotConfig
@@ -30,6 +30,7 @@ var (
 	levelCache       *ttlcache.Cache
 	gitOut           []byte
 	router           *crouter.Router
+	startTime        time.Time
 
 	messageIDMap, starboardMsgIDMap map[string]string
 )
@@ -152,6 +153,9 @@ func main() {
 	dg.AddHandler(onReady)
 
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsGuildMembers)
+
+	// Get start time for uptime command
+	startTime = time.Now()
 
 	err = dg.Open()
 	if err != nil {
