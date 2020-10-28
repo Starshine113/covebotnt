@@ -56,7 +56,7 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 		permStrings = append(permStrings, "Administrator")
 	}
 	if perms&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
-		permStrings = append(permStrings, "Manage Guild")
+		permStrings = append(permStrings, "Manage Server")
 	}
 	if perms&discordgo.PermissionManageChannels == discordgo.PermissionManageChannels {
 		permStrings = append(permStrings, "Manage Channels")
@@ -67,8 +67,26 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 	if perms&discordgo.PermissionBanMembers == discordgo.PermissionBanMembers {
 		permStrings = append(permStrings, "Ban Members")
 	}
+	if perms&discordgo.PermissionKickMembers == discordgo.PermissionKickMembers {
+		permStrings = append(permStrings, "Kick Members")
+	}
+	if perms&discordgo.PermissionViewAuditLogs == discordgo.PermissionViewAuditLogs {
+		permStrings = append(permStrings, "View Audit Log")
+	}
 	if perms&discordgo.PermissionMentionEveryone == discordgo.PermissionMentionEveryone {
 		permStrings = append(permStrings, "Mention @everyone")
+	}
+	if perms&discordgo.PermissionManageNicknames == discordgo.PermissionManageNicknames {
+		permStrings = append(permStrings, "Manage Nicknames")
+	}
+	if perms&discordgo.PermissionManageEmojis == discordgo.PermissionManageEmojis {
+		permStrings = append(permStrings, "Manage Emojis")
+	}
+	if perms&discordgo.PermissionVoiceMoveMembers == discordgo.PermissionVoiceMoveMembers {
+		permStrings = append(permStrings, "Voice Move Members")
+	}
+	if perms&discordgo.PermissionVoiceMuteMembers == discordgo.PermissionVoiceMuteMembers {
+		permStrings = append(permStrings, "Voice Mute Members")
 	}
 	if perms&discordgo.PermissionManageMessages == discordgo.PermissionManageMessages {
 		permStrings = append(permStrings, "Manage Messages")
