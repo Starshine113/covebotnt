@@ -16,7 +16,7 @@ func commandStarboard(ctx *cbctx.Ctx) (err error) {
 
 	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
 	if err != nil {
-		commandError(err, ctx.Session, ctx.Message)
+		ctx.CommandError(err)
 		return nil
 	}
 
@@ -30,12 +30,12 @@ func commandStarboard(ctx *cbctx.Ctx) (err error) {
 		if ctx.Args[0] == "channel" {
 			channel, err := ctx.ParseChannel(ctx.Args[1])
 			if err != nil {
-				commandError(err, ctx.Session, ctx.Message)
+				ctx.CommandError(err)
 				return nil
 			}
 			err = setStarboardChannel(channel.ID, ctx.Message.GuildID)
 			if err != nil {
-				commandError(err, ctx.Session, ctx.Message)
+				ctx.CommandError(err)
 				return nil
 			}
 			_, err = ctx.Send(&discordgo.MessageEmbed{
@@ -48,12 +48,12 @@ func commandStarboard(ctx *cbctx.Ctx) (err error) {
 		} else if ctx.Args[0] == "limit" {
 			limit, err := strconv.ParseInt(ctx.Args[1], 10, 0)
 			if err != nil {
-				commandError(err, ctx.Session, ctx.Message)
+				ctx.CommandError(err)
 				return nil
 			}
 			err = setStarboardLimit(int(limit), ctx.Message.GuildID)
 			if err != nil {
-				commandError(err, ctx.Session, ctx.Message)
+				ctx.CommandError(err)
 				return nil
 			}
 			_, err = ctx.Send(&discordgo.MessageEmbed{

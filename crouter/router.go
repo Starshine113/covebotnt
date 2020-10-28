@@ -15,6 +15,24 @@ func (r *Router) AddCommand(cmd *Command) {
 	r.Commands = append(r.Commands, cmd)
 }
 
+// CreateCommand creates a command and adds it to the router
+func (r *Router) CreateCommand(names []string, description, usage string, perms PermLevel, command func(ctx *cbctx.Ctx) error) {
+	name := names[0]
+	var aliases []string
+	if len(names) >= 1 {
+		aliases = names[1:]
+	}
+	cmd := &Command{
+		Name:        name,
+		Aliases:     aliases,
+		Description: description,
+		Usage:       usage,
+		Permissions: perms,
+		Command:     command,
+	}
+	r.Commands = append(r.Commands, cmd)
+}
+
 // Execute actually executes the router
 func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
 	if ctx.Match("help") {

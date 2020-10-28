@@ -39,6 +39,11 @@ func (ctx *Ctx) Edit(message *discordgo.Message, arg interface{}) (msg *discordg
 	return msg, err
 }
 
+// React reacts to the triggering message
+func (ctx *Ctx) React(emoji string) (err error) {
+	return ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, ctx.Message.ID, emoji)
+}
+
 // TriggerTyping triggers typing in the channel the command was invoked in.
 func (ctx *Ctx) TriggerTyping() (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)

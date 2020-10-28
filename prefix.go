@@ -8,15 +8,9 @@ import (
 )
 
 func commandPrefix(ctx *cbctx.Ctx) (err error) {
-	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	err = ctx.TriggerTyping()
 	if err != nil {
 		return err
-	}
-
-	perms := checkModRole(ctx.Session, ctx.Message.Author.ID, ctx.Message.GuildID, false)
-	if perms != nil {
-		ctx.CommandError(perms)
-		return nil
 	}
 
 	// if there are no arguments, show the current prefix

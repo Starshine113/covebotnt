@@ -4,6 +4,7 @@ import (
 	"github.com/Starshine113/covebotnt/commands"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/levels"
+	"github.com/Starshine113/covebotnt/notes"
 )
 
 func addUserCommands() {
@@ -21,7 +22,7 @@ func addUserCommands() {
 		Description: "Enlarges a custom emoji",
 		Usage:       "enlarge <emoji>",
 		Permissions: crouter.PermLevelNone,
-		Command:     commandEnlarge,
+		Command:     commands.Enlarge,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -75,7 +76,7 @@ func addHelperCommands() {
 		Description: "Shows a user's notes",
 		Usage:       "notes <user>",
 		Permissions: crouter.PermLevelHelper,
-		Command:     commandNotes,
+		Command:     notes.CommandNotes,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -84,7 +85,7 @@ func addHelperCommands() {
 		Description: "Set a note for a user",
 		Usage:       "setnote <user> <note>",
 		Permissions: crouter.PermLevelHelper,
-		Command:     commandSetNote,
+		Command:     notes.CommandSetNote,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -103,7 +104,7 @@ func addModCommands() {
 		Description: "Remove a note by ID",
 		Usage:       "delnote <id>",
 		Permissions: crouter.PermLevelMod,
-		Command:     commandDelNote,
+		Command:     notes.CommandDelNote,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -112,7 +113,7 @@ func addModCommands() {
 		Description: "Make the bot say something",
 		Usage:       "echo [-ch <channel>] <message>",
 		Permissions: crouter.PermLevelMod,
-		Command:     commandEcho,
+		Command:     commands.Echo,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -121,7 +122,7 @@ func addModCommands() {
 		Description: "Steal an emote by URL + name, or usage in message (with Nitro)",
 		Usage:       "steal <emoji: url/emoji> [name]",
 		Permissions: crouter.PermLevelMod,
-		Command:     commandSteal,
+		Command:     commands.Steal,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -144,8 +145,16 @@ func addAdminCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "prefix",
+		Description: "Show this server's prefix or change it",
+		Usage:       "prefix [new prefix]",
+		Permissions: crouter.PermLevelAdmin,
+		Command:     commandPrefix,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "modroles",
-		Aliases:     []string{"mod-roles", "mod_roles", "mod-role", "mod_role", "modrole"},
+		Aliases:     []string{"mod-roles", "modrole"},
 		Description: "List/modify this server's mod roles",
 		Usage:       "modroles [add|remove <role>]",
 		Permissions: crouter.PermLevelAdmin,
@@ -154,7 +163,7 @@ func addAdminCommands() {
 
 	router.AddCommand(&crouter.Command{
 		Name:        "helperroles",
-		Aliases:     []string{"help-roles", "helper_roles", "helper-role", "helper_role", "helperrole"},
+		Aliases:     []string{"helper-roles", "helper-role", "helperrole"},
 		Description: "List/modify this server's helper roles",
 		Usage:       "helperroles [add|remove <role>]",
 		Permissions: crouter.PermLevelAdmin,
@@ -169,5 +178,13 @@ func addOwnerCommands() {
 		Usage:       "setstatus <-replace/-append> [<status>|-clear]",
 		Permissions: crouter.PermLevelOwner,
 		Command:     commandSetStatus,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "kill",
+		Description: "Stop the bot immediately",
+		Usage:       "kill",
+		Permissions: crouter.PermLevelOwner,
+		Command:     commandKill,
 	})
 }

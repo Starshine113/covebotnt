@@ -15,7 +15,7 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 
 	// this command needs at least 2 arguments
 	if len(ctx.Args) < 2 {
-		commandError(&errorNotEnoughArgs{2, len(ctx.Args)}, ctx.Session, ctx.Message)
+		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{2, len(ctx.Args)})
 		return nil
 	}
 
@@ -25,7 +25,7 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 	} else if ctx.Args[0] == "-append" {
 		config.Bot.CustomStatus.Override = false
 	} else {
-		commandError(&errorMissingRequiredArgs{"<-replace/-append> [-clear] <status string>", "<-replace/-append>"}, ctx.Session, ctx.Message)
+		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{"<-replace/-append> [-clear] <status string>", "<-replace/-append>"})
 		return nil
 	}
 
@@ -47,7 +47,7 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 	}
 	err = dg.UpdateStatus(0, newStatus)
 	if err != nil {
-		commandError(err, ctx.Session, ctx.Message)
+		ctx.CommandError(err)
 		return err
 	}
 	_, err = ctx.Send("Set status to `" + newStatus + "`")

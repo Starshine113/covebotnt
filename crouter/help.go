@@ -13,18 +13,14 @@ import (
 // Help is the help command
 func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err error) {
 	if len(ctx.Args) == 0 {
-		var perms error
-		var embedDesc string
-		var level int
+		level := 0
 
-		if perms = checkAdmin(ctx); perms == nil {
+		if err = checkAdmin(ctx); err == nil {
 			level = 3
-		} else if perms = checkModPerm(ctx, guildSettings); perms == nil {
+		} else if err = checkModPerm(ctx, guildSettings); err == nil {
 			level = 2
-		} else if perms = checkHelperPerm(ctx, guildSettings); perms == nil {
+		} else if err = checkHelperPerm(ctx, guildSettings); err == nil {
 			level = 1
-		} else {
-			level = 0
 		}
 
 		var adminCmdString, modCmdString, helperCmdString, userCmdString string
@@ -41,14 +37,14 @@ func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err
 			}
 		}
 
-		if level == 3 {
-			embedDesc = adminCmdString + modCmdString + helperCmdString + userCmdString
+		embedDesc := userCmdString
+		if level == 1 {
+			embedDesc += helperCmdString
 		} else if level == 2 {
-			embedDesc = modCmdString + helperCmdString + userCmdString
-		} else if level == 1 {
-			embedDesc = helperCmdString + userCmdString
-		} else {
-			embedDesc = userCmdString
+			embedDesc += modCmdString
+		}
+		if level == 3 {
+			embedDesc += adminCmdString
 		}
 
 		_, err = ctx.Send(&discordgo.MessageEmbed{
@@ -73,6 +69,8 @@ func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err
 			}
 		}
 	}
+
+	_, err = ctx.Send(fmt.Sprintf("%v Invalid command provided:\n> `%v` is not a known command or alias.", cbctx.ErrorEmoji, ctx.Args[0]))
 
 	return
 }
@@ -101,7 +99,7 @@ func cmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 	}
 
 	embed := &discordgo.MessageEmbed{
-		Title:       fmt.Sprintf("`%v`", cmd.Name),
+		Title:       fmt.Sprintf("```%v```", strings.ToUpper(cmd.Name)),
 		Description: cmd.Description,
 		Color:       0x21a1a8,
 		Fields: []*discordgo.MessageEmbedField{

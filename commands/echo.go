@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"strings"
@@ -8,14 +8,15 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandEcho(ctx *cbctx.Ctx) (err error) {
-	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+// Echo says whatever the user inputs through the bot
+func Echo(ctx *cbctx.Ctx) (err error) {
+	err = ctx.TriggerTyping()
 	if err != nil {
 		return err
 	}
 
 	if len(ctx.Args) == 0 {
-		ctx.CommandError(&errorNotEnoughArgs{1, len(ctx.Args)})
+		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: len(ctx.Args)})
 		return nil
 	}
 
@@ -60,7 +61,7 @@ func commandEcho(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	err = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, ctx.Message.ID, cbctx.SuccessEmoji)
+	err = ctx.React(cbctx.SuccessEmoji)
 	if err != nil {
 		return nil
 	}
