@@ -24,7 +24,7 @@ func commandUpdate(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	update := exec.Command("go", "build")
+	update := exec.Command("/usr/local/go/bin/go", "build")
 	updateOutput, err := update.Output()
 	if err != nil {
 		ctx.CommandError(err)
