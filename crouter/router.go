@@ -7,7 +7,23 @@ import (
 
 // NewRouter creates a Router object
 func NewRouter() *Router {
-	return &Router{}
+	router := &Router{}
+
+	router.AddCommand(&Command{
+		Name:        "help",
+		Aliases:     []string{"usage"},
+		Description: "Show info about how to use the bot",
+		Usage:       "help [command]",
+		Permissions: PermLevelNone,
+		Command:     router.dummy,
+	})
+
+	return router
+}
+
+// dummy is used when a command isn't handled with the normal process
+func (r *Router) dummy(ctx *cbctx.Ctx) error {
+	return nil
 }
 
 // AddCommand adds a command to the router
