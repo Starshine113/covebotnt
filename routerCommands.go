@@ -181,10 +181,19 @@ func addOwnerCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
-		Name:        "kill",
-		Description: "Stop the bot immediately",
-		Usage:       "kill",
+		Name:        "restart",
+		Aliases:     []string{"kill"},
+		Description: "Stop the bot immediately (restarts with `sytemd`)",
+		Usage:       "restart",
 		Permissions: crouter.PermLevelOwner,
 		Command:     commandKill,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "update",
+		Description: "Update the bot in place",
+		Usage:       "update",
+		Permissions: crouter.PermLevelOwner,
+		Command:     commandUpdate,
 	})
 }
