@@ -231,6 +231,10 @@ func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName str
 	sort.Sort(rls)
 
 	for _, role := range rls {
+		if perms&discordgo.PermissionAdministrator == discordgo.PermissionAdministrator {
+			perms |= discordgo.PermissionAll
+			break
+		}
 		perms |= role.Permissions
 	}
 	highestRoleName = rls[0].Name
