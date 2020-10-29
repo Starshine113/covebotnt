@@ -51,7 +51,7 @@ func About(ctx *cbctx.Ctx) (err error) {
 			},
 			{
 				Name:   "Author",
-				Value:  "<@694563574386786314>",
+				Value:  "<@694563574386786314> / Starshine ☀✨#0001",
 				Inline: false,
 			},
 			{
