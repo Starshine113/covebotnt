@@ -11,6 +11,7 @@ require (
 	github.com/andersfylling/disgord v0.19.1
 	github.com/bwmarrin/discordgo v0.22.0
 	github.com/jackc/pgx/v4 v4.9.0
+	github.com/pelletier/go-toml v1.8.1
 	go.etcd.io/bbolt v1.3.5
 	go.uber.org/zap v1.10.0
 )

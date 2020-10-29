@@ -1,9 +1,11 @@
 package main
 
 import (
+	"io/ioutil"
 	"strings"
 
 	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/pelletier/go-toml"
 )
 
 func commandSetStatus(ctx *cbctx.Ctx) (err error) {
@@ -64,5 +66,17 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 	sugar.Infof("Updated status to \"%v\"", config.Bot.CustomStatus.Status)
+
+	b, err := toml.Marshal(config)
+	if err != nil {
+		sugar.Errorf("Error marshaling toml config: %v", err)
+		return
+	}
+	err = ioutil.WriteFile("config.toml", b, 0644)
+	if err != nil {
+		sugar.Errorf("Error writing config: %v", err)
+		return
+	}
+
 	return nil
 }
