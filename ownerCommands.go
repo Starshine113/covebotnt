@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/Starshine113/covebotnt/cbctx"
@@ -13,48 +12,57 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	// this command needs at least 2 arguments
-	if len(ctx.Args) < 2 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{2, len(ctx.Args)})
+	// this command needs at least 1 arguments
+	if len(ctx.Args) < 1 {
+		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{1, len(ctx.Args)})
 		return nil
 	}
 
-	// check the first arg -- boolean between -replace and -append
-	if ctx.Args[0] == "-replace" {
-		config.Bot.CustomStatus.Override = true
-	} else if ctx.Args[0] == "-append" {
-		config.Bot.CustomStatus.Override = false
-	} else {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{"<-replace/-append> [-clear] <status string>", "<-replace/-append>"})
+	// check the first arg
+	switch ctx.Args[0] {
+	case "listening", "listening to":
+		config.Bot.CustomStatus.Type = "listening"
+	case "playing":
+		config.Bot.CustomStatus.Type = "playing"
+	default:
+		fallthrough
+	case "clear":
+		config.Bot.CustomStatus.Status = ""
+		config.Bot.CustomStatus.Type = ""
+	}
+
+	if config.Bot.CustomStatus.Type == "" {
+		err = dg.UpdateStatus(0, "")
+		if err != nil {
+			ctx.CommandError(err)
+			return err
+		}
+		return nil
+	}
+
+	if len(ctx.Args) < 2 {
+		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+			NumRequiredArgs: 2,
+			SuppliedArgs:    len(ctx.Args),
+		})
 		return nil
 	}
 
 	// set custom status to the specified string
 	config.Bot.CustomStatus.Status = strings.Join(ctx.Args[1:], " ")
 
-	// check second argument -- if it's `-clear` the custom status is cleared
-	if ctx.Args[1] == "-clear" {
-		config.Bot.CustomStatus.Status = ""
-	}
-
-	// set the status
-	newStatus := config.Bot.Prefixes[0] + "help | in " + fmt.Sprint(len(ctx.Session.State.Guilds)) + " guilds"
-	if config.Bot.CustomStatus.Status != "" {
-		newStatus += " | " + config.Bot.CustomStatus.Status
-	}
-	if config.Bot.CustomStatus.Override {
-		newStatus = config.Bot.CustomStatus.Status
-	}
-	err = dg.UpdateStatus(0, newStatus)
+	err = updateStatus(ctx.Session)
 	if err != nil {
 		ctx.CommandError(err)
-		return err
+		sugar.Errorf("Error setting status: %v", err)
+		return nil
 	}
-	_, err = ctx.Send("Set status to `" + newStatus + "`")
+
+	_, err = ctx.Send("Set status to `" + config.Bot.CustomStatus.Status + "`")
 	if err != nil {
 		sugar.Errorf("Error when sending message: ", err)
 		return err
 	}
-	sugar.Infof("Updated status to \"%v\"", newStatus)
+	sugar.Infof("Updated status to \"%v\"", config.Bot.CustomStatus.Status)
 	return nil
 }

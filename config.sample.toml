@@ -1,11 +1,11 @@
 [bot]
 bot_admins = ["0", "0", "0"]
-prefixes = ["?"]
+prefixes = ["c;"]
 allowed_bots = ["204255221017214977"] # list of bots allowed to run commands
 # custom status
 [bot.custom_status]
-override = false # if set to false, status follows the default "<prefix>help | in <n> guilds"
-status = "testing"
+type = "listening" # <blank>, "listening", "playing", or "watching"
+status = "c;help"
 [auth]
 token = 'secretDiscordString'
 database_url = 'postgresql://starbot:starbot@localhost/starbot'

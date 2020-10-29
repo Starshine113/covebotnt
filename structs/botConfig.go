@@ -13,8 +13,8 @@ type BotConfig struct {
 		Invite       string   `toml:"invite"`
 		AllowedBots  []string `toml:"allowed_bots"`
 		CustomStatus struct {
-			Override bool   `toml:"override"`
-			Status   string `toml:"status"`
+			Type   string `toml:"type"`
+			Status string `toml:"status"`
 		} `toml:"custom_status"`
 	} `toml:"bot"`
 }
