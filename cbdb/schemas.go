@@ -14,5 +14,5 @@ var DBVersions []string = []string{
 		created 	timestamp	not null default (current_timestamp at time zone 'utc')
 	);
 	
-	update info set schema_version = 2;`,
+	update public.info set schema_version = 2;`,
 }

@@ -36,7 +36,7 @@ type gatekeeperSettings struct {
 }
 
 func initSettingsForGuild(guildID string) (err error) {
-	_, err = db.Exec(context.Background(), "insert into guild_settings (guild_id) values ($1)", guildID)
+	_, err = db.Exec(context.Background(), "insert into public.guild_settings (guild_id) values ($1)", guildID)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func getSettingsForGuild(guildID string) (err error) {
 		gatekeeperMessage, welcomeMessage string
 	)
 
-	row := db.QueryRow(context.Background(), "select * from guild_settings where guild_id=$1", guildID)
+	row := db.QueryRow(context.Background(), "select * from public.guild_settings where guild_id=$1", guildID)
 
 	row.Scan(&guildID, &prefix, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
 		&modRoles, &helperRoles, &modLog, &muteRole, &pauseRole,
@@ -81,7 +81,7 @@ func getSettingsForGuild(guildID string) (err error) {
 func getSettingsAll() (map[string]structs.GuildSettings, error) {
 	settings := make(map[string]structs.GuildSettings)
 	// get starboard settings
-	rows, err := db.Query(context.Background(), "select * from guild_settings")
+	rows, err := db.Query(context.Background(), "select * from public.guild_settings")
 	if err != nil {
 		return settings, err
 	}

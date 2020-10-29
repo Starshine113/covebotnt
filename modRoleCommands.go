@@ -124,7 +124,7 @@ func commandHelperRoles(ctx *cbctx.Ctx) (err error) {
 func addModRole(guildID, roleID string) (err error) {
 	roles := append(globalSettings[guildID].Moderation.ModRoles, roleID)
 
-	commandTag, err := db.Exec(context.Background(), "update guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func delModRole(guildID, roleID string) (err error) {
 		}
 	}
 
-	commandTag, err := db.Exec(context.Background(), "update guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func delModRole(guildID, roleID string) (err error) {
 func addHelperRole(guildID, roleID string) (err error) {
 	roles := append(globalSettings[guildID].Moderation.HelperRoles, roleID)
 
-	commandTag, err := db.Exec(context.Background(), "update guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}
@@ -194,7 +194,7 @@ func delHelperRole(guildID, roleID string) (err error) {
 		}
 	}
 
-	commandTag, err := db.Exec(context.Background(), "update guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}

@@ -100,7 +100,7 @@ func initDBIfNotInitialised(db *pgxpool.Pool) error {
 
 func updateDB(db *pgxpool.Pool) (err error) {
 	var dbVersion int
-	err = db.QueryRow(context.Background(), "select schema_version from info").Scan(&dbVersion)
+	err = db.QueryRow(context.Background(), "select schema_version from public.info").Scan(&dbVersion)
 	if err != nil {
 		return err
 	}

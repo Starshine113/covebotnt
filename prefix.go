@@ -51,7 +51,7 @@ func commandPrefix(ctx *cbctx.Ctx) (err error) {
 
 func setGuildPrefix(prefix, guildID string) error {
 	sugar.Infof("Changing prefix for %v", guildID)
-	commandTag, err := db.Exec(context.Background(), "update guild_settings set prefix = $1 where guild_id = $2", prefix, guildID)
+	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set prefix = $1 where guild_id = $2", prefix, guildID)
 	if err != nil {
 		return err
 	}

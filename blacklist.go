@@ -8,7 +8,7 @@ import (
 func getBlacklistAll() (channelBlacklist map[string][]string) {
 	var guilds []string
 
-	guildRows, err := db.Query(context.Background(), "select distinct server_id from starboard_blacklisted_channels")
+	guildRows, err := db.Query(context.Background(), "select distinct server_id from public.starboard_blacklisted_channels")
 	if err != nil {
 		panic(err)
 	}
@@ -23,7 +23,7 @@ func getBlacklistAll() (channelBlacklist map[string][]string) {
 	for _, guild := range guilds {
 		var channels []string
 
-		channelRows, err := db.Query(context.Background(), "select channel_id from starboard_blacklisted_channels where server_id=$1", guild)
+		channelRows, err := db.Query(context.Background(), "select channel_id from public.starboard_blacklisted_channels where server_id=$1", guild)
 		if err != nil {
 			panic(err)
 		}
@@ -46,7 +46,7 @@ func getBlacklistAll() (channelBlacklist map[string][]string) {
 func getBlacklistForGuild(guildID string) error {
 	var channels []string
 
-	channelRows, err := db.Query(context.Background(), "select channel_id from starboard_blacklisted_channels where server_id=$1", guildID)
+	channelRows, err := db.Query(context.Background(), "select channel_id from public.starboard_blacklisted_channels where server_id=$1", guildID)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func addChannelsToBlacklist(guildID string, channels []string) error {
 	}
 
 	for _, channel := range channels {
-		commandTag, err := db.Exec(context.Background(), "insert into starboard_blacklisted_channels (channel_id, server_id) values ($1, $2)", channel, guildID)
+		commandTag, err := db.Exec(context.Background(), "insert into public.starboard_blacklisted_channels (channel_id, server_id) values ($1, $2)", channel, guildID)
 		if err != nil {
 			return err
 		}
