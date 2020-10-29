@@ -99,7 +99,11 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 	for _, role := range rls {
 		roles += role.Mention() + ", "
 	}
-	roles = roles[:len(roles)-2]
+	if len(roles) <= 2 {
+		roles = "No roles."
+	} else {
+		roles = roles[:len(roles)-2]
+	}
 	if len(roles) >= 1000 {
 		roles = "Too many to list"
 	}
