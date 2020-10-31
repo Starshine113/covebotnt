@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/bwmarrin/discordgo"
 )
 
 // PermLevel is the permission level of the command
@@ -41,7 +42,14 @@ func (p PermLevel) String() string {
 
 // Router is the command router
 type Router struct {
-	Commands []*Command
+	Commands      []*Command
+	AutoResponses []*AutoResponse
+}
+
+// AutoResponse is a single autoresponse, intended for very simple responses to exact messages that don't match commands
+type AutoResponse struct {
+	Triggers []string
+	Response func(s *discordgo.Session, m *discordgo.MessageCreate) error
 }
 
 // Command is a single command

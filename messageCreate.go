@@ -26,9 +26,9 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	if strings.ToLower(m.Content) == "nyaa" {
-		s.ChannelMessageSend(m.ChannelID, "*Nyaa nyaa~* <:meowpats:771890485978726431>")
-		return
+	err := router.Respond(s, m)
+	if err != nil {
+		sugar.Errorf("Error sending autoresponse: %v", err)
 	}
 
 	// get prefix for the guild

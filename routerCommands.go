@@ -4,6 +4,7 @@ import (
 	"github.com/Starshine113/covebotnt/commands"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/notes"
+	"github.com/bwmarrin/discordgo"
 )
 
 func addUserCommands() {
@@ -177,5 +178,23 @@ func addOwnerCommands() {
 		Usage:       "update",
 		Permissions: crouter.PermLevelOwner,
 		Command:     commandUpdate,
+	})
+}
+
+func addAutoResponses() {
+	router.AddResponse(&crouter.AutoResponse{
+		Triggers: []string{"nyaa"},
+		Response: func(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
+			_, err = s.ChannelMessageSend(m.ChannelID, "*Nyaa nyaa~* <:meowpats:771890485978726431>")
+			return err
+		},
+	})
+
+	router.AddResponse(&crouter.AutoResponse{
+		Triggers: []string{"covebot pronouns", "covebot, what are your pronouns?", "covebotn't pronouns", "covebotn't, what are your pronouns?"},
+		Response: func(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
+			_, err = s.ChannelMessageSend(m.ChannelID, "cat/cat/cats/cats/catself sound really good right now ~~actually, they *always* sound good~~")
+			return err
+		},
 	})
 }

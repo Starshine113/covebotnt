@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const botVersion = "0.13"
+const botVersion = "0.15"
 
 var (
 	config           structs.BotConfig
@@ -133,6 +133,8 @@ func main() {
 	addModCommands()
 	addAdminCommands()
 	addOwnerCommands()
+	// add autoresponses
+	addAutoResponses()
 
 	// add message create handler for commands
 	dg.AddHandler(messageCreateCommand)

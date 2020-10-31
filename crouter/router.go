@@ -1,8 +1,11 @@
 package crouter
 
 import (
+	"strings"
+
 	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/structs"
+	"github.com/bwmarrin/discordgo"
 )
 
 // NewRouter creates a Router object
@@ -31,22 +34,22 @@ func (r *Router) AddCommand(cmd *Command) {
 	r.Commands = append(r.Commands, cmd)
 }
 
-// CreateCommand creates a command and adds it to the router
-func (r *Router) CreateCommand(names []string, description, usage string, perms PermLevel, command func(ctx *cbctx.Ctx) error) {
-	name := names[0]
-	var aliases []string
-	if len(names) >= 1 {
-		aliases = names[1:]
+// AddResponse adds an autoresponse to the router
+func (r *Router) AddResponse(response *AutoResponse) {
+	r.AutoResponses = append(r.AutoResponses, response)
+}
+
+// Respond checks if the message is any of the configured autoresponse triggers, and responds if it is
+func (r *Router) Respond(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
+	for _, response := range r.AutoResponses {
+		for _, trigger := range response.Triggers {
+			if strings.ToLower(m.Content) == trigger {
+				err = response.Response(s, m)
+				return
+			}
+		}
 	}
-	cmd := &Command{
-		Name:        name,
-		Aliases:     aliases,
-		Description: description,
-		Usage:       usage,
-		Permissions: perms,
-		Command:     command,
-	}
-	r.Commands = append(r.Commands, cmd)
+	return
 }
 
 // Execute actually executes the router
