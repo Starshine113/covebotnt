@@ -108,13 +108,51 @@ func addModCommands() {
 		Command:     commands.Steal,
 	})
 
-	router.AddCommand(&crouter.Command{
+	starboard := router.AddGroup(&crouter.Group{
 		Name:        "starboard",
 		Aliases:     []string{"sb"},
 		Description: "Manage the server's starboard",
-		Usage:       "starboard <channel|limit|emoji>",
-		Permissions: crouter.PermLevelMod,
+		Command: &crouter.Command{
+			Name:        "show",
+			Description: "Show the server's starboard settings",
+			Usage:       "show",
+			Permissions: crouter.PermLevelNone,
+			Command:     commandStarboard,
+		},
+	})
+
+	starboard.AddCommand(&crouter.Command{
+		Name:        "show",
+		Aliases:     []string{"get"},
+		Description: "Show the server's starboard settings",
+		Usage:       "show",
+		Permissions: crouter.PermLevelNone,
 		Command:     commandStarboard,
+	})
+
+	starboard.AddCommand(&crouter.Command{
+		Name:        "channel",
+		Aliases:     []string{"ch"},
+		Description: "Change the starboard channel",
+		Usage:       "channel <channel>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandStarboardChannel,
+	})
+
+	starboard.AddCommand(&crouter.Command{
+		Name:        "limit",
+		Description: "Change the starboard limit",
+		Usage:       "limit <int>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandStarboardLimit,
+	})
+
+	starboard.AddCommand(&crouter.Command{
+		Name:        "emoji",
+		Description: "Change the starboard emoji",
+		Usage:       "emoji <emoji>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandStarboardEmoji,
 	})
 }
 

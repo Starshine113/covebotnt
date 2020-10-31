@@ -54,10 +54,29 @@ func (r *Router) Respond(s *discordgo.Session, m *discordgo.MessageCreate) (err 
 
 // Execute actually executes the router
 func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
-	if ctx.Match("help") {
+	// add the guild settings to the additional parameters
+	ctx.AdditionalParams["guildSettings"] = guildSettings
+
+	if ctx.Match("help") || ctx.Match("usage") || ctx.Match("hlep") {
 		ctx.TriggerTyping()
 		err = r.Help(ctx, guildSettings)
 		return
+	}
+	for _, g := range r.Groups {
+		if ctx.Match(append([]string{g.Name}, g.Aliases...)...) {
+			if len(ctx.Args) == 0 {
+				ctx.Command = ""
+			} else {
+				ctx.Command = ctx.Args[0]
+			}
+			if len(ctx.Args) > 1 {
+				ctx.Args = ctx.Args[1:]
+			} else {
+				ctx.Args = []string{}
+			}
+			err = g.Execute(ctx, guildSettings, ownerIDs)
+			return
+		}
 	}
 	for _, cmd := range r.Commands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
@@ -87,9 +106,6 @@ func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, o
 					return nil
 				}
 			}
-			// add the guild settings to the additional parameters
-			ctx.AdditionalParams["guildSettings"] = guildSettings
-
 			err = cmd.Command(ctx)
 			return err
 		}

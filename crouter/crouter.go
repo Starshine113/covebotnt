@@ -43,6 +43,7 @@ func (p PermLevel) String() string {
 // Router is the command router
 type Router struct {
 	Commands      []*Command
+	Groups        []*Group
 	AutoResponses []*AutoResponse
 }
 
@@ -59,5 +60,5 @@ type Command struct {
 	Description string
 	Usage       string
 	Permissions PermLevel
-	Command     func(ctx *cbctx.Ctx) error
+	Command     func(*cbctx.Ctx) error
 }

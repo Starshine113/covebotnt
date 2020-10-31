@@ -20,52 +20,71 @@ func commandStarboard(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
-	if len(ctx.Args) == 0 {
-		_, err = ctx.Send(currentStarboardSettings(guild))
-		if err != nil {
-			return fmt.Errorf("Starboard: %w", err)
-		}
-	}
-	if len(ctx.Args) == 2 {
-		if ctx.Args[0] == "channel" {
-			channel, err := ctx.ParseChannel(ctx.Args[1])
-			if err != nil {
-				ctx.CommandError(err)
-				return nil
-			}
-			err = setStarboardChannel(channel.ID, ctx.Message.GuildID)
-			if err != nil {
-				ctx.CommandError(err)
-				return nil
-			}
-			_, err = ctx.Send(&discordgo.MessageEmbed{
-				Title:       "Starboard channel changed",
-				Description: "Changed the starboard channel for " + guild.Name + " to " + channel.Mention(),
-			})
-			if err != nil {
-				return err
-			}
-		} else if ctx.Args[0] == "limit" {
-			limit, err := strconv.ParseInt(ctx.Args[1], 10, 0)
-			if err != nil {
-				ctx.CommandError(err)
-				return nil
-			}
-			err = setStarboardLimit(int(limit), ctx.Message.GuildID)
-			if err != nil {
-				ctx.CommandError(err)
-				return nil
-			}
-			_, err = ctx.Send(&discordgo.MessageEmbed{
-				Title:       "Starboard limit changed",
-				Description: "Changed the starboard limit for " + guild.Name + " to " + fmt.Sprint(limit),
-			})
-			if err != nil {
-				return err
-			}
-		}
+	_, err = ctx.Send(currentStarboardSettings(guild))
+	if err != nil {
+		return fmt.Errorf("Starboard: %w", err)
 	}
 	return nil
+}
+
+func commandStarboardChannel(ctx *cbctx.Ctx) (err error) {
+	if len(ctx.Args) == 0 {
+		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+			NumRequiredArgs: 1,
+			SuppliedArgs:    0,
+		})
+		return nil
+	}
+	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	channel, err := ctx.ParseChannel(ctx.Args[0])
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	err = setStarboardChannel(channel.ID, ctx.Message.GuildID)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	_, err = ctx.Send(&discordgo.MessageEmbed{
+		Title:       "Starboard channel changed",
+		Description: "Changed the starboard channel for " + guild.Name + " to " + channel.Mention(),
+	})
+	return
+}
+
+func commandStarboardLimit(ctx *cbctx.Ctx) (err error) {
+	if len(ctx.Args) == 0 {
+		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+			NumRequiredArgs: 1,
+			SuppliedArgs:    0,
+		})
+		return nil
+	}
+	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
+	limit, err := strconv.ParseInt(ctx.Args[0], 10, 0)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	err = setStarboardLimit(int(limit), ctx.Message.GuildID)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	_, err = ctx.Send(&discordgo.MessageEmbed{
+		Title:       "Starboard limit changed",
+		Description: "Changed the starboard limit for " + guild.Name + " to " + fmt.Sprint(limit),
+	})
+	return
+}
+
+func commandStarboardEmoji(ctx *cbctx.Ctx) (err error) {
+	return
 }
 
 func currentStarboardSettings(guild *discordgo.Guild) *discordgo.MessageEmbed {
