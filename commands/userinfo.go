@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -95,14 +97,15 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 		permStrings = []string{"No special permissions"}
 	}
 
-	var roles string
+	var rolesSlice []string
 	for _, role := range rls {
-		roles += role.Mention() + ", "
+		rolesSlice = append(rolesSlice, role.Mention())
 	}
-	if len(roles) <= 2 {
+	var roles string
+	if len(rolesSlice) == 0 {
 		roles = "No roles."
 	} else {
-		roles = roles[:len(roles)-2]
+		roles = strings.Join(rolesSlice, ", ")
 	}
 	if len(roles) >= 1000 {
 		roles = "Too many to list"
@@ -112,6 +115,36 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 	if len(permString) >= 950 {
 		permString = permString[:950]
 		permString += "..."
+	}
+
+	botPerm := crouter.PermLevelNone
+	botOwners := ctx.AdditionalParams["config"].(structs.BotConfig).Bot.BotOwners
+	helperRoles := ctx.AdditionalParams["guildSettings"].(*structs.GuildSettings).Moderation.HelperRoles
+	modRoles := ctx.AdditionalParams["guildSettings"].(*structs.GuildSettings).Moderation.ModRoles
+
+	for _, r := range rls {
+		for _, helperRole := range helperRoles {
+			if r.ID == helperRole {
+				botPerm = crouter.PermLevelHelper
+				break
+			}
+		}
+	}
+	for _, r := range rls {
+		for _, modRole := range modRoles {
+			if r.ID == modRole {
+				botPerm = crouter.PermLevelHelper
+				break
+			}
+		}
+	}
+	if perms&discordgo.PermissionAdministrator == discordgo.PermissionAdministrator {
+		botPerm = crouter.PermLevelAdmin
+	}
+	for _, id := range botOwners {
+		if user.User.ID == id {
+			botPerm = crouter.PermLevelOwner
+		}
 	}
 
 	guildCreated, err := discordgo.SnowflakeTimestamp(ctx.Message.GuildID)
@@ -149,6 +182,11 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 				Inline: true,
 			},
 			{
+				Name:   "Bot Permissions",
+				Value:  "`" + botPerm.String() + "`",
+				Inline: true,
+			},
+			{
 				Name:   "Highest rank",
 				Value:  highestRoleName,
 				Inline: true,
@@ -171,7 +209,7 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 			{
 				Name:   "Joined at",
 				Value:  fmt.Sprintf("%v\n(%v ago)\n%v days after the server was created", joinedTime.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(joinedTime)), days),
-				Inline: true,
+				Inline: false,
 			},
 			{
 				Name:   fmt.Sprintf("Roles (%v)", len(user.Roles)),

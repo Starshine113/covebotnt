@@ -11,7 +11,7 @@ func NewRouter() *Router {
 
 	router.AddCommand(&Command{
 		Name:        "help",
-		Aliases:     []string{"usage"},
+		Aliases:     []string{"usage", "hlep"},
 		Description: "Show info about how to use the bot",
 		Usage:       "help [command]",
 		Permissions: PermLevelNone,
@@ -84,6 +84,9 @@ func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, o
 					return nil
 				}
 			}
+			// add the guild settings to the additional parameters
+			ctx.AdditionalParams["guildSettings"] = guildSettings
+
 			err = cmd.Command(ctx)
 			return err
 		}
