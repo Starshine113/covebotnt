@@ -26,6 +26,11 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+	if strings.ToLower(m.Content) == "nyaa" {
+		s.ChannelMessageSend(m.ChannelID, "*Nyaa nyaa~* <:meowpats:771890485978726431>")
+		return
+	}
+
 	// get prefix for the guild
 	prefix := getPrefix(m.GuildID)
 
