@@ -37,6 +37,7 @@ func (r *Router) GetGroup(name string) (group *Group) {
 
 // Execute executes any command given
 func (g *Group) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+	g.Subcommands = append(g.Subcommands, g.Command)
 	for _, cmd := range g.Subcommands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
 			ctx.TriggerTyping()

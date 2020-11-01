@@ -154,6 +154,22 @@ func addModCommands() {
 		Permissions: crouter.PermLevelMod,
 		Command:     commandStarboardEmoji,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "modlog",
+		Description: "Set the modlog channel",
+		Usage:       "modlog <channel>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandModLogChannel,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "ban",
+		Description: "Ban users by ID",
+		Usage:       "ban <user ID> [reason]",
+		Permissions: crouter.PermLevelMod,
+		Command:     commands.Ban,
+	})
 }
 
 func addAdminCommands() {

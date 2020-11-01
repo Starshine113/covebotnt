@@ -61,6 +61,11 @@ func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err
 					Value:  groupCmds,
 					Inline: false,
 				},
+				{
+					Name:   "Prefix",
+					Value:  fmt.Sprintf("This server's prefix is `%v`.\nYou can also mention the bot (%v) to invoke commands.", ctx.GuildPrefix, ctx.BotUser.Mention()),
+					Inline: false,
+				},
 			},
 			Footer: &discordgo.MessageEmbedFooter{
 				Text: "Use `help <cmd>` for more information on a command",
