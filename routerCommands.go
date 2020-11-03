@@ -170,6 +170,72 @@ func addModCommands() {
 		Permissions: crouter.PermLevelMod,
 		Command:     commands.Ban,
 	})
+
+	gk := router.AddGroup(&crouter.Group{
+		Name:        "gatekeeper",
+		Aliases:     []string{"gb", "g"},
+		Description: "Manage the server's gatekeeper",
+		Command: &crouter.Command{
+			Name:        "approve",
+			Aliases:     []string{"a"},
+			Description: "Approves a user in the gatekeeper",
+			Usage:       "approve <user ID>",
+			Permissions: crouter.PermLevelNone,
+			Command:     commands.GkApprove,
+		},
+	})
+
+	gk.AddCommand(&crouter.Command{
+		Name:        "channel",
+		Aliases:     []string{"chan", "ch"},
+		Description: "Set the gatekeeper channel",
+		Usage:       "channel <channel>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandGkChannel,
+	})
+
+	gk.AddCommand(&crouter.Command{
+		Name:        "message",
+		Aliases:     []string{"msg"},
+		Description: "Set the gatekeeper message",
+		Usage:       "message <message>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandGkMessage,
+	})
+
+	gk.AddCommand(&crouter.Command{
+		Name:        "welcome-channel",
+		Aliases:     []string{"welcome-ch", "wch"},
+		Description: "Set the welcome channel",
+		Usage:       "welcome-channel <channel>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandWelcomeChannel,
+	})
+
+	gk.AddCommand(&crouter.Command{
+		Name:        "welcome-message",
+		Aliases:     []string{"welcome-msg", "wmsg"},
+		Description: "Set the welcome message",
+		Usage:       "welcome-message <message>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandWelcomeMessage,
+	})
+
+	gk.AddCommand(&crouter.Command{
+		Name:        "gk-roles",
+		Description: "Set the gatekeeper roles",
+		Usage:       "gk-roles <roles...>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandGkRoles,
+	})
+
+	gk.AddCommand(&crouter.Command{
+		Name:        "member-roles",
+		Description: "Set the member roles",
+		Usage:       "member-roles <roles...>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commandMemberRoles,
+	})
 }
 
 func addAdminCommands() {
