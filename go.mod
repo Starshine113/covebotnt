@@ -7,7 +7,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/ReneKroon/ttlcache v1.7.0
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/Starshine113/flagparser v0.0.0-20201019200207-9c6d8be6bf04
+	github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655
 	github.com/andersfylling/disgord v0.19.1
 	github.com/bwmarrin/discordgo v0.22.0
 	github.com/jackc/pgx/v4 v4.9.0

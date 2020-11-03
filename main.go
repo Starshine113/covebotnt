@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const botVersion = "0.19"
+const botVersion = "0.21"
 
 var (
 	config           structs.BotConfig
@@ -33,6 +33,7 @@ var (
 	startTime        time.Time
 
 	messageIDMap, starboardMsgIDMap map[string]string
+	handlerMap                      map[string]func()
 )
 
 var (

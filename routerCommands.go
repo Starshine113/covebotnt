@@ -18,7 +18,7 @@ func addUserCommands() {
 
 	router.AddCommand(&crouter.Command{
 		Name:        "enlarge",
-		Aliases:     []string{"emote", "emoji"},
+		Aliases:     []string{"e", "emote", "emoji", "enlorge"},
 		Description: "Enlarges a custom emoji",
 		Usage:       "enlarge <emoji>",
 		Permissions: crouter.PermLevelNone,

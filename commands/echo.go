@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/Starshine113/covebotnt/cbctx"
@@ -40,6 +41,10 @@ func Echo(ctx *cbctx.Ctx) (err error) {
 		channel, err := ctx.ParseChannel(processedArgs["channel"].(string))
 		if err != nil {
 			ctx.CommandError(err)
+			return nil
+		}
+		if channel.GuildID != ctx.Message.GuildID {
+			ctx.CommandError(errors.New("you cannot echo messages into a channel in a different server"))
 			return nil
 		}
 		channelID = channel.ID
