@@ -13,14 +13,20 @@ func checkHelperPerm(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err 
 	}
 
 	// get the guild
-	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
-	if err != nil {
+	guild, err := ctx.Session.State.Guild(ctx.Message.GuildID)
+	if err == discordgo.ErrStateNotFound {
+		guild, err = ctx.Session.Guild(ctx.Message.GuildID)
+	}
+	if err != nil && err != discordgo.ErrStateNotFound {
 		return err
 	}
 
 	// get the member
-	member, err := ctx.Session.GuildMember(ctx.Message.GuildID, ctx.Author.ID)
-	if err != nil {
+	member, err := ctx.Session.State.Member(ctx.Message.GuildID, ctx.Author.ID)
+	if err == discordgo.ErrStateNotFound {
+		member, err = ctx.Session.GuildMember(ctx.Message.GuildID, ctx.Author.ID)
+	}
+	if err != nil && err != discordgo.ErrStateNotFound {
 		return err
 	}
 
@@ -72,14 +78,20 @@ func checkModPerm(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err err
 	}
 
 	// get the guild
-	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
-	if err != nil {
+	guild, err := ctx.Session.State.Guild(ctx.Message.GuildID)
+	if err == discordgo.ErrStateNotFound {
+		guild, err = ctx.Session.Guild(ctx.Message.GuildID)
+	}
+	if err != nil && err != discordgo.ErrStateNotFound {
 		return err
 	}
 
 	// get the member
-	member, err := ctx.Session.GuildMember(ctx.Message.GuildID, ctx.Author.ID)
-	if err != nil {
+	member, err := ctx.Session.State.Member(ctx.Message.GuildID, ctx.Author.ID)
+	if err == discordgo.ErrStateNotFound {
+		member, err = ctx.Session.GuildMember(ctx.Message.GuildID, ctx.Author.ID)
+	}
+	if err != nil && err != discordgo.ErrStateNotFound {
 		return err
 	}
 
@@ -122,14 +134,20 @@ func checkAdmin(ctx *cbctx.Ctx) (err error) {
 	}
 
 	// get the guild
-	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
-	if err != nil {
+	guild, err := ctx.Session.State.Guild(ctx.Message.GuildID)
+	if err == discordgo.ErrStateNotFound {
+		guild, err = ctx.Session.Guild(ctx.Message.GuildID)
+	}
+	if err != nil && err != discordgo.ErrStateNotFound {
 		return err
 	}
 
 	// get the member
-	member, err := ctx.Session.GuildMember(ctx.Message.GuildID, ctx.Author.ID)
-	if err != nil {
+	member, err := ctx.Session.State.Member(ctx.Message.GuildID, ctx.Author.ID)
+	if err == discordgo.ErrStateNotFound {
+		member, err = ctx.Session.GuildMember(ctx.Message.GuildID, ctx.Author.ID)
+	}
+	if err != nil && err != discordgo.ErrStateNotFound {
 		return err
 	}
 

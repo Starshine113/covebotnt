@@ -174,8 +174,13 @@ func UserInfo(ctx *cbctx.Ctx) (err error) {
 		},
 		Timestamp:   createdTime.Format(time.RFC3339),
 		Color:       highestRoleColour,
-		Description: fmt.Sprintf("User information for %v", user.Mention()),
+		Description: user.User.ID,
 		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "User information for",
+				Value:  user.Mention(),
+				Inline: false,
+			},
 			{
 				Name:   "Avatar",
 				Value:  fmt.Sprintf("[Link](%v)", user.User.AvatarURL("1024")),
