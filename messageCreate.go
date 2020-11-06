@@ -48,6 +48,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	ctx, err := cbctx.Context(prefix, m.Content, s, m, &cbdb.Db{Pool: db}, boltDb)
 	if err != nil {
 		sugar.Errorf("Error getting context: %v", err)
+		return
 	}
 	// check if the message might be a command
 	if ctx.MatchPrefix() {
