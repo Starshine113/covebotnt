@@ -40,7 +40,6 @@ func (g *Group) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ow
 	g.Subcommands = append(g.Subcommands, g.Command)
 	for _, cmd := range g.Subcommands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
-			ctx.TriggerTyping()
 			if cmd.Permissions == PermLevelHelper {
 				perms := checkHelperPerm(ctx, guildSettings)
 				if perms != nil {

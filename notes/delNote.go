@@ -9,11 +9,6 @@ import (
 
 // CommandDelNote deletes a note by ID
 func CommandDelNote(ctx *cbctx.Ctx) (err error) {
-	err = ctx.TriggerTyping()
-	if err != nil {
-		return err
-	}
-
 	if len(ctx.Args) != 1 {
 		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
 			RequiredArgs: "id: int",

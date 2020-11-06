@@ -26,6 +26,15 @@ func addUserCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "avatar",
+		Aliases:     []string{"pfp", "a"},
+		Description: "Show a user's avatar",
+		Usage:       "avatar [user]",
+		Permissions: crouter.PermLevelNone,
+		Command:     commands.Avatar,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "about",
 		Description: "Show some info about the bot",
 		Usage:       "about",

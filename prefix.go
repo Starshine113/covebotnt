@@ -8,11 +8,6 @@ import (
 )
 
 func commandPrefix(ctx *cbctx.Ctx) (err error) {
-	err = ctx.TriggerTyping()
-	if err != nil {
-		return err
-	}
-
 	// if there are no arguments, show the current prefix
 	if len(ctx.Args) == 0 {
 		if globalSettings[ctx.Message.GuildID].Prefix == "" {

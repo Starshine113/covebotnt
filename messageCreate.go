@@ -11,8 +11,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+var botUser *discordgo.User
+
 // command handler
 func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+	var err error
+
 	// if message was sent by a bot return; not only to ignore bots, but also to make sure PluralKit users don't trigger commands twice.
 	if m.Author.Bot {
 		allowed := false
@@ -26,7 +30,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	err := router.Respond(s, m)
+	err = router.Respond(s, m)
 	if err != nil {
 		sugar.Errorf("Error sending autoresponse: %v", err)
 	}
@@ -34,9 +38,11 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// get prefix for the guild
 	prefix := getPrefix(m.GuildID)
 
-	botUser, err := s.User("@me")
-	if err != nil {
-		sugar.Errorf("Error fetching bot user: %v", err)
+	if botUser == nil {
+		botUser, err = s.User("@me")
+		if err != nil {
+			sugar.Errorf("Error fetching bot user: %v", err)
+		}
 	}
 
 	ctx, err := cbctx.Context(prefix, m.Content, s, m, &cbdb.Db{Pool: db}, boltDb)

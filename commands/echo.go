@@ -11,11 +11,6 @@ import (
 
 // Echo says whatever the user inputs through the bot
 func Echo(ctx *cbctx.Ctx) (err error) {
-	err = ctx.TriggerTyping()
-	if err != nil {
-		return err
-	}
-
 	if len(ctx.Args) == 0 {
 		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: len(ctx.Args)})
 		return nil

@@ -10,11 +10,6 @@ import (
 
 // Enlarge enlarges a custom emoji
 func Enlarge(ctx *cbctx.Ctx) (err error) {
-	err = ctx.TriggerTyping()
-	if err != nil {
-		return err
-	}
-
 	if len(ctx.Args) == 0 {
 		_, err = ctx.CommandError(&cbctx.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: 0})
 		return err

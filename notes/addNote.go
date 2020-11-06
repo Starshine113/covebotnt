@@ -12,11 +12,6 @@ import (
 
 // CommandSetNote sets a note
 func CommandSetNote(ctx *cbctx.Ctx) (err error) {
-	err = ctx.TriggerTyping()
-	if err != nil {
-		return err
-	}
-
 	if len(ctx.Args) <= 1 {
 		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
 			RequiredArgs: "user: id/mention, note: string",

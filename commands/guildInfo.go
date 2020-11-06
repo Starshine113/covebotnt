@@ -11,11 +11,6 @@ import (
 
 // GuildInfo command shows information about the current guild
 func GuildInfo(ctx *cbctx.Ctx) (err error) {
-	err = ctx.TriggerTyping()
-	if err != nil {
-		return err
-	}
-
 	guild, err := ctx.Session.State.Guild(ctx.Message.GuildID)
 	if err != nil {
 		return err

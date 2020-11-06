@@ -16,7 +16,7 @@ func About(ctx *cbctx.Ctx) (err error) {
 
 	embed := &discordgo.MessageEmbed{
 		Title:       "About CoveBotn't",
-		Description: "CoveBotn't is a general purpose bot, with ~~a gatekeeper~~, moderation commands, and starboard functionality.",
+		Description: "CoveBotn't is a general purpose bot, with a gatekeeper, moderation commands, and starboard functionality.",
 		Color:       0x21a1a8,
 		Footer: &discordgo.MessageEmbedFooter{
 			IconURL: ctx.BotUser.AvatarURL("256"),

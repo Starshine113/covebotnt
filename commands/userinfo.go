@@ -15,11 +15,6 @@ import (
 
 // UserInfo returns user info, formatted nicely
 func UserInfo(ctx *cbctx.Ctx) (err error) {
-	err = ctx.TriggerTyping()
-	if err != nil {
-		return err
-	}
-
 	user, err := ctx.ParseMember(ctx.Author.ID)
 	if err != nil {
 		ctx.CommandError(err)

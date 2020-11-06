@@ -58,7 +58,6 @@ func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, o
 	ctx.AdditionalParams["guildSettings"] = guildSettings
 
 	if ctx.Match("help") || ctx.Match("usage") || ctx.Match("hlep") {
-		ctx.TriggerTyping()
 		err = r.Help(ctx, guildSettings)
 		return
 	}
@@ -80,7 +79,6 @@ func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, o
 	}
 	for _, cmd := range r.Commands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
-			ctx.TriggerTyping()
 			if cmd.Permissions == PermLevelHelper {
 				perms := checkHelperPerm(ctx, guildSettings)
 				if perms != nil {
