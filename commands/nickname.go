@@ -10,11 +10,8 @@ import (
 
 // Nickname changes the bot's nickname
 func Nickname(ctx *cbctx.Ctx) (err error) {
-	if len(ctx.Args) == 0 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
-			NumRequiredArgs: 1,
-			SuppliedArgs:    0,
-		})
+	if err = ctx.CheckMinArgs(1); err != nil {
+		ctx.CommandError(err)
 		return nil
 	}
 	nick := strings.Join(ctx.Args, " ")

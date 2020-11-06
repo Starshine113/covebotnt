@@ -35,6 +35,15 @@ func addUserCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "snowflake",
+		Aliases:     []string{"idtime"},
+		Description: "Get timestamps from the given ID(s)",
+		Usage:       "snowflake [...IDs]",
+		Permissions: crouter.PermLevelNone,
+		Command:     commands.Snowflake,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "about",
 		Description: "Show some info about the bot",
 		Usage:       "about",

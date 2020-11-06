@@ -13,11 +13,8 @@ import (
 
 // Steal adds an emote by URL/ID
 func Steal(ctx *cbctx.Ctx) (err error) {
-	if len(ctx.Args) == 0 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: 0})
-		return nil
-	} else if len(ctx.Args) > 2 {
-		ctx.CommandError(&cbctx.ErrorTooManyArguments{MaxArgs: 2, SuppliedArgs: len(ctx.Args)})
+	if err = ctx.CheckArgRange(1, 2); err != nil {
+		ctx.CommandError(err)
 		return nil
 	}
 
