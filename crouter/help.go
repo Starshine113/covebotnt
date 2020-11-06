@@ -11,19 +11,31 @@ import (
 )
 
 // Help is the help command
-func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err error) {
+func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+	err = ctx.TriggerTyping()
+	if err != nil {
+		return
+	}
+
 	if len(ctx.Args) == 0 {
 		level := 0
+		permLevel := PermLevelNone
 
-		if err = checkAdmin(ctx); err == nil {
+		if err = checkOwner(ctx.Author.ID, ownerIDs); err == nil {
+			level = 4
+			permLevel = PermLevelOwner
+		} else if err = checkAdmin(ctx); err == nil {
 			level = 3
+			permLevel = PermLevelAdmin
 		} else if err = checkModPerm(ctx, guildSettings); err == nil {
 			level = 2
+			permLevel = PermLevelMod
 		} else if err = checkHelperPerm(ctx, guildSettings); err == nil {
 			level = 1
+			permLevel = PermLevelNone
 		}
 
-		var adminCmdString, modCmdString, helperCmdString, userCmdString string
+		var ownerCmdString, adminCmdString, modCmdString, helperCmdString, userCmdString string
 		for _, cmd := range r.Commands {
 			switch cmd.Permissions {
 			case PermLevelNone:
@@ -34,6 +46,8 @@ func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err
 				modCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
 			case PermLevelAdmin:
 				adminCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
+			case PermLevelOwner:
+				ownerCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
 			}
 		}
 		var groupCmds string
@@ -41,32 +55,46 @@ func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err
 			groupCmds += fmt.Sprintf("`%v`: %v\n", g.Name, g.Description)
 		}
 
-		embedDesc := userCmdString
-		if level == 1 {
-			embedDesc += helperCmdString
-		} else if level == 2 {
-			embedDesc += modCmdString
+		fields := []*discordgo.MessageEmbedField{
+			{
+				Name:   fmt.Sprintf("User commands (%v)", len(strings.Split(userCmdString, "\n"))),
+				Value:  userCmdString,
+				Inline: false,
+			},
 		}
-		if level == 3 {
-			embedDesc += adminCmdString
+		if level >= 1 {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   fmt.Sprintf("Helper commands (%v)", len(strings.Split(helperCmdString, "\n"))),
+				Value:  helperCmdString,
+				Inline: false,
+			})
+		}
+		if level >= 2 {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   fmt.Sprintf("Mod commands (%v)", len(strings.Split(modCmdString, "\n"))),
+				Value:  modCmdString,
+				Inline: false,
+			})
+		}
+		if level >= 3 {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   fmt.Sprintf("Admin commands (%v)", len(strings.Split(adminCmdString, "\n"))),
+				Value:  adminCmdString,
+				Inline: false,
+			})
 		}
 
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   fmt.Sprintf("Groups (%v)", len(strings.Split(groupCmds, "\n"))),
+			Value:  groupCmds,
+			Inline: false,
+		})
+
 		_, err = ctx.Send(&discordgo.MessageEmbed{
-			Title:       "Command list",
-			Description: embedDesc,
+			Title:       "Help",
+			Description: fmt.Sprintf("This server's prefix is `%v`.\nYou can also mention the bot (%v) to invoke commands.\nYour bot permission level is `%v`.", ctx.GuildPrefix, ctx.BotUser.Mention(), permLevel.String()),
 			Color:       0x21a1a8,
-			Fields: []*discordgo.MessageEmbedField{
-				{
-					Name:   "Groups",
-					Value:  groupCmds,
-					Inline: false,
-				},
-				{
-					Name:   "Prefix",
-					Value:  fmt.Sprintf("This server's prefix is `%v`.\nYou can also mention the bot (%v) to invoke commands.", ctx.GuildPrefix, ctx.BotUser.Mention()),
-					Inline: false,
-				},
-			},
+			Fields:      fields,
 			Footer: &discordgo.MessageEmbedFooter{
 				Text: "Use `help <cmd>` for more information on a command",
 			},

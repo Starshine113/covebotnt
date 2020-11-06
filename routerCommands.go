@@ -124,6 +124,15 @@ func addModCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "nickname",
+		Aliases:     []string{"nick"},
+		Description: "Change the bot's nickname",
+		Usage:       "nickname <new nickname>",
+		Permissions: crouter.PermLevelMod,
+		Command:     commands.Nickname,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "echo",
 		Aliases:     []string{"say", "send"},
 		Description: "Make the bot say something",

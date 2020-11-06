@@ -58,7 +58,7 @@ func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, o
 	ctx.AdditionalParams["guildSettings"] = guildSettings
 
 	if ctx.Match("help") || ctx.Match("usage") || ctx.Match("hlep") {
-		err = r.Help(ctx, guildSettings)
+		err = r.Help(ctx, guildSettings, ownerIDs)
 		return
 	}
 	for _, g := range r.Groups {

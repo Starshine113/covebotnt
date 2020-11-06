@@ -30,6 +30,7 @@ type Ctx struct {
 	BotUser          *discordgo.User
 	Database         *cbdb.Db
 	BoltDb           *cbdb.BoltDb
+	Handlers         *map[string]func()
 	AdditionalParams map[string]interface{}
 }
 
@@ -39,7 +40,8 @@ func Context(
 	s *discordgo.Session,
 	m *discordgo.MessageCreate,
 	db *cbdb.Db,
-	boltDb *cbdb.BoltDb) (ctx *Ctx, err error) {
+	boltDb *cbdb.BoltDb,
+	handlerMap *map[string]func()) (ctx *Ctx, err error) {
 
 	botUser, err := s.User("@me")
 	if err != nil {
@@ -58,7 +60,7 @@ func Context(
 		}
 	}
 
-	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb}
+	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb, Handlers: handlerMap}
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {

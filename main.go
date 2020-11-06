@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const botVersion = "0.25"
+const botVersion = "0.27"
 
 var (
 	config           structs.BotConfig
