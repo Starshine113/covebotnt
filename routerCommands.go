@@ -87,6 +87,30 @@ func addHelperCommands() {
 		Permissions: crouter.PermLevelHelper,
 		Command:     notes.CommandSetNote,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "warn",
+		Description: "Warn a user",
+		Usage:       "warn <user> <reason>",
+		Permissions: crouter.PermLevelHelper,
+		Command:     commands.Warn,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "modlogs",
+		Description: "Show a user's modlogs",
+		Usage:       "warn <user>",
+		Permissions: crouter.PermLevelHelper,
+		Command:     commands.ModLogs,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "logmute",
+		Description: "Log a user mute made with another bot",
+		Usage:       "logmute <user> [-d <duration>] [-hardmute] [reason]",
+		Permissions: crouter.PermLevelHelper,
+		Command:     commands.LogMute,
+	})
 }
 
 func addModCommands() {

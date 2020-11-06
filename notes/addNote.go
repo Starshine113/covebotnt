@@ -26,16 +26,6 @@ func CommandSetNote(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
-	notes, err := ctx.Database.Notes(ctx.Message.GuildID, member.User.ID)
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
-	}
-	if len(notes) >= 25 {
-		_, err = ctx.Send(fmt.Sprintf("User **%v#%v** has too many notes (maximum of 25 per user). Remove some with `?delnote`.", member.User.Username, member.User.Discriminator))
-		return
-	}
-
 	note := strings.Join(ctx.Args[1:], " ")
 	if len(note) > 200 {
 		_, err = ctx.Send(fmt.Sprintf("%v This note is too long (maximum 200 characters). Input was %v characters.", cbctx.WarnEmoji, len(note)))
@@ -62,12 +52,15 @@ func noteField(s *discordgo.Session, note *cbdb.Note) (field *discordgo.MessageE
 	if err == discordgo.ErrStateNotFound {
 		mod, err = s.GuildMember(note.GuildID, note.ModID)
 	}
-	if err != nil {
-		return field, err
+	var noteHeader string
+	if err == nil {
+		noteHeader = fmt.Sprintf("#%v (%v)", note.ID, mod.User.String())
+	} else {
+		noteHeader = fmt.Sprintf("#%v (%v)", note.ID, note.ModID)
 	}
 
 	return &discordgo.MessageEmbedField{
-		Name:   fmt.Sprintf("#%v (%v#%v)", note.ID, mod.User.Username, mod.User.Discriminator),
+		Name:   noteHeader,
 		Value:  fmt.Sprintf("%v\nCreated at %v", note.Note, note.Created.Format(time.RFC1123)),
 		Inline: false,
 	}, nil
