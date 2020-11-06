@@ -12,14 +12,15 @@ import (
 )
 
 type export struct {
-	GuildID   string       `json:"guild_id"`
-	Timestamp time.Time    `json:"timestamp"`
-	InvokedBy string       `json:"invoked_by"`
-	Notes     []*cbdb.Note `json:"notes"`
+	GuildID   string              `json:"guild_id"`
+	Timestamp time.Time           `json:"timestamp"`
+	InvokedBy string              `json:"invoked_by"`
+	Notes     []*cbdb.Note        `json:"notes"`
+	ModLogs   []*cbdb.ModLogEntry `json:"mod_logs"`
 }
 
 func commandExport(ctx *cbctx.Ctx) (err error) {
-	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
+	err = ctx.TriggerTyping()
 	if err != nil {
 		return err
 	}
@@ -30,18 +31,25 @@ func commandExport(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
+	logs, err := ctx.Database.GetAllLogs(ctx.Message.GuildID)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+
 	exportStruct := export{
 		GuildID:   ctx.Message.GuildID,
 		Timestamp: time.Now(),
 		InvokedBy: ctx.Author.ID,
 		Notes:     notes,
+		ModLogs:   logs,
 	}
 
 	exportB, _ := json.MarshalIndent(exportStruct, "", "    ")
 	reader := bytes.NewReader(exportB)
 
 	file := discordgo.File{
-		Name:   fmt.Sprintf("notes-export-%v-%v.json", ctx.Message.GuildID, time.Now().Format("2006-01-02-15_04_05")),
+		Name:   fmt.Sprintf("export-%v-%v.json", ctx.Message.GuildID, time.Now().Format("2006-01-02-15_04_05")),
 		Reader: reader,
 	}
 
@@ -56,34 +64,4 @@ func commandExport(ctx *cbctx.Ctx) (err error) {
 	}
 
 	return
-}
-
-type archive struct {
-	GuildID   string               `json:"guild_id"`
-	ChannelID string               `json:"channel_id"`
-	Timestamp time.Time            `json:"timestamp"`
-	Messages  []*discordgo.Message `json:"messages"`
-}
-
-func commandArchive(ctx *cbctx.Ctx) (err error) {
-	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
-	if err != nil {
-		return err
-	}
-
-	messages, err := ctx.Session.ChannelMessages(ctx.Message.ChannelID, 100, "", "", "")
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
-	}
-
-	exportB, _ := json.MarshalIndent(archive{
-		GuildID:   ctx.Message.GuildID,
-		ChannelID: ctx.Message.ChannelID,
-		Timestamp: time.Now(),
-		Messages:  messages,
-	}, "", "    ")
-
-	fmt.Println(string(exportB))
-	return nil
 }

@@ -274,7 +274,7 @@ func addModCommands() {
 func addAdminCommands() {
 	router.AddCommand(&crouter.Command{
 		Name:        "export",
-		Description: "Export this server's notes",
+		Description: "Export this server's mod logs",
 		Usage:       "export",
 		Permissions: crouter.PermLevelAdmin,
 		Command:     commandExport,
