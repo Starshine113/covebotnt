@@ -5,15 +5,15 @@ import (
 	"strconv"
 
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/bwmarrin/discordgo"
 )
 
 // ModLogs shows the moderation logs for the specified user
-func ModLogs(ctx *cbctx.Ctx) (err error) {
+func ModLogs(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 1,
 			SuppliedArgs:    0,
 		})

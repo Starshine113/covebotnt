@@ -3,7 +3,6 @@ package crouter
 import (
 	"fmt"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -60,5 +59,5 @@ type Command struct {
 	Description string
 	Usage       string
 	Permissions PermLevel
-	Command     func(*cbctx.Ctx) error
+	Command     func(*Ctx) error
 }

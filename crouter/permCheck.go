@@ -1,15 +1,28 @@
 package crouter
 
 import (
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
-func checkHelperPerm(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err error) {
+// Check checks if the user has permissions to run a command
+func (ctx *Ctx) Check(owners []string) (err error) {
+	if ctx.Cmd.Permissions == PermLevelHelper {
+		return checkHelperPerm(ctx, ctx.GuildSettings)
+	} else if ctx.Cmd.Permissions == PermLevelMod {
+		return checkModPerm(ctx, ctx.GuildSettings)
+	} else if ctx.Cmd.Permissions == PermLevelAdmin {
+		return checkAdmin(ctx)
+	} else if ctx.Cmd.Permissions == PermLevelOwner {
+		return checkOwner(ctx.Author.ID, owners)
+	}
+	return nil
+}
+
+func checkHelperPerm(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
 	// check if in DMs
 	if ctx.Message.GuildID == "" {
-		return &cbctx.ErrorNoDMs{}
+		return &ErrorNoDMs{}
 	}
 
 	// get the guild
@@ -68,13 +81,13 @@ func checkHelperPerm(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err 
 		}
 	}
 
-	return &cbctx.ErrorNoPermissions{MissingPerms: "Administrator, HelperRole, or ModRole"}
+	return &ErrorNoPermissions{MissingPerms: "Administrator, HelperRole, or ModRole"}
 }
 
-func checkModPerm(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err error) {
+func checkModPerm(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
 	// check if in DMs
 	if ctx.Message.GuildID == "" {
-		return &cbctx.ErrorNoDMs{}
+		return &ErrorNoDMs{}
 	}
 
 	// get the guild
@@ -124,13 +137,13 @@ func checkModPerm(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings) (err err
 		}
 	}
 
-	return &cbctx.ErrorNoPermissions{MissingPerms: "Administrator or ModRole"}
+	return &ErrorNoPermissions{MissingPerms: "Administrator or ModRole"}
 }
 
-func checkAdmin(ctx *cbctx.Ctx) (err error) {
+func checkAdmin(ctx *Ctx) (err error) {
 	// check if in DMs
 	if ctx.Message.GuildID == "" {
-		return &cbctx.ErrorNoDMs{}
+		return &ErrorNoDMs{}
 	}
 
 	// get the guild
@@ -171,7 +184,7 @@ func checkAdmin(ctx *cbctx.Ctx) (err error) {
 		}
 	}
 
-	return &cbctx.ErrorNoPermissions{MissingPerms: "Administrator"}
+	return &ErrorNoPermissions{MissingPerms: "Administrator"}
 }
 
 func checkOwner(userID string, owners []string) error {
@@ -180,5 +193,5 @@ func checkOwner(userID string, owners []string) error {
 			return nil
 		}
 	}
-	return &cbctx.ErrorNoPermissions{MissingPerms: "BotOwner"}
+	return &ErrorNoPermissions{MissingPerms: "BotOwner"}
 }

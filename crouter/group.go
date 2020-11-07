@@ -1,7 +1,6 @@
 package crouter
 
 import (
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/structs"
 )
 
@@ -31,39 +30,47 @@ func (r *Router) GetGroup(name string) (group *Group) {
 		if group.Name == name {
 			return group
 		}
+		for _, a := range group.Aliases {
+			if a == name {
+				return group
+			}
+		}
+	}
+	return nil
+}
+
+// GetCommand gets a command by name
+func (g *Group) GetCommand(name string) (c *Command) {
+	for _, cmd := range g.Subcommands {
+		if cmd.Name == name {
+			return cmd
+		}
+		for _, a := range cmd.Aliases {
+			if a == name {
+				return cmd
+			}
+		}
+	}
+	if g.Command.Name == name {
+		return g.Command
+	}
+	for _, a := range g.Command.Aliases {
+		if a == name {
+			return g.Command
+		}
 	}
 	return nil
 }
 
 // Execute executes any command given
-func (g *Group) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
 	g.Subcommands = append(g.Subcommands, g.Command)
 	for _, cmd := range g.Subcommands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
-			if cmd.Permissions == PermLevelHelper {
-				perms := checkHelperPerm(ctx, guildSettings)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
-			} else if cmd.Permissions == PermLevelMod {
-				perms := checkModPerm(ctx, guildSettings)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
-			} else if cmd.Permissions == PermLevelAdmin {
-				perms := checkAdmin(ctx)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
-			} else if cmd.Permissions == PermLevelOwner {
-				perms := checkOwner(ctx.Author.ID, ownerIDs)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
+			ctx.Cmd = cmd
+			if perms := ctx.Check(ownerIDs); perms != nil {
+				ctx.CommandError(perms)
+				return nil
 			}
 			err = cmd.Command(ctx)
 			return

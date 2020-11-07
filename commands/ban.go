@@ -6,18 +6,18 @@ import (
 	"time"
 
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Ban bans the specified user from the server
-func Ban(ctx *cbctx.Ctx) (err error) {
+func Ban(ctx *crouter.Ctx) (err error) {
 	reason := "None"
 
 	if len(ctx.Args) == 0 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "<user ID>",
 			MissingArgs:  "<user ID>",
 		})
@@ -46,7 +46,7 @@ func Ban(ctx *cbctx.Ctx) (err error) {
 			if ban.Reason != "" {
 				reason = ban.Reason
 			}
-			_, err = ctx.Send(fmt.Sprintf("%v User **%v** is already banned.\n(Reason: __%v__)", cbctx.ErrorEmoji, user.String(), reason))
+			_, err = ctx.Send(fmt.Sprintf("%v User **%v** is already banned.\n(Reason: __%v__)", crouter.ErrorEmoji, user.String(), reason))
 			return
 		}
 	}
@@ -59,7 +59,7 @@ func Ban(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v Banned **%v** with reason: __%v__", cbctx.SuccessEmoji, user.String(), reason))
+	_, err = ctx.Send(fmt.Sprintf("%v Banned **%v** with reason: __%v__", crouter.SuccessEmoji, user.String(), reason))
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func Ban(ctx *cbctx.Ctx) (err error) {
 	modLog := ctx.AdditionalParams["guildSettings"].(*structs.GuildSettings).Moderation.ModLog
 
 	if modLog == "" {
-		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", cbctx.WarnEmoji, ctx.GuildPrefix))
+		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", crouter.WarnEmoji, ctx.GuildPrefix))
 		return
 	}
 

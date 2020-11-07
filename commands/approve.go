@@ -7,16 +7,15 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
-
-	"github.com/Starshine113/covebotnt/cbctx"
 )
 
 // GkApprove approves the given member, giving them the member roles
-func GkApprove(ctx *cbctx.Ctx) (err error) {
+func GkApprove(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "<member>",
 			MissingArgs:  "<member>",
 		})
@@ -36,7 +35,7 @@ func GkApprove(ctx *cbctx.Ctx) (err error) {
 	}
 
 	if guildConf.Gatekeeper.WelcomeChannel == "" {
-		_, err = ctx.Send(fmt.Sprintf("%v No welcome channel set. Set one with `%vgatekeeper welcome-channel <channel>`.", cbctx.WarnEmoji, ctx.GuildPrefix))
+		_, err = ctx.Send(fmt.Sprintf("%v No welcome channel set. Set one with `%vgatekeeper welcome-channel <channel>`.", crouter.WarnEmoji, ctx.GuildPrefix))
 		if err != nil {
 			return err
 		}
@@ -55,13 +54,13 @@ func GkApprove(ctx *cbctx.Ctx) (err error) {
 		}
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v **%v** approved **%v**.", cbctx.SuccessEmoji, ctx.Author.Mention(), member.User.Mention()))
+	_, err = ctx.Send(fmt.Sprintf("%v **%v** approved **%v**.", crouter.SuccessEmoji, ctx.Author.Mention(), member.User.Mention()))
 	if err != nil {
 		return err
 	}
 
 	if guildConf.Moderation.ModLog == "" {
-		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", cbctx.WarnEmoji, ctx.GuildPrefix))
+		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", crouter.WarnEmoji, ctx.GuildPrefix))
 		return
 	}
 

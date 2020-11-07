@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 )
 
 const pkAPIversion = 1
@@ -24,7 +24,7 @@ var (
 )
 
 // Hello says hello to the user invoking the command
-func Hello(ctx *cbctx.Ctx) (err error) {
+func Hello(ctx *crouter.Ctx) (err error) {
 	var apiResponse pkAPIResponse
 	var person string
 

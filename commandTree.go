@@ -1,10 +1,8 @@
 package main
 
-import (
-	"github.com/Starshine113/covebotnt/cbctx"
-)
+import "github.com/Starshine113/covebotnt/crouter"
 
-func commandTree(ctx *cbctx.Ctx) {
+func commandTree(ctx *crouter.Ctx) {
 	guildSettings := globalSettings[ctx.Message.GuildID]
 	ctx.AdditionalParams = map[string]interface{}{"config": config, "botVer": botVersion, "gitVer": string(gitOut), "startTime": startTime}
 	err := router.Execute(ctx, &guildSettings, config.Bot.BotOwners)

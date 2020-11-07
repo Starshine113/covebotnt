@@ -5,15 +5,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
 // CommandSetNote sets a note
-func CommandSetNote(ctx *cbctx.Ctx) (err error) {
+func CommandSetNote(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) <= 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "user: id/mention, note: string",
 			MissingArgs:  "user: id/mention, note: string",
 		})
@@ -28,7 +28,7 @@ func CommandSetNote(ctx *cbctx.Ctx) (err error) {
 
 	note := strings.Join(ctx.Args[1:], " ")
 	if len(note) > 200 {
-		_, err = ctx.Send(fmt.Sprintf("%v This note is too long (maximum 200 characters). Input was %v characters.", cbctx.WarnEmoji, len(note)))
+		_, err = ctx.Send(fmt.Sprintf("%v This note is too long (maximum 200 characters). Input was %v characters.", crouter.WarnEmoji, len(note)))
 		return
 	}
 
@@ -43,7 +43,7 @@ func CommandSetNote(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v ***Note taken.***\n**Note:** %v", cbctx.SuccessEmoji, note))
+	_, err = ctx.Send(fmt.Sprintf("%v ***Note taken.***\n**Note:** %v", crouter.SuccessEmoji, note))
 	return nil
 }
 

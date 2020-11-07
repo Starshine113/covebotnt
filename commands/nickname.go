@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Nickname changes the bot's nickname
-func Nickname(ctx *cbctx.Ctx) (err error) {
+func Nickname(ctx *crouter.Ctx) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		ctx.CommandError(err)
 		return nil

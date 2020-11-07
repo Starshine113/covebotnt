@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 )
 
 // CommandDelNote deletes a note by ID
-func CommandDelNote(ctx *cbctx.Ctx) (err error) {
+func CommandDelNote(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) != 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "id: int",
 			MissingArgs:  "id: int",
 		})
@@ -29,6 +29,6 @@ func CommandDelNote(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v Removed note #%v.", cbctx.SuccessEmoji, id))
+	_, err = ctx.Send(fmt.Sprintf("%v Removed note #%v.", crouter.SuccessEmoji, id))
 	return
 }

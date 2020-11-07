@@ -3,12 +3,12 @@ package commands
 import (
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Avatar returns the user's, or the given member's, avatar
-func Avatar(ctx *cbctx.Ctx) (err error) {
+func Avatar(ctx *crouter.Ctx) (err error) {
 	var user string
 	if len(ctx.Args) >= 1 {
 		user = strings.Join(ctx.Args, " ")

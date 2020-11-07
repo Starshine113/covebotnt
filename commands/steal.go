@@ -8,11 +8,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 )
 
 // Steal adds an emote by URL/ID
-func Steal(ctx *cbctx.Ctx) (err error) {
+func Steal(ctx *crouter.Ctx) (err error) {
 	if err = ctx.CheckArgRange(1, 2); err != nil {
 		ctx.CommandError(err)
 		return nil

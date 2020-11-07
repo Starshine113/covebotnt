@@ -7,13 +7,13 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandGkChannel(ctx *cbctx.Ctx) (err error) {
+func commandGkChannel(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "<channel>",
 			MissingArgs:  "<channel>",
 		})
@@ -41,9 +41,9 @@ func commandGkChannel(ctx *cbctx.Ctx) (err error) {
 	return
 }
 
-func commandGkMessage(ctx *cbctx.Ctx) (err error) {
+func commandGkMessage(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "<msg>",
 			MissingArgs:  "<msg>",
 		})
@@ -94,13 +94,13 @@ func commandGkMessage(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v Updated the gatekeeper welcome message.", cbctx.SuccessEmoji))
+	_, err = ctx.Send(fmt.Sprintf("%v Updated the gatekeeper welcome message.", crouter.SuccessEmoji))
 	return
 }
 
-func commandWelcomeChannel(ctx *cbctx.Ctx) (err error) {
+func commandWelcomeChannel(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "<channel>",
 			MissingArgs:  "<channel>",
 		})
@@ -128,9 +128,9 @@ func commandWelcomeChannel(ctx *cbctx.Ctx) (err error) {
 	return
 }
 
-func commandWelcomeMessage(ctx *cbctx.Ctx) (err error) {
+func commandWelcomeMessage(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "<msg>",
 			MissingArgs:  "<msg>",
 		})
@@ -181,6 +181,6 @@ func commandWelcomeMessage(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v Updated the welcome message.", cbctx.SuccessEmoji))
+	_, err = ctx.Send(fmt.Sprintf("%v Updated the welcome message.", crouter.SuccessEmoji))
 	return
 }

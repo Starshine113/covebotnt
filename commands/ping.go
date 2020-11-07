@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 )
 
 // Ping command: replies with latency and message edit time
-func Ping(ctx *cbctx.Ctx) (err error) {
+func Ping(ctx *crouter.Ctx) (err error) {
 	heartbeat := ctx.Session.HeartbeatLatency().String()
 
 	// get current time

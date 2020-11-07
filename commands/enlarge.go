@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Enlarge enlarges a custom emoji
-func Enlarge(ctx *cbctx.Ctx) (err error) {
+func Enlarge(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) == 0 {
-		_, err = ctx.CommandError(&cbctx.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: 0})
+		_, err = ctx.CommandError(&crouter.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: 0})
 		return err
 	}
 
@@ -38,6 +38,6 @@ func Enlarge(ctx *cbctx.Ctx) (err error) {
 		_, err = ctx.Send(embed)
 		return err
 	}
-	_, err = ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{RequiredArgs: "emoji", MissingArgs: "emoji"})
+	_, err = ctx.CommandError(&crouter.ErrorMissingRequiredArgs{RequiredArgs: "emoji", MissingArgs: "emoji"})
 	return err
 }

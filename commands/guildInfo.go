@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
 // GuildInfo command shows information about the current guild
-func GuildInfo(ctx *cbctx.Ctx) (err error) {
+func GuildInfo(ctx *crouter.Ctx) (err error) {
 	guild, err := ctx.Session.State.Guild(ctx.Message.GuildID)
 	if err != nil {
 		return err

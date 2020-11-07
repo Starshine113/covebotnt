@@ -4,15 +4,15 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/flagparser"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Echo says whatever the user inputs through the bot
-func Echo(ctx *cbctx.Ctx) (err error) {
+func Echo(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) == 0 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: len(ctx.Args)})
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{NumRequiredArgs: 1, SuppliedArgs: len(ctx.Args)})
 		return nil
 	}
 
@@ -61,13 +61,13 @@ func Echo(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	err = ctx.React(cbctx.SuccessEmoji)
+	err = ctx.React(crouter.SuccessEmoji)
 	if err != nil {
 		return nil
 	}
 
 	if channelID != ctx.Message.ChannelID {
-		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, cbctx.SuccessEmoji+" Sent message to <#"+channelID+">")
+		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, crouter.SuccessEmoji+" Sent message to <#"+channelID+">")
 		if err != nil {
 			return err
 		}

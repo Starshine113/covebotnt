@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 )
 
-func commandPrefix(ctx *cbctx.Ctx) (err error) {
+func commandPrefix(ctx *crouter.Ctx) (err error) {
 	// if there are no arguments, show the current prefix
 	if len(ctx.Args) == 0 {
 		if globalSettings[ctx.Message.GuildID].Prefix == "" {
@@ -26,7 +26,7 @@ func commandPrefix(ctx *cbctx.Ctx) (err error) {
 
 	// if there's more than 1 argument, error
 	if len(ctx.Args) > 1 {
-		ctx.CommandError(&cbctx.ErrorTooManyArguments{1, len(ctx.Args)})
+		ctx.CommandError(&crouter.ErrorTooManyArguments{1, len(ctx.Args)})
 		return nil
 	}
 

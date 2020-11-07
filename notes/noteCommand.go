@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
 // CommandNotes list all notes for a given user
-func CommandNotes(ctx *cbctx.Ctx) (err error) {
+func CommandNotes(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "user: id/mention",
 			MissingArgs:  "user: id/mention",
 		})

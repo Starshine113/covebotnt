@@ -5,17 +5,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/Starshine113/flagparser"
 	"github.com/bwmarrin/discordgo"
 )
 
 // LogMute adds a mute to the mute log
-func LogMute(ctx *cbctx.Ctx) (err error) {
+func LogMute(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 1,
 			SuppliedArgs:    len(ctx.Args),
 		})
@@ -34,7 +34,7 @@ func LogMute(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 	if len(args["rest"].([]string)) == 0 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
 			RequiredArgs: "<user ID/mention>",
 			MissingArgs:  "<user ID/mention>",
 		})
@@ -76,7 +76,7 @@ func LogMute(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v Added this mute to the mod log.", cbctx.SuccessEmoji))
+	_, err = ctx.Send(fmt.Sprintf("%v Added this mute to the mod log.", crouter.SuccessEmoji))
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func LogMute(ctx *cbctx.Ctx) (err error) {
 	modLog := ctx.AdditionalParams["guildSettings"].(*structs.GuildSettings).Moderation.ModLog
 
 	if modLog == "" {
-		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", cbctx.WarnEmoji, ctx.GuildPrefix))
+		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", crouter.WarnEmoji, ctx.GuildPrefix))
 		return
 	}
 

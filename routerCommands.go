@@ -231,7 +231,7 @@ func addModCommands() {
 			Aliases:     []string{"a"},
 			Description: "Approves a user in the gatekeeper",
 			Usage:       "approve <user ID>",
-			Permissions: crouter.PermLevelNone,
+			Permissions: crouter.PermLevelMod,
 			Command:     commands.GkApprove,
 		},
 	})

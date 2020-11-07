@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 )
 
-func commandKill(ctx *cbctx.Ctx) (err error) {
+func commandKill(ctx *crouter.Ctx) (err error) {
 	_, err = ctx.Send("Restarting the bot, please wait...")
 	if err != nil {
 		return err

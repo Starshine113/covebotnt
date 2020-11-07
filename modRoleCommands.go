@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandModRoles(ctx *cbctx.Ctx) (err error) {
+func commandModRoles(ctx *crouter.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
@@ -19,7 +19,7 @@ func commandModRoles(ctx *cbctx.Ctx) (err error) {
 		switch ctx.Args[0] {
 		case "add":
 			if len(ctx.Args) != 2 {
-				_, err = ctx.Send(cbctx.ErrorEmoji + "No/too many roles supplied.")
+				_, err = ctx.Send(crouter.ErrorEmoji + "No/too many roles supplied.")
 				return err
 			}
 			role, err := ctx.ParseRole(ctx.Args[1])
@@ -36,7 +36,7 @@ func commandModRoles(ctx *cbctx.Ctx) (err error) {
 			return err
 		case "remove", "delete":
 			if len(ctx.Args) != 2 {
-				_, err = ctx.Send(cbctx.ErrorEmoji + "No/too many roles supplied.")
+				_, err = ctx.Send(crouter.ErrorEmoji + "No/too many roles supplied.")
 				return err
 			}
 			role, err := ctx.ParseRole(ctx.Args[1])
@@ -65,7 +65,7 @@ func commandModRoles(ctx *cbctx.Ctx) (err error) {
 	return nil
 }
 
-func commandHelperRoles(ctx *cbctx.Ctx) (err error) {
+func commandHelperRoles(ctx *crouter.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func commandHelperRoles(ctx *cbctx.Ctx) (err error) {
 		switch ctx.Args[0] {
 		case "add":
 			if len(ctx.Args) != 2 {
-				_, err = ctx.Send(cbctx.ErrorEmoji + "No/too many roles supplied.")
+				_, err = ctx.Send(crouter.ErrorEmoji + "No/too many roles supplied.")
 				return err
 			}
 			role, err := ctx.ParseRole(ctx.Args[1])
@@ -92,7 +92,7 @@ func commandHelperRoles(ctx *cbctx.Ctx) (err error) {
 			return err
 		case "remove", "delete":
 			if len(ctx.Args) != 2 {
-				_, err = ctx.Send(cbctx.ErrorEmoji + "No/too many roles supplied.")
+				_, err = ctx.Send(crouter.ErrorEmoji + "No/too many roles supplied.")
 				return err
 			}
 			role, err := ctx.ParseRole(ctx.Args[1])

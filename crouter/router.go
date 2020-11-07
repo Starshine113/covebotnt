@@ -3,7 +3,6 @@ package crouter
 import (
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
@@ -25,7 +24,7 @@ func NewRouter() *Router {
 }
 
 // dummy is used when a command isn't handled with the normal process
-func (r *Router) dummy(ctx *cbctx.Ctx) error {
+func (r *Router) dummy(ctx *Ctx) error {
 	return nil
 }
 
@@ -37,6 +36,21 @@ func (r *Router) AddCommand(cmd *Command) {
 // AddResponse adds an autoresponse to the router
 func (r *Router) AddResponse(response *AutoResponse) {
 	r.AutoResponses = append(r.AutoResponses, response)
+}
+
+// GetCommand gets a command by name
+func (r *Router) GetCommand(name string) (c *Command) {
+	for _, cmd := range r.Commands {
+		if cmd.Name == name {
+			return cmd
+		}
+		for _, a := range cmd.Aliases {
+			if a == name {
+				return cmd
+			}
+		}
+	}
+	return nil
 }
 
 // Respond checks if the message is any of the configured autoresponse triggers, and responds if it is
@@ -53,9 +67,10 @@ func (r *Router) Respond(s *discordgo.Session, m *discordgo.MessageCreate) (err 
 }
 
 // Execute actually executes the router
-func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
 	// add the guild settings to the additional parameters
 	ctx.AdditionalParams["guildSettings"] = guildSettings
+	ctx.GuildSettings = guildSettings
 
 	if ctx.Match("help") || ctx.Match("usage") || ctx.Match("hlep") {
 		err = r.Help(ctx, guildSettings, ownerIDs)
@@ -79,30 +94,10 @@ func (r *Router) Execute(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, o
 	}
 	for _, cmd := range r.Commands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
-			if cmd.Permissions == PermLevelHelper {
-				perms := checkHelperPerm(ctx, guildSettings)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
-			} else if cmd.Permissions == PermLevelMod {
-				perms := checkModPerm(ctx, guildSettings)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
-			} else if cmd.Permissions == PermLevelAdmin {
-				perms := checkAdmin(ctx)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
-			} else if cmd.Permissions == PermLevelOwner {
-				perms := checkOwner(ctx.Author.ID, ownerIDs)
-				if perms != nil {
-					ctx.CommandError(perms)
-					return nil
-				}
+			ctx.Cmd = cmd
+			if perms := ctx.Check(ownerIDs); perms != nil {
+				ctx.CommandError(perms)
+				return nil
 			}
 			err = cmd.Command(ctx)
 			return err

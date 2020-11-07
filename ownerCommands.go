@@ -4,11 +4,11 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/pelletier/go-toml"
 )
 
-func commandSetStatus(ctx *cbctx.Ctx) (err error) {
+func commandSetStatus(ctx *crouter.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
@@ -16,7 +16,7 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 
 	// this command needs at least 1 arguments
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{1, len(ctx.Args)})
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{1, len(ctx.Args)})
 		return nil
 	}
 
@@ -43,7 +43,7 @@ func commandSetStatus(ctx *cbctx.Ctx) (err error) {
 	}
 
 	if len(ctx.Args) < 2 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 2,
 			SuppliedArgs:    len(ctx.Args),
 		})

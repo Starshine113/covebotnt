@@ -1,4 +1,4 @@
-package cbctx
+package crouter
 
 import (
 	"errors"
@@ -34,6 +34,7 @@ type Ctx struct {
 	Handlers         *map[string]func()
 	AdditionalParams map[string]interface{}
 	GuildSettings    *structs.GuildSettings
+	Cmd              *Command
 }
 
 // Context creates a new Ctx

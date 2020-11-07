@@ -5,16 +5,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Warn warns the specified member
-func Warn(ctx *cbctx.Ctx) (err error) {
+func Warn(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 2 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 2,
 			SuppliedArgs:    len(ctx.Args),
 		})
@@ -40,7 +40,7 @@ func Warn(ctx *cbctx.Ctx) (err error) {
 		return nil
 	}
 
-	warnMessage := fmt.Sprintf("%v You were warned in %v.\n**Reason:** %v", cbctx.WarnEmoji, guild.Name, warnReason)
+	warnMessage := fmt.Sprintf("%v You were warned in %v.\n**Reason:** %v", crouter.WarnEmoji, guild.Name, warnReason)
 	_, err = ctx.Session.ChannelMessageSend(dmChannel.ID, warnMessage)
 	if err != nil {
 		ctx.CommandError(err)
@@ -72,7 +72,7 @@ func Warn(ctx *cbctx.Ctx) (err error) {
 		warnCountStr = fmt.Sprintf("%vth", warnCount+1)
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v Warned **%v**, this is their %v warning.", cbctx.SuccessEmoji, member.User.String(), warnCountStr))
+	_, err = ctx.Send(fmt.Sprintf("%v Warned **%v**, this is their %v warning.", crouter.SuccessEmoji, member.User.String(), warnCountStr))
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func Warn(ctx *cbctx.Ctx) (err error) {
 	modLog := ctx.AdditionalParams["guildSettings"].(*structs.GuildSettings).Moderation.ModLog
 
 	if modLog == "" {
-		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", cbctx.WarnEmoji, ctx.GuildPrefix))
+		_, err = ctx.Send(fmt.Sprintf("%v No mod log channel set. Set one with `%vmodlog <channel>`.", crouter.WarnEmoji, ctx.GuildPrefix))
 		return
 	}
 

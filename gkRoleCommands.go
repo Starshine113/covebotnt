@@ -1,10 +1,10 @@
 package main
 
-import "github.com/Starshine113/covebotnt/cbctx"
+import "github.com/Starshine113/covebotnt/crouter"
 
-func commandGkRoles(ctx *cbctx.Ctx) (err error) {
+func commandGkRoles(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 1,
 			SuppliedArgs:    0,
 		})
@@ -30,13 +30,13 @@ func commandGkRoles(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	_, err = ctx.Send(cbctx.SuccessEmoji + " Updated the list of gatekeeper roles.")
+	_, err = ctx.Send(crouter.SuccessEmoji + " Updated the list of gatekeeper roles.")
 	return
 }
 
-func commandMemberRoles(ctx *cbctx.Ctx) (err error) {
+func commandMemberRoles(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 1,
 			SuppliedArgs:    0,
 		})
@@ -62,6 +62,6 @@ func commandMemberRoles(ctx *cbctx.Ctx) (err error) {
 		return err
 	}
 
-	_, err = ctx.Send(cbctx.SuccessEmoji + " Updated the list of member roles.")
+	_, err = ctx.Send(crouter.SuccessEmoji + " Updated the list of member roles.")
 	return
 }

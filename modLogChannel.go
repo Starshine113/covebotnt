@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandModLogChannel(ctx *cbctx.Ctx) (err error) {
+func commandModLogChannel(ctx *crouter.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
 	}
 
 	if len(ctx.Args) != 1 {
-		ctx.CommandError(&cbctx.ErrorMissingRequiredArgs{RequiredArgs: "channel", MissingArgs: "channel"})
+		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{RequiredArgs: "channel", MissingArgs: "channel"})
 		return nil
 	}
 

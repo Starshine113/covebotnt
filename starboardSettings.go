@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
-func commandStarboard(ctx *cbctx.Ctx) (err error) {
+func commandStarboard(ctx *crouter.Ctx) (err error) {
 	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 	if err != nil {
 		return err
@@ -27,9 +27,9 @@ func commandStarboard(ctx *cbctx.Ctx) (err error) {
 	return nil
 }
 
-func commandStarboardChannel(ctx *cbctx.Ctx) (err error) {
+func commandStarboardChannel(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) == 0 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 1,
 			SuppliedArgs:    0,
 		})
@@ -57,9 +57,9 @@ func commandStarboardChannel(ctx *cbctx.Ctx) (err error) {
 	return
 }
 
-func commandStarboardLimit(ctx *cbctx.Ctx) (err error) {
+func commandStarboardLimit(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) == 0 {
-		ctx.CommandError(&cbctx.ErrorNotEnoughArgs{
+		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
 			NumRequiredArgs: 1,
 			SuppliedArgs:    0,
 		})
@@ -83,7 +83,7 @@ func commandStarboardLimit(ctx *cbctx.Ctx) (err error) {
 	return
 }
 
-func commandStarboardEmoji(ctx *cbctx.Ctx) (err error) {
+func commandStarboardEmoji(ctx *crouter.Ctx) (err error) {
 	return
 }
 

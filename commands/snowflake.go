@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Snowflake shows the timestamp of all discord IDs given
-func Snowflake(ctx *cbctx.Ctx) (err error) {
+func Snowflake(ctx *crouter.Ctx) (err error) {
 	if err = ctx.CheckMinArgs(1); err != nil {
 		ctx.CommandError(err)
 		return nil

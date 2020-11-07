@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -19,7 +19,7 @@ type export struct {
 	ModLogs   []*cbdb.ModLogEntry `json:"mod_logs"`
 }
 
-func commandExport(ctx *cbctx.Ctx) (err error) {
+func commandExport(ctx *crouter.Ctx) (err error) {
 	err = ctx.TriggerTyping()
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func commandExport(ctx *cbctx.Ctx) (err error) {
 		Files:   []*discordgo.File{&file},
 	})
 
-	err = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, ctx.Message.ID, cbctx.SuccessEmoji)
+	err = ctx.Session.MessageReactionAdd(ctx.Message.ChannelID, ctx.Message.ID, crouter.SuccessEmoji)
 	if err != nil {
 		return nil
 	}

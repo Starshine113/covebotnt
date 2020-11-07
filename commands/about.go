@@ -5,13 +5,13 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
 // About shows some info about the bot
-func About(ctx *cbctx.Ctx) (err error) {
+func About(ctx *crouter.Ctx) (err error) {
 	startTime := ctx.AdditionalParams["startTime"].(time.Time).UTC()
 
 	embed := &discordgo.MessageEmbed{

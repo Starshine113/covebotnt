@@ -7,14 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
 // UserInfo returns user info, formatted nicely
-func UserInfo(ctx *cbctx.Ctx) (err error) {
+func UserInfo(ctx *crouter.Ctx) (err error) {
 	user, err := ctx.ParseMember(ctx.Author.ID)
 	if err != nil {
 		ctx.CommandError(err)

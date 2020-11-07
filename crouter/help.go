@@ -5,13 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbctx"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Help is the help command
-func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
 	err = ctx.TriggerTyping()
 	if err != nil {
 		return
@@ -103,38 +102,25 @@ func (r *Router) Help(ctx *cbctx.Ctx, guildSettings *structs.GuildSettings, owne
 		return
 	}
 
-	for _, cmd := range r.Commands {
-		aliases := []string{cmd.Name}
-		aliases = append(aliases, cmd.Aliases...)
-		for _, alias := range aliases {
-			if ctx.Args[0] == alias {
-				_, err = ctx.Send(cmdEmbed(cmd))
-				return err
-			}
-		}
+	cmd := r.GetCommand(ctx.Args[0])
+	if cmd != nil {
+		_, err = ctx.Send(cmdEmbed(cmd))
+		return
 	}
-	for _, g := range r.Groups {
-		aliases := []string{g.Name}
-		aliases = append(aliases, g.Aliases...)
-		for _, alias := range aliases {
-			if ctx.Args[0] == alias {
-				if len(ctx.Args) == 1 {
-					_, err = ctx.Send(groupEmbed(g))
-					return
-				}
-				for _, cmd := range g.Subcommands {
-					for _, alias := range append([]string{cmd.Name}, cmd.Aliases...) {
-						if ctx.Args[1] == alias {
-							_, err = ctx.Send(groupCmdEmbed(g, cmd))
-							return
-						}
-					}
-				}
-			}
+	g := r.GetGroup(ctx.Args[0])
+	if g != nil {
+		if len(ctx.Args) == 1 {
+			_, err = ctx.Send(groupEmbed(g))
+			return
+		}
+		cmd = g.GetCommand(ctx.Args[1])
+		if cmd != nil {
+			_, err = ctx.Send(groupCmdEmbed(g, cmd))
+			return
 		}
 	}
 
-	_, err = ctx.Send(fmt.Sprintf("%v Invalid command or group provided:\n> `%v` is not a known command, group or alias.", cbctx.ErrorEmoji, ctx.Args[0]))
+	_, err = ctx.Send(fmt.Sprintf("%v Invalid command or group provided:\n> `%v` is not a known command, group or alias.", ErrorEmoji, ctx.Args[0]))
 
 	return
 }

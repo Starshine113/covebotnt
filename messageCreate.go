@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -44,7 +44,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	ctx, err := cbctx.Context(prefix, m.Content, s, m, pool, boltDb, &handlerMap)
+	ctx, err := crouter.Context(prefix, m.Content, s, m, pool, boltDb, &handlerMap)
 	if err != nil {
 		sugar.Errorf("Error getting context: %v", err)
 		return
@@ -60,7 +60,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	match, _ := regexp.MatchString(fmt.Sprintf("<@!?%v>.*hello$", botUser.ID), content)
 	match2, _ := regexp.MatchString(fmt.Sprintf("%vhello$", regexp.QuoteMeta(prefix)), content)
 	if match || match2 {
-		ctx, err = cbctx.Context("--", "--hello", s, m, pool, boltDb, &handlerMap)
+		ctx, err = crouter.Context("--", "--hello", s, m, pool, boltDb, &handlerMap)
 		if err != nil {
 			sugar.Errorf("Error getting context: %v", err)
 			return

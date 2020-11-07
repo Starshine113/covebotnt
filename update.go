@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/Starshine113/covebotnt/cbctx"
+	"github.com/Starshine113/covebotnt/crouter"
 )
 
-func commandUpdate(ctx *cbctx.Ctx) (err error) {
+func commandUpdate(ctx *crouter.Ctx) (err error) {
 	_, err = ctx.Send("Updating Git repository...")
 	if err != nil {
 		return err
