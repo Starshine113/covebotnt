@@ -7,6 +7,9 @@ import (
 
 // Check checks if the user has permissions to run a command
 func (ctx *Ctx) Check(owners []string) (err error) {
+	if ctx.Cmd.GuildOnly && ctx.Message.GuildID == "" {
+		return &ErrorNoDMs{}
+	}
 	if ctx.Cmd.Permissions == PermLevelHelper {
 		return checkHelperPerm(ctx, ctx.GuildSettings)
 	} else if ctx.Cmd.Permissions == PermLevelMod {

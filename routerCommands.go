@@ -26,12 +26,22 @@ func addUserCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "color",
+		Aliases:     []string{"colour"},
+		Description: "Previews a color",
+		Usage:       "color <color>",
+		Permissions: crouter.PermLevelNone,
+		Command:     commands.Color,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "avatar",
 		Aliases:     []string{"pfp", "a"},
 		Description: "Show a user's avatar",
 		Usage:       "avatar [user]",
 		Permissions: crouter.PermLevelNone,
 		Command:     commands.Avatar,
+		GuildOnly:   true,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -58,6 +68,7 @@ func addUserCommands() {
 		Usage:       "info [user]",
 		Permissions: crouter.PermLevelNone,
 		Command:     commands.UserInfo,
+		GuildOnly:   true,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -67,6 +78,7 @@ func addUserCommands() {
 		Usage:       "serverinfo",
 		Permissions: crouter.PermLevelNone,
 		Command:     commands.GuildInfo,
+		GuildOnly:   true,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -85,6 +97,7 @@ func addUserCommands() {
 		Usage:       "hello",
 		Permissions: crouter.PermLevelNone,
 		Command:     commands.Hello,
+		GuildOnly:   true,
 	})
 }
 

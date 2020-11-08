@@ -60,4 +60,5 @@ type Command struct {
 	Usage       string
 	Permissions PermLevel
 	Command     func(*Ctx) error
+	GuildOnly   bool
 }
