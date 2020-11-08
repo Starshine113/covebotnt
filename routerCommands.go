@@ -70,6 +70,15 @@ func addUserCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "majorityof",
+		Aliases:     []string{"majority"},
+		Description: "Get the majority of a number with abstains",
+		Usage:       "majorityof <count> [abstains]",
+		Permissions: crouter.PermLevelNone,
+		Command:     commands.MajorityOf,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "hello",
 		Aliases:     []string{"hi", "henlo", "heya", "heyo"},
 		Description: "Say hi to the bot",
@@ -220,6 +229,14 @@ func addModCommands() {
 		Usage:       "ban <user ID> [reason]",
 		Permissions: crouter.PermLevelMod,
 		Command:     commands.Ban,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "mvc",
+		Description: "Get the mvc majority",
+		Usage:       "mvc [abstains]",
+		Permissions: crouter.PermLevelMod,
+		Command:     commands.MVC,
 	})
 
 	gk := router.AddGroup(&crouter.Group{
