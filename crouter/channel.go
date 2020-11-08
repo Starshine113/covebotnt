@@ -2,6 +2,8 @@ package crouter
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -19,6 +21,29 @@ func (ctx *Ctx) Send(arg interface{}) (message *discordgo.Message, err error) {
 		err = errors.New("don't know what to do with that type")
 	}
 	return message, err
+}
+
+// Sendf sends a fmt.Sprintf-like input string
+func (ctx *Ctx) Sendf(args ...interface{}) (msg *discordgo.Message, err error) {
+	if len(args) < 2 {
+		return nil, errors.New("not enough arguments")
+	}
+	format := args[0].(string)
+	args = args[1:]
+	msg, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf(format, args...))
+	return
+}
+
+// Embed sends the input as an embed
+func (ctx *Ctx) Embed(title, description string, color int) (msg *discordgo.Message, err error) {
+	embed := &discordgo.MessageEmbed{
+		Title:       title,
+		Description: description,
+		Color:       color,
+		Timestamp:   time.Now().UTC().Format(time.RFC3339),
+	}
+	msg, err = ctx.Session.ChannelMessageSendEmbed(ctx.Message.ChannelID, embed)
+	return
 }
 
 // Edit a message

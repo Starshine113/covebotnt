@@ -6,7 +6,11 @@ import bolt "go.etcd.io/bbolt"
 func BoltInit(db *bolt.DB) (*BoltDb, error) {
 	err := db.Update(func(tx *bolt.Tx) (err error) {
 		_, err = tx.CreateBucketIfNotExists([]byte("starboardBlacklist"))
-		return err
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte("errors"))
+		return
 	})
 
 	return &BoltDb{Bolt: db}, err

@@ -350,6 +350,14 @@ func addOwnerCommands() {
 		Permissions: crouter.PermLevelOwner,
 		Command:     commandUpdate,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "error",
+		Description: "Get an error by UUID",
+		Usage:       "error <UUID>",
+		Permissions: crouter.PermLevelOwner,
+		Command:     commands.Error,
+	})
 }
 
 func addAutoResponses() {

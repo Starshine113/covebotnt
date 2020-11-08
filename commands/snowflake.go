@@ -23,8 +23,8 @@ func Snowflake(ctx *crouter.Ctx) (err error) {
 		for _, a := range args {
 			t, err := discordgo.SnowflakeTimestamp(a)
 			if err != nil {
-				ctx.CommandError(err)
-				continue
+				_, err = ctx.CommandError(err)
+				return err
 			}
 			msgs = append(msgs, fmt.Sprintf("`%v`: %v", a, t.UTC().Format(time.RFC3339)))
 		}

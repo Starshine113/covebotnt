@@ -10,6 +10,7 @@ require (
 	github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655
 	github.com/andersfylling/disgord v0.19.1
 	github.com/bwmarrin/discordgo v0.22.0
+	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx/v4 v4.9.0
 	github.com/pelletier/go-toml v1.8.1
 	go.etcd.io/bbolt v1.3.5
