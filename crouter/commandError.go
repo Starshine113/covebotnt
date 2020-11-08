@@ -1,6 +1,7 @@
 package crouter
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Starshine113/covebotnt/cbdb"
@@ -52,7 +53,7 @@ func (ctx *Ctx) CommandError(err error) (error, error) {
 
 		embed := &discordgo.MessageEmbed{
 			Title:       "Internal error occured",
-			Description: "If this error persists, please contact the bot developer with the ID above.",
+			Description: fmt.Sprintf("```%v```\nIf this error persists, please contact the bot developer with the ID above.", err.Error()),
 			Color:       0xbf1122,
 			Timestamp:   time.Now().UTC().Format(time.RFC3339),
 			Footer: &discordgo.MessageEmbedFooter{
