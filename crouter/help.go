@@ -56,35 +56,35 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs [
 
 		fields := []*discordgo.MessageEmbedField{
 			{
-				Name:   fmt.Sprintf("User commands (%v)", len(strings.Split(userCmdString, "\n"))),
+				Name:   fmt.Sprintf("User commands (%v)", len(strings.Split(userCmdString, "\n"))-1),
 				Value:  userCmdString,
 				Inline: false,
 			},
 		}
 		if level >= 1 {
 			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:   fmt.Sprintf("Helper commands (%v)", len(strings.Split(helperCmdString, "\n"))),
+				Name:   fmt.Sprintf("Helper commands (%v)", len(strings.Split(helperCmdString, "\n"))-1),
 				Value:  helperCmdString,
 				Inline: false,
 			})
 		}
 		if level >= 2 {
 			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:   fmt.Sprintf("Mod commands (%v)", len(strings.Split(modCmdString, "\n"))),
+				Name:   fmt.Sprintf("Mod commands (%v)", len(strings.Split(modCmdString, "\n"))-1),
 				Value:  modCmdString,
 				Inline: false,
 			})
 		}
 		if level >= 3 {
 			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:   fmt.Sprintf("Admin commands (%v)", len(strings.Split(adminCmdString, "\n"))),
+				Name:   fmt.Sprintf("Admin commands (%v)", len(strings.Split(adminCmdString, "\n"))-1),
 				Value:  adminCmdString,
 				Inline: false,
 			})
 		}
 
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   fmt.Sprintf("Groups (%v)", len(strings.Split(groupCmds, "\n"))),
+			Name:   fmt.Sprintf("Groups (%v)", len(strings.Split(groupCmds, "\n"))-1),
 			Value:  groupCmds,
 			Inline: false,
 		})
@@ -160,7 +160,7 @@ func groupEmbed(g *Group) *discordgo.MessageEmbed {
 			},
 			{
 				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v```", g.Command.Usage),
+				Value:  fmt.Sprintf("```%v %v```", g.Command.Name, g.Command.Usage),
 				Inline: false,
 			},
 			{
@@ -190,7 +190,7 @@ func groupCmdEmbed(g *Group, cmd *Command) *discordgo.MessageEmbed {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v %v```", g.Name, cmd.Usage),
+				Value:  fmt.Sprintf("```%v %v %v```", g.Name, cmd.Name, cmd.Usage),
 				Inline: false,
 			},
 			{
@@ -225,7 +225,7 @@ func cmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v```", cmd.Usage),
+				Value:  fmt.Sprintf("```%v %v```", cmd.Name, cmd.Usage),
 				Inline: false,
 			},
 			{
