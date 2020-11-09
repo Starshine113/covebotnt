@@ -15,13 +15,13 @@ func Ping(ctx *crouter.Ctx) (err error) {
 	cmdStart := time.Now()
 
 	// send initial message
-	message, err := ctx.Send("Pong!\nHeartbeat: " + heartbeat)
+	msg, err := ctx.Embedf("Pong!", "Heartbeat: %v", heartbeat)
 	if err != nil {
 		return fmt.Errorf("Ping: %w", err)
 	}
 
 	// get time difference, edit message
 	diff := time.Now().Sub(cmdStart).String()
-	_, err = ctx.Edit(message, message.Content+"\nMessage latency: "+diff)
+	_, err = ctx.EditEmbedf(msg, "Pong!", "Heartbeat: %v\nMessage latency: %v", heartbeat, diff)
 	return err
 }
