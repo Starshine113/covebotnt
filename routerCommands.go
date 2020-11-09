@@ -72,6 +72,16 @@ func addUserCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "roleinfo",
+		Aliases:     []string{"ri"},
+		Description: "Show information about a role",
+		Usage:       "roleinfo <role>",
+		Permissions: crouter.PermLevelNone,
+		Command:     commands.RoleInfo,
+		GuildOnly:   true,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "serverinfo",
 		Aliases:     []string{"si", "guildinfo"},
 		Description: "Show information about the current server",
@@ -352,6 +362,14 @@ func addAdminCommands() {
 		Usage:       "helperroles [add|remove <role>]",
 		Permissions: crouter.PermLevelAdmin,
 		Command:     commandHelperRoles,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "refreshmvc",
+		Description: "Refresh the mvc role",
+		Usage:       "refreshmvc",
+		Permissions: crouter.PermLevelAdmin,
+		Command:     commands.RefreshMVC,
 	})
 }
 
