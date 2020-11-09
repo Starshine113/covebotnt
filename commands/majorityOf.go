@@ -29,7 +29,7 @@ func MajorityOf(ctx *crouter.Ctx) (err error) {
 		}
 	}
 
-	majority := math.Ceil(float64(((count - abstains) / 2) + 1))
+	majority := (count-abstains)/2 + 1
 	_, err = ctx.Sendf("The majority of %v with %v abstains is %v.", count, abstains, majority)
 	return
 }
