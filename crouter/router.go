@@ -12,10 +12,10 @@ func NewRouter() *Router {
 	router := &Router{}
 
 	router.AddCommand(&Command{
-		Name:        "help",
-		Aliases:     []string{"usage", "hlep"},
+		Name:        "Help",
+		Aliases:     []string{"Usage", "Hlep"},
 		Description: "Show info about how to use the bot",
-		Usage:       "help [command]",
+		Usage:       "[command]",
 		Permissions: PermLevelNone,
 		Command:     router.dummy,
 	})
@@ -41,11 +41,11 @@ func (r *Router) AddResponse(response *AutoResponse) {
 // GetCommand gets a command by name
 func (r *Router) GetCommand(name string) (c *Command) {
 	for _, cmd := range r.Commands {
-		if cmd.Name == name {
+		if strings.ToLower(cmd.Name) == strings.ToLower(name) {
 			return cmd
 		}
 		for _, a := range cmd.Aliases {
-			if a == name {
+			if strings.ToLower(a) == strings.ToLower(name) {
 				return cmd
 			}
 		}

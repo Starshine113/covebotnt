@@ -15,7 +15,7 @@ func (ctx *Ctx) MatchPrefix() bool {
 // Match checks if any of the given command aliases match
 func (ctx *Ctx) Match(cmds ...string) bool {
 	for _, cmd := range cmds {
-		if strings.ToLower(ctx.Command) == cmd {
+		if strings.ToLower(ctx.Command) == strings.ToLower(cmd) {
 			return true
 		}
 	}

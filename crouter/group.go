@@ -1,6 +1,8 @@
 package crouter
 
 import (
+	"strings"
+
 	"github.com/Starshine113/covebotnt/structs"
 )
 
@@ -42,20 +44,20 @@ func (r *Router) GetGroup(name string) (group *Group) {
 // GetCommand gets a command by name
 func (g *Group) GetCommand(name string) (c *Command) {
 	for _, cmd := range g.Subcommands {
-		if cmd.Name == name {
+		if strings.ToLower(cmd.Name) == strings.ToLower(name) {
 			return cmd
 		}
 		for _, a := range cmd.Aliases {
-			if a == name {
+			if strings.ToLower(a) == strings.ToLower(name) {
 				return cmd
 			}
 		}
 	}
-	if g.Command.Name == name {
+	if strings.ToLower(g.Command.Name) == strings.ToLower(name) {
 		return g.Command
 	}
 	for _, a := range g.Command.Aliases {
-		if a == name {
+		if strings.ToLower(a) == strings.ToLower(name) {
 			return g.Command
 		}
 	}
