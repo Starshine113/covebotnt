@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 
@@ -30,7 +29,7 @@ func MajorityOf(ctx *crouter.Ctx) (err error) {
 	}
 
 	majority := (count-abstains)/2 + 1
-	_, err = ctx.Sendf("The majority of %v with %v abstains is %v.", count, abstains, majority)
+	_, err = ctx.Embedf("Majority", "The majority of %v with %v abstains is %v.", count, abstains, majority)
 	return
 }
 
@@ -73,6 +72,6 @@ func MVC(ctx *crouter.Ctx) (err error) {
 	}
 
 	majority := math.Ceil(float64(((count - abstains) / 2) + 1))
-	_, err = ctx.Embed("MVC majority", fmt.Sprintf("The majority of %v with %v abstains is %v.", count, abstains, majority), 0x21a1a8)
+	_, err = ctx.Embedf("MVC majority", "The majority of %v with %v abstains is %v.", count, abstains, majority)
 	return
 }
