@@ -95,6 +95,9 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 				return
 			}
 		}
+		if m.Author.ID == botUser.ID {
+			return
+		}
 
 		timestamp, err := discordgo.SnowflakeTimestamp(m.ID)
 		if err != nil {
