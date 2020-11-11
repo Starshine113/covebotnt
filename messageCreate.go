@@ -85,7 +85,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.GuildID != "" {
 		return
 	}
-	if config.Bot.DMWebhook != "" {
+	if config.Bot.DMWebhook != "" && m.Author.ID != s.State.User.ID {
 		for _, u := range config.Bot.BlockedUsers {
 			if m.Author.ID == u {
 				_, err = s.ChannelMessageSend(m.ChannelID, "You are blocked from DMing the bot. Please DM a bot admin if you think this is in error.")
@@ -94,9 +94,6 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 				return
 			}
-		}
-		if m.Author.ID == botUser.ID {
-			return
 		}
 
 		timestamp, err := discordgo.SnowflakeTimestamp(m.ID)
