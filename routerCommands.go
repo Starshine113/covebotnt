@@ -400,6 +400,14 @@ func addOwnerCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "AdminDM",
+		Description: "Send any user sharing a server with the bot a message, including attachment",
+		Usage:       "<user ID> <message>",
+		Permissions: crouter.PermLevelOwner,
+		Command:     commands.AdminDM,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "Error",
 		Description: "Get an error by UUID",
 		Usage:       "<UUID>",

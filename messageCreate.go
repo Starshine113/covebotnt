@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
+	"codeberg.org/eviedelta/dwhook"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
@@ -77,6 +79,58 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		return
+	}
+
+	// no commands were triggered, so check if it's a DM, if not, return
+	if m.GuildID != "" {
+		return
+	}
+	if config.Bot.DMWebhook != "" {
+		for _, u := range config.Bot.BlockedUsers {
+			if m.Author.ID == u {
+				_, err = s.ChannelMessageSend(m.ChannelID, "You are blocked from DMing the bot. Please DM a bot admin if you think this is in error.")
+				if err != nil {
+					sugar.Errorf("Error sending message: %v", err)
+				}
+				return
+			}
+		}
+
+		timestamp, err := discordgo.SnowflakeTimestamp(m.ID)
+		if err != nil {
+			sugar.Errorf("Error when getting timestamp for message %v: %v", m.ID, err)
+		}
+
+		var attachmentLink string
+		if len(m.Attachments) > 0 {
+			match, _ := regexp.MatchString("\\.(png|jpg|jpeg|gif|webp)$", m.Attachments[0].URL)
+			if match {
+				attachmentLink = m.Attachments[0].URL
+			}
+		}
+
+		msg := dwhook.Message{
+			Content:   fmt.Sprintf("%v got DMed a message by %v (%v/%v):", botUser.Username, m.Author.String(), m.Author.Mention(), m.Author.ID),
+			Username:  botUser.Username,
+			AvatarURL: botUser.AvatarURL("256"),
+			Embeds: []dwhook.Embed{{
+				Author: dwhook.EmbedAuthor{
+					Name:    m.Author.String(),
+					IconURL: m.Author.AvatarURL("128"),
+				},
+				Color:       0x21a1a8,
+				Description: m.Content,
+				Footer: dwhook.EmbedFooter{
+					Text: "Original message ID: " + m.ID,
+				},
+				Timestamp: timestamp.UTC().Format(time.RFC3339),
+				Image: dwhook.EmbedImage{
+					URL: attachmentLink,
+				},
+			}},
+		}
+
+		dwhook.SendTo(config.Bot.DMWebhook, msg)
 	}
 }
 

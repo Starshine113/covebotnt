@@ -57,10 +57,6 @@ func Context(
 	args := []string{}
 	if len(message) > 1 {
 		args = message[1:]
-		args, err = combineQuotedItems(args)
-		if err != nil {
-			return
-		}
 	}
 
 	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb, Handlers: handlerMap}

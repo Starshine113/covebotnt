@@ -12,6 +12,8 @@ type BotConfig struct {
 		BotOwners    []string `toml:"bot_owners"`
 		Invite       string   `toml:"invite"`
 		AllowedBots  []string `toml:"allowed_bots"`
+		DMWebhook    string   `toml:"dm_webhook"`
+		BlockedUsers []string `toml:"blocked_users"`
 		CustomStatus struct {
 			Type   string `toml:"type"`
 			Status string `toml:"status"`
