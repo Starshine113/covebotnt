@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -40,7 +41,7 @@ func AdminDM(ctx *crouter.Ctx) (err error) {
 			Name:    ctx.BotUser.Username + " Admin",
 		},
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: "Original message ID: " + ctx.Message.ID,
+			Text: "Message ID: " + ctx.Message.ID,
 		},
 		Image: &discordgo.MessageEmbedImage{
 			URL: attachmentLink,
@@ -67,7 +68,8 @@ func AdminDM(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	_, err = ctx.Send("Successfully sent message to user!")
+	send.Content = fmt.Sprintf("> Successfully sent message to user %v", ctx.Args[0])
+	_, err = ctx.Send(send)
 	if err != nil {
 		return err
 	}
