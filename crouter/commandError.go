@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"codeberg.org/eviedelta/dwhook"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
 )
@@ -59,6 +61,29 @@ func (ctx *Ctx) CommandError(err error) (error, error) {
 			Footer: &discordgo.MessageEmbedFooter{
 				Text: id.String(),
 			},
+		}
+
+		config := ctx.AdditionalParams["config"].(structs.BotConfig)
+
+		if config.Bot.LogWebhook != "" {
+			msg := dwhook.Message{
+				Content:   fmt.Sprintf("> An internal error occured in %v (%v) of guild %v\n> Triggered by %v (%v/%v):", ctx.Channel.ID, ctx.Channel.Mention(), ctx.Channel.GuildID, ctx.Author.String(), ctx.Author.Mention(), ctx.Author.ID),
+				Username:  ctx.BotUser.Username + " Error",
+				AvatarURL: ctx.BotUser.AvatarURL("256"),
+				Embeds: []dwhook.Embed{{
+					Color:       0xbf1122,
+					Description: fmt.Sprintf("```%v```", err.Error()),
+					Fields: []dwhook.EmbedField{{
+						Name:  "Command",
+						Value: fmt.Sprintf("**Command**: `%v`\n**Arguments**: `%v`", ctx.Command, ctx.Args),
+					}},
+					Footer: dwhook.EmbedFooter{
+						Text: "Triggering message ID: " + ctx.Author.ID,
+					},
+					Timestamp: time.Now().UTC().Format(time.RFC3339),
+				}},
+			}
+			dwhook.SendTo(config.Bot.LogWebhook, msg)
 		}
 
 		_, msgErr = ctx.Send(&discordgo.MessageSend{
