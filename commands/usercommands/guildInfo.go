@@ -1,4 +1,4 @@
-package commands
+package usercommands
 
 import (
 	"fmt"
@@ -96,7 +96,7 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Created at",
-				Value:  fmt.Sprintf("%v\n(%v ago)", guildCreated.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(guildCreated))),
+				Value:  fmt.Sprintf("%v\n(%v ago)", guildCreated.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(guildCreated))),
 				Inline: true,
 			},
 			{

@@ -1,4 +1,4 @@
-package commands
+package usercommands
 
 import (
 	"fmt"
@@ -202,12 +202,12 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Created at",
-				Value:  fmt.Sprintf("%v\n(%v ago)", createdTime.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(createdTime))),
+				Value:  fmt.Sprintf("%v\n(%v ago)", createdTime.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(createdTime))),
 				Inline: true,
 			},
 			{
 				Name:   "Joined at",
-				Value:  fmt.Sprintf("%v\n(%v ago)\n%v days after the server was created", joinedTime.Format("Jan _2 2006, 15:04:05 MST"), prettyDurationString(time.Since(joinedTime)), days),
+				Value:  fmt.Sprintf("%v\n(%v ago)\n%v days after the server was created", joinedTime.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(joinedTime)), days),
 				Inline: false,
 			},
 			{
@@ -231,7 +231,8 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 	return
 }
 
-func prettyDurationString(duration time.Duration) (out string) {
+// PrettyDurationString ...
+func PrettyDurationString(duration time.Duration) (out string) {
 	var days, hours, hoursFrac, minutes float64
 
 	hours = duration.Hours()

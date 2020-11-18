@@ -25,7 +25,7 @@ func commandGkRoles(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return err
 	}
-	err = getSettingsForGuild(ctx.Message.GuildID)
+	err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func commandMemberRoles(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return err
 	}
-	err = getSettingsForGuild(ctx.Message.GuildID)
+	err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID)
 	if err != nil {
 		return err
 	}

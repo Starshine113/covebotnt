@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Starshine113/covebotnt/commands"
+	"github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/notes"
 	"github.com/bwmarrin/discordgo"
@@ -13,7 +14,7 @@ func addUserCommands() {
 		Description: "Ping pong!",
 		Usage:       "",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.Ping,
+		Command:     usercommands.Ping,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -22,7 +23,7 @@ func addUserCommands() {
 		Description: "Enlarges a custom emoji",
 		Usage:       "<emoji>",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.Enlarge,
+		Command:     usercommands.Enlarge,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -31,7 +32,7 @@ func addUserCommands() {
 		Description: "Previews a color",
 		Usage:       "<color>",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.Color,
+		Command:     usercommands.Color,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -40,7 +41,7 @@ func addUserCommands() {
 		Description: "Show a user's avatar",
 		Usage:       "[user]",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.Avatar,
+		Command:     usercommands.Avatar,
 		GuildOnly:   true,
 	})
 
@@ -50,7 +51,7 @@ func addUserCommands() {
 		Description: "Get timestamps from the given ID(s)",
 		Usage:       "[...IDs]",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.Snowflake,
+		Command:     usercommands.Snowflake,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -58,7 +59,7 @@ func addUserCommands() {
 		Description: "Show some info about the bot",
 		Usage:       "",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.About,
+		Command:     usercommands.About,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -67,7 +68,7 @@ func addUserCommands() {
 		Description: "Show information about a user (or yourself)",
 		Usage:       "[user]",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.UserInfo,
+		Command:     usercommands.UserInfo,
 		GuildOnly:   true,
 	})
 
@@ -77,7 +78,7 @@ func addUserCommands() {
 		Description: "Show information about a role",
 		Usage:       "<role>",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.RoleInfo,
+		Command:     usercommands.RoleInfo,
 		GuildOnly:   true,
 	})
 
@@ -87,7 +88,7 @@ func addUserCommands() {
 		Description: "Show information about the current server",
 		Usage:       "",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.GuildInfo,
+		Command:     usercommands.GuildInfo,
 		GuildOnly:   true,
 	})
 
@@ -106,7 +107,7 @@ func addUserCommands() {
 		Description: "Say hi to the bot",
 		Usage:       "",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.Hello,
+		Command:     usercommands.Hello,
 		GuildOnly:   true,
 	})
 }
@@ -151,6 +152,15 @@ func addHelperCommands() {
 		Usage:       "<user> [-d <duration>] [-hardmute] [reason]",
 		Permissions: crouter.PermLevelHelper,
 		Command:     commands.LogMute,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "BGC",
+		Aliases:     []string{"BackgroundCheck"},
+		Description: "Quickly check a user",
+		Usage:       "<user>",
+		Permissions: crouter.PermLevelHelper,
+		Command:     commands.BGC,
 	})
 }
 
@@ -371,6 +381,29 @@ func addAdminCommands() {
 		Permissions: crouter.PermLevelAdmin,
 		Command:     commands.RefreshMVC,
 	})
+
+	dm := router.AddGroup(&crouter.Group{
+		Name:        "DM",
+		Aliases:     []string{"DirectMessage"},
+		Description: "DM a server user",
+		Command: &crouter.Command{
+			Name:        "Standard",
+			Aliases:     []string{"Std"},
+			Description: "Send a message to a user, showing the moderator's name",
+			Usage:       "<user> <message>",
+			Permissions: crouter.PermLevelAdmin,
+			Command:     commands.DM,
+		},
+	})
+
+	dm.AddCommand(&crouter.Command{
+		Name:        "Anonymous",
+		Aliases:     []string{"Anon"},
+		Description: "Send a message to a user, hiding the moderator's name",
+		Usage:       "<user> <message>",
+		Permissions: crouter.PermLevelAdmin,
+		Command:     commands.AnonDM,
+	})
 }
 
 func addOwnerCommands() {
@@ -392,27 +425,11 @@ func addOwnerCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
-		Name:        "Update",
-		Description: "Update the bot in place",
-		Usage:       "",
-		Permissions: crouter.PermLevelOwner,
-		Command:     commandUpdate,
-	})
-
-	router.AddCommand(&crouter.Command{
 		Name:        "AdminDM",
 		Description: "Send any user sharing a server with the bot a message, including attachment",
 		Usage:       "<user ID> <message>",
 		Permissions: crouter.PermLevelOwner,
 		Command:     commands.AdminDM,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Error",
-		Description: "Get an error by UUID",
-		Usage:       "<UUID>",
-		Permissions: crouter.PermLevelOwner,
-		Command:     commands.Error,
 	})
 }
 

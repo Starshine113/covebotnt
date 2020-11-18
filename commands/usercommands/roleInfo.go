@@ -1,4 +1,4 @@
-package commands
+package usercommands
 
 import (
 	"fmt"
@@ -91,7 +91,7 @@ func RoleInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Created",
-				Value:  fmt.Sprintf("%v ago", prettyDurationString(time.Since(created))),
+				Value:  fmt.Sprintf("%v ago", PrettyDurationString(time.Since(created))),
 				Inline: true,
 			},
 		},

@@ -8,12 +8,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/Starshine113/covebotnt/starboard"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
-	"github.com/jackc/pgx/v4/pgxpool"
 	bolt "go.etcd.io/bbolt"
 	"go.uber.org/zap"
 )
@@ -21,19 +20,14 @@ import (
 const botVersion = "0.35"
 
 var (
-	config           structs.BotConfig
-	globalSettings   map[string]structs.GuildSettings
-	channelBlacklist map[string][]string
-	db               *pgxpool.Pool
-	pool             *cbdb.Db
-	boltDb           *cbdb.BoltDb
-	levelCache       *ttlcache.Cache
-	gitOut           []byte
-	router           *crouter.Router
-	startTime        time.Time
+	config    structs.BotConfig
+	pool      *cbdb.Db
+	boltDb    *cbdb.BoltDb
+	gitOut    []byte
+	router    *crouter.Router
+	startTime time.Time
 
-	messageIDMap, starboardMsgIDMap map[string]string
-	handlerMap                      map[string]func()
+	handlerMap map[string]func()
 )
 
 var (
@@ -42,15 +36,8 @@ var (
 	dg     *discordgo.Session
 )
 
-func loadDB() (err error) {
-	db, err = initDB()
-	if err != nil {
-		return err
-	}
-	pool = &cbdb.Db{Pool: db}
-	channelBlacklist = getBlacklistAll()
-	globalSettings, err = getSettingsAll()
-
+func loadDB(c structs.BotConfig) (err error) {
+	pool, err = cbdb.DbInit(config)
 	return err
 }
 
@@ -60,6 +47,7 @@ func initialise(token, databaseURL string) (err error) {
 	if err != nil {
 		return err
 	}
+	zap.RedirectStdLog(logger)
 	sugar = logger.Sugar()
 
 	// load config
@@ -95,21 +83,11 @@ func initialise(token, databaseURL string) (err error) {
 	}
 
 	// open database connection and load state
-	err = loadDB()
+	err = loadDB(config)
 	if err != nil {
 		return err
 	}
 
-	// create a cache for XP gain
-	levelCache = ttlcache.NewCache()
-	levelCache.SkipTTLExtensionOnHit(true)
-	levelCache.SetTTL(8 * time.Second)
-
-	// get starboard messages
-	messageIDMap, starboardMsgIDMap, err = getStarboardMessages()
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -122,6 +100,11 @@ func main() {
 	err := initialise(*token, *databaseURL)
 	if err != nil {
 		panic(err)
+	}
+
+	sb := starboard.Sb{
+		Sugar: sugar,
+		Pool:  pool,
 	}
 
 	git := exec.Command("git", "rev-parse", "--short", "HEAD")
@@ -144,10 +127,10 @@ func main() {
 	dg.AddHandler(guildJoin)
 
 	// add reaction add/remove handler for starboard
-	dg.AddHandler(starboardReactionAdd)
-	dg.AddHandler(starboardReactionRemove)
+	dg.AddHandler(sb.ReactionAdd)
+	dg.AddHandler(sb.ReactionRemove)
 	// add message delete handler for starboard
-	dg.AddHandler(starboardMessageDelete)
+	dg.AddHandler(sb.MessageDelete)
 
 	// add join handler
 	dg.AddHandler(onJoin)
@@ -169,12 +152,11 @@ func main() {
 	defer func() {
 		dg.Close()
 		sugar.Infof("Disconnected from Discord.")
-		db.Close()
+		pool.Pool.Close()
 		sugar.Infof("Closed database connection.")
 
 		logger.Sync()
 		boltDb.Bolt.Close()
-		levelCache.Close()
 	}()
 
 	sugar.Infof("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")

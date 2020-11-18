@@ -33,7 +33,7 @@ func commandGkChannel(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
-	err = getSettingsForGuild(ctx.Message.GuildID)
+	err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func commandGkMessage(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
-	err = getSettingsForGuild(ctx.Message.GuildID)
+	err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func commandWelcomeChannel(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
-	err = getSettingsForGuild(ctx.Message.GuildID)
+	err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func commandWelcomeMessage(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
-	err = getSettingsForGuild(ctx.Message.GuildID)
+	err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID)
 	if err != nil {
 		return err
 	}

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/Starshine113/flagparser"
@@ -61,7 +62,7 @@ func LogMute(ctx *crouter.Ctx) (err error) {
 	if args["d"].(time.Duration) == defaultDuration {
 		duration = "none"
 	} else {
-		duration = prettyDurationString(args["d"].(time.Duration))
+		duration = usercommands.PrettyDurationString(args["d"].(time.Duration))
 	}
 
 	entry, err := ctx.Database.AddToModLog(&cbdb.ModLogEntry{

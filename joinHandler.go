@@ -13,7 +13,10 @@ func onJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 		return
 	}
 
-	guildConf := globalSettings[m.GuildID]
+	guildConf, err := pool.GetGuildSettings(m.GuildID)
+	if err != nil {
+		sugar.Errorf("Error getting guild settings: %v", err)
+	}
 	if guildConf.Gatekeeper.GatekeeperChannel != "" {
 		var msgB bytes.Buffer
 		tmpl, err := template.New("gatekeeper").Parse(guildConf.Gatekeeper.GatekeeperMessage)

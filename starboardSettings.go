@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -20,7 +21,12 @@ func commandStarboard(ctx *crouter.Ctx) (err error) {
 		return nil
 	}
 
-	_, err = ctx.Send(currentStarboardSettings(guild))
+	s, err := ctx.Database.GetGuildSettings(ctx.Message.GuildID)
+	if err != nil {
+		_, err = ctx.CommandError(err)
+		return err
+	}
+	_, err = ctx.Send(currentStarboardSettings(guild, s))
 	if err != nil {
 		return fmt.Errorf("Starboard: %w", err)
 	}
@@ -45,7 +51,7 @@ func commandStarboardChannel(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
-	err = setStarboardChannel(channel.ID, ctx.Message.GuildID)
+	err = pool.SetStarboardChannel(channel.ID, ctx.Message.GuildID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
@@ -71,7 +77,7 @@ func commandStarboardLimit(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
-	err = setStarboardLimit(int(limit), ctx.Message.GuildID)
+	err = pool.SetStarboardLimit(int(limit), ctx.Message.GuildID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
@@ -87,9 +93,9 @@ func commandStarboardEmoji(ctx *crouter.Ctx) (err error) {
 	return
 }
 
-func currentStarboardSettings(guild *discordgo.Guild) *discordgo.MessageEmbed {
+func currentStarboardSettings(guild *discordgo.Guild, settings structs.GuildSettings) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Title:       "Current starboard settings for " + guild.Name,
-		Description: "Starboard channel is <#" + globalSettings[guild.ID].Starboard.StarboardID + ">\nThe star emoji is " + globalSettings[guild.ID].Starboard.Emoji + "\nThe current requirement is " + fmt.Sprint(globalSettings[guild.ID].Starboard.ReactLimit) + " reactions",
+		Description: "Starboard channel is <#" + settings.Starboard.StarboardID + ">\nThe star emoji is " + settings.Starboard.Emoji + "\nThe current requirement is " + fmt.Sprint(settings.Starboard.ReactLimit) + " reactions",
 	}
 }

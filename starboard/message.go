@@ -1,4 +1,4 @@
-package main
+package starboard
 
 import (
 	"fmt"
@@ -7,32 +7,37 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func createOrEditMessage(s *discordgo.Session, message *discordgo.Message, guildID string, count int, emoji *discordgo.Emoji) (err error) {
+func (sb *Sb) createOrEditMessage(s *discordgo.Session, message *discordgo.Message, guildID string, count int, emoji *discordgo.Emoji) (err error) {
 	embed, err := starboardEmbed(s, message, guildID)
 	if err != nil {
 		return err
 	}
 	msgContent := "**" + fmt.Sprint(count) + "** " + emoji.MessageFormat() + " <#" + message.ChannelID + ">"
 
-	if val, ok := messageIDMap[message.ID]; ok {
+	gs, err := sb.Pool.GetGuildSettings(guildID)
+	if err != nil {
+		return err
+	}
+
+	if m := sb.Pool.GetStarboardEntry(message.ID); m != "" {
 		_, err := s.ChannelMessageEditComplex(&discordgo.MessageEdit{
 			Content: &msgContent,
 			Embed:   embed,
-			ID:      val,
-			Channel: globalSettings[guildID].Starboard.StarboardID,
+			ID:      m,
+			Channel: gs.Starboard.StarboardID,
 		})
 		if err != nil {
 			return err
 		}
 	} else {
-		starboardMsg, err := s.ChannelMessageSendComplex(globalSettings[guildID].Starboard.StarboardID, &discordgo.MessageSend{
+		starboardMsg, err := s.ChannelMessageSendComplex(gs.Starboard.StarboardID, &discordgo.MessageSend{
 			Content: msgContent,
 			Embed:   embed,
 		})
 		if err != nil {
 			return err
 		}
-		err = insertStarboardEntry(message.ID, message.ChannelID, guildID, starboardMsg.ID)
+		err = sb.Pool.InsertStarboardEntry(message.ID, message.ChannelID, guildID, starboardMsg.ID)
 		if err != nil {
 			return err
 		}
@@ -40,12 +45,17 @@ func createOrEditMessage(s *discordgo.Session, message *discordgo.Message, guild
 	return nil
 }
 
-func deleteStarboardMessage(s *discordgo.Session, starboardMessage, guildID string) error {
-	err := s.ChannelMessageDelete(globalSettings[guildID].Starboard.StarboardID, starboardMessage)
+func (sb *Sb) deleteStarboardMessage(s *discordgo.Session, starboardMessage, guildID string) error {
+	gs, err := sb.Pool.GetGuildSettings(guildID)
 	if err != nil {
 		return err
 	}
-	err = deleteStarboardEntry(starboardMessage)
+
+	err = s.ChannelMessageDelete(gs.Starboard.StarboardID, starboardMessage)
+	if err != nil {
+		return err
+	}
+	err = sb.Pool.DeleteStarboardEntry(starboardMessage)
 	return err
 }
 

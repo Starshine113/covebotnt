@@ -1,4 +1,4 @@
-package commands
+package usercommands
 
 import (
 	"fmt"
@@ -53,7 +53,7 @@ func About(ctx *crouter.Ctx) (err error) {
 		},
 		{
 			Name:   "Uptime",
-			Value:  fmt.Sprintf("Up %v\n(Since %v)", prettyDurationString(time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
+			Value:  fmt.Sprintf("Up %v\n(Since %v)", PrettyDurationString(time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
 			Inline: false,
 		},
 	}...)

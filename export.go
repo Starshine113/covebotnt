@@ -45,7 +45,7 @@ func commandExport(ctx *crouter.Ctx) (err error) {
 		ModLogs:   logs,
 	}
 
-	exportB, _ := json.MarshalIndent(exportStruct, "", "    ")
+	exportB, _ := json.MarshalIndent(exportStruct, "", "  ")
 	reader := bytes.NewReader(exportB)
 
 	file := discordgo.File{

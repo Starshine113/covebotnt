@@ -122,16 +122,20 @@ func commandHelperRoles(ctx *crouter.Ctx) (err error) {
 }
 
 func addModRole(guildID, roleID string) (err error) {
-	roles := append(globalSettings[guildID].Moderation.ModRoles, roleID)
+	gs, err := pool.GetGuildSettings(guildID)
+	if err != nil {
+		return err
+	}
+	roles := append(gs.Moderation.ModRoles, roleID)
 
-	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := pool.Pool.Exec(context.Background(), "update public.guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}
 	if commandTag.RowsAffected() != 1 {
 		return errors.New("no rows affected")
 	}
-	err = getSettingsForGuild(guildID)
+	err = pool.RemoveFromGuildCache(guildID)
 	if err != nil {
 		return err
 	}
@@ -140,7 +144,11 @@ func addModRole(guildID, roleID string) (err error) {
 }
 
 func delModRole(guildID, roleID string) (err error) {
-	roles := globalSettings[guildID].Moderation.ModRoles
+	gs, err := pool.GetGuildSettings(guildID)
+	if err != nil {
+		return err
+	}
+	roles := gs.Moderation.ModRoles
 	for i, v := range roles {
 		if v == roleID {
 			roles, err = removeElement(roles, i)
@@ -150,14 +158,14 @@ func delModRole(guildID, roleID string) (err error) {
 		}
 	}
 
-	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := pool.Pool.Exec(context.Background(), "update public.guild_settings set mod_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}
 	if commandTag.RowsAffected() != 1 {
 		return errors.New("no rows affected")
 	}
-	err = getSettingsForGuild(guildID)
+	err = pool.RemoveFromGuildCache(guildID)
 	if err != nil {
 		return err
 	}
@@ -166,16 +174,20 @@ func delModRole(guildID, roleID string) (err error) {
 }
 
 func addHelperRole(guildID, roleID string) (err error) {
-	roles := append(globalSettings[guildID].Moderation.HelperRoles, roleID)
+	gs, err := pool.GetGuildSettings(guildID)
+	if err != nil {
+		return err
+	}
+	roles := append(gs.Moderation.HelperRoles, roleID)
 
-	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := pool.Pool.Exec(context.Background(), "update public.guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}
 	if commandTag.RowsAffected() != 1 {
 		return errors.New("no rows affected")
 	}
-	err = getSettingsForGuild(guildID)
+	err = pool.RemoveFromGuildCache(guildID)
 	if err != nil {
 		return err
 	}
@@ -184,7 +196,11 @@ func addHelperRole(guildID, roleID string) (err error) {
 }
 
 func delHelperRole(guildID, roleID string) (err error) {
-	roles := globalSettings[guildID].Moderation.HelperRoles
+	gs, err := pool.GetGuildSettings(guildID)
+	if err != nil {
+		return err
+	}
+	roles := gs.Moderation.HelperRoles
 	for i, v := range roles {
 		if v == roleID {
 			roles, err = removeElement(roles, i)
@@ -194,14 +210,14 @@ func delHelperRole(guildID, roleID string) (err error) {
 		}
 	}
 
-	commandTag, err := db.Exec(context.Background(), "update public.guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
+	commandTag, err := pool.Pool.Exec(context.Background(), "update public.guild_settings set helper_roles = $1 where guild_id = $2", roles, guildID)
 	if err != nil {
 		return err
 	}
 	if commandTag.RowsAffected() != 1 {
 		return errors.New("no rows affected")
 	}
-	err = getSettingsForGuild(guildID)
+	err = pool.RemoveFromGuildCache(guildID)
 	if err != nil {
 		return err
 	}
@@ -215,7 +231,11 @@ func getModRoles(s *discordgo.Session, guildID string) (*discordgo.MessageEmbed,
 	if err != nil {
 		return nil, err
 	}
-	for _, modRole := range globalSettings[guildID].Moderation.ModRoles {
+	gs, err := pool.GetGuildSettings(guildID)
+	if err != nil {
+		return nil, err
+	}
+	for _, modRole := range gs.Moderation.ModRoles {
 		roles = append(roles, "<@&"+modRole+">")
 	}
 
@@ -245,7 +265,11 @@ func getHelperRoles(s *discordgo.Session, guildID string) (*discordgo.MessageEmb
 	if err != nil {
 		return nil, err
 	}
-	for _, modRole := range globalSettings[guildID].Moderation.HelperRoles {
+	gs, err := pool.GetGuildSettings(guildID)
+	if err != nil {
+		return nil, err
+	}
+	for _, modRole := range gs.Moderation.ModRoles {
 		roles = append(roles, "<@&"+modRole+">")
 	}
 

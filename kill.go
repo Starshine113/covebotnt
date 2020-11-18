@@ -15,12 +15,11 @@ func commandKill(ctx *crouter.Ctx) (err error) {
 
 	dg.Close()
 	sugar.Infof("Disconnected from Discord.")
-	db.Close()
+	pool.Pool.Close()
 	sugar.Infof("Closed database connection.")
 
 	logger.Sync()
 	boltDb.Bolt.Close()
-	levelCache.Close()
 
 	os.Exit(0)
 	return nil

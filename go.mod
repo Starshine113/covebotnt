@@ -6,6 +6,7 @@ require (
 	codeberg.org/eviedelta/drc v0.0.0-20201014114604-c0facdfd1b01
 	codeberg.org/eviedelta/dwhook v0.0.0-20201015021046-043084b306b3
 	github.com/BurntSushi/toml v0.3.1
+	github.com/ReneKroon/ttlcache v1.7.0
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
 	github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655
 	github.com/bwmarrin/discordgo v0.22.0
