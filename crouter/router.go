@@ -62,6 +62,12 @@ func (r *Router) Respond(s *discordgo.Session, m *discordgo.MessageCreate) (err 
 				return
 			}
 		}
+		if response.Regex != nil {
+			if response.Regex.MatchString(strings.ToLower(m.Content)) {
+				err = response.Response(s, m)
+				return
+			}
+		}
 	}
 	return
 }
@@ -77,7 +83,7 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerID
 		return
 	}
 	for _, g := range r.Groups {
-		if ctx.Match(append([]string{g.Name}, g.Aliases...)...) {
+		if ctx.Match(append([]string{g.Name}, g.Aliases...)...) || ctx.MatchRegexp(g.Regex) {
 			if len(ctx.Args) == 0 {
 				ctx.Command = ""
 			} else {
@@ -93,7 +99,7 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerID
 		}
 	}
 	for _, cmd := range r.Commands {
-		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
+		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) || ctx.MatchRegexp(cmd.Regex) {
 			ctx.Cmd = cmd
 			if perms := ctx.Check(ownerIDs); perms != nil {
 				ctx.CommandError(perms)

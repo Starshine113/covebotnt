@@ -22,8 +22,10 @@ func (ctx *Ctx) Match(cmds ...string) bool {
 	return false
 }
 
-// MatchRegex checks if the command matches the given regex
-func (ctx *Ctx) MatchRegex(regex string) bool {
-	match, _ := regexp.MatchString(regex, strings.ToLower(ctx.Command))
-	return match
+// MatchRegexp checks if the command matches the given regex
+func (ctx *Ctx) MatchRegexp(re *regexp.Regexp) bool {
+	if re == nil {
+		return false
+	}
+	return re.MatchString(strings.ToLower(ctx.Command))
 }

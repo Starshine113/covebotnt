@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math/rand"
+	"regexp"
+
 	"github.com/Starshine113/covebotnt/commands"
 	"github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
@@ -443,9 +446,23 @@ func addAutoResponses() {
 	})
 
 	router.AddResponse(&crouter.AutoResponse{
-		Triggers: []string{"covebot pronouns", "covebot, what are your pronouns?", "covebotn't pronouns", "covebotn't, what are your pronouns?"},
+		Regex: regexp.MustCompile("(?i)(?:(?:<@756804764112519188>|<@!756804764112519188>|covebot|covebotn't|covey)[ 's]+(?:(?:what are|what're|whatre|whatr|what is|whats|what's|what) (?:your|you're|youre|yours|youres|you'res|you) (?:pronoun)|pronoun)){1}"),
 		Response: func(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
-			_, err = s.ChannelMessageSend(m.ChannelID, "cat/cat/cats/cats/catself sound really good right now ~~actually, they *always* sound good~~")
+			n := rand.Intn(5)
+			var msg string
+			switch n {
+			case 0:
+				msg = "I'm really liking cat/cat/cats/cats/catself right now"
+			case 1:
+				msg = "cat/cat/cats/cats/catself sound good"
+			case 2:
+				msg = "I'll take cat/cat/cats/cats/catself"
+			case 3:
+				msg = "Let's go with cat/cat/cats/cats/catself"
+			case 4:
+				msg = "cat/cat/cats/cats/catself sound really good right now ~~actually, they *always* sound good~~"
+			}
+			_, err = s.ChannelMessageSend(m.ChannelID, msg)
 			return err
 		},
 	})

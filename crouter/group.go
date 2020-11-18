@@ -1,6 +1,7 @@
 package crouter
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/Starshine113/covebotnt/structs"
@@ -10,6 +11,7 @@ import (
 type Group struct {
 	Name        string
 	Aliases     []string
+	Regex       *regexp.Regexp
 	Description string
 	Command     *Command
 	Subcommands []*Command
@@ -68,7 +70,7 @@ func (g *Group) GetCommand(name string) (c *Command) {
 func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
 	g.Subcommands = append(g.Subcommands, g.Command)
 	for _, cmd := range g.Subcommands {
-		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) {
+		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) || ctx.MatchRegexp(cmd.Regex) {
 			ctx.Cmd = cmd
 			if perms := ctx.Check(ownerIDs); perms != nil {
 				ctx.CommandError(perms)
@@ -78,30 +80,10 @@ func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs
 			return
 		}
 	}
-	if g.Command.Permissions == PermLevelHelper {
-		perms := checkHelperPerm(ctx, guildSettings)
-		if perms != nil {
-			ctx.CommandError(perms)
-			return nil
-		}
-	} else if g.Command.Permissions == PermLevelMod {
-		perms := checkModPerm(ctx, guildSettings)
-		if perms != nil {
-			ctx.CommandError(perms)
-			return nil
-		}
-	} else if g.Command.Permissions == PermLevelAdmin {
-		perms := checkAdmin(ctx)
-		if perms != nil {
-			ctx.CommandError(perms)
-			return nil
-		}
-	} else if g.Command.Permissions == PermLevelOwner {
-		perms := checkOwner(ctx.Author.ID, ownerIDs)
-		if perms != nil {
-			ctx.CommandError(perms)
-			return nil
-		}
+	ctx.Cmd = g.Command
+	if perms := ctx.Check(ownerIDs); perms != nil {
+		ctx.CommandError(perms)
+		return nil
 	}
 	err = g.Command.Command(ctx)
 	return

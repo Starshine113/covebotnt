@@ -2,6 +2,7 @@ package crouter
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -49,6 +50,7 @@ type Router struct {
 // AutoResponse is a single autoresponse, intended for very simple responses to exact messages that don't match commands
 type AutoResponse struct {
 	Triggers []string
+	Regex    *regexp.Regexp
 	Response func(s *discordgo.Session, m *discordgo.MessageCreate) error
 }
 
@@ -56,6 +58,7 @@ type AutoResponse struct {
 type Command struct {
 	Name        string
 	Aliases     []string
+	Regex       *regexp.Regexp
 	Description string
 	Usage       string
 	Permissions PermLevel
