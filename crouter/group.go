@@ -15,16 +15,19 @@ type Group struct {
 	Description string
 	Command     *Command
 	Subcommands []*Command
+	Router      *Router
 }
 
 // AddGroup adds a group to the router
 func (r *Router) AddGroup(group *Group) *Group {
+	group.Router = r
 	r.Groups = append(r.Groups, group)
 	return r.GetGroup(group.Name)
 }
 
 // AddCommand adds a command to a group
 func (g *Group) AddCommand(cmd *Command) {
+	cmd.Router = g.Router
 	g.Subcommands = append(g.Subcommands, cmd)
 }
 
@@ -67,12 +70,12 @@ func (g *Group) GetCommand(name string) (c *Command) {
 }
 
 // Execute executes any command given
-func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
 	g.Subcommands = append(g.Subcommands, g.Command)
 	for _, cmd := range g.Subcommands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) || ctx.MatchRegexp(cmd.Regex) {
 			ctx.Cmd = cmd
-			if perms := ctx.Check(ownerIDs); perms != nil {
+			if perms := ctx.Check(g.Router.BotOwners); perms != nil {
 				ctx.CommandError(perms)
 				return nil
 			}
@@ -81,7 +84,7 @@ func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs
 		}
 	}
 	ctx.Cmd = g.Command
-	if perms := ctx.Check(ownerIDs); perms != nil {
+	if perms := ctx.Check(g.Router.BotOwners); perms != nil {
 		ctx.CommandError(perms)
 		return nil
 	}

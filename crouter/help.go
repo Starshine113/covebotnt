@@ -10,7 +10,7 @@ import (
 )
 
 // Help is the help command
-func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
 	err = ctx.TriggerTyping()
 	if err != nil {
 		return
@@ -20,7 +20,7 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs [
 		level := 0
 		permLevel := PermLevelNone
 
-		if err = checkOwner(ctx.Author.ID, ownerIDs); err == nil {
+		if err = checkOwner(ctx.Author.ID, r.BotOwners); err == nil {
 			level = 4
 			permLevel = PermLevelOwner
 		} else if err = checkAdmin(ctx); err == nil {
@@ -104,18 +104,18 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs [
 
 	cmd := r.GetCommand(ctx.Args[0])
 	if cmd != nil {
-		_, err = ctx.Send(cmdEmbed(cmd))
+		_, err = ctx.Send(ctx.CmdEmbed(cmd))
 		return
 	}
 	g := r.GetGroup(ctx.Args[0])
 	if g != nil {
 		if len(ctx.Args) == 1 {
-			_, err = ctx.Send(groupEmbed(g))
+			_, err = ctx.Send(ctx.GroupEmbed(g))
 			return
 		}
 		cmd = g.GetCommand(ctx.Args[1])
 		if cmd != nil {
-			_, err = ctx.Send(groupCmdEmbed(g, cmd))
+			_, err = ctx.Send(ctx.GroupCmdEmbed(g, cmd))
 			return
 		}
 	}
@@ -125,7 +125,8 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs [
 	return
 }
 
-func groupEmbed(g *Group) *discordgo.MessageEmbed {
+// GroupEmbed ...
+func (ctx *Ctx) GroupEmbed(g *Group) *discordgo.MessageEmbed {
 	var aliases string
 	if g.Aliases == nil {
 		aliases = "N/A"
@@ -160,7 +161,7 @@ func groupEmbed(g *Group) *discordgo.MessageEmbed {
 			},
 			{
 				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v %v```", g.Command.Name, g.Command.Usage),
+				Value:  fmt.Sprintf("```%v%v %v```", ctx.GuildPrefix, strings.ToLower(g.Command.Name), g.Command.Usage),
 				Inline: false,
 			},
 			{
@@ -174,7 +175,8 @@ func groupEmbed(g *Group) *discordgo.MessageEmbed {
 	return embed
 }
 
-func groupCmdEmbed(g *Group, cmd *Command) *discordgo.MessageEmbed {
+// GroupCmdEmbed ...
+func (ctx *Ctx) GroupCmdEmbed(g *Group, cmd *Command) *discordgo.MessageEmbed {
 	var aliases string
 
 	if cmd.Aliases == nil {
@@ -190,7 +192,7 @@ func groupCmdEmbed(g *Group, cmd *Command) *discordgo.MessageEmbed {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v %v %v```", g.Name, cmd.Name, cmd.Usage),
+				Value:  fmt.Sprintf("```%v%v %v %v```", ctx.GuildPrefix, strings.ToLower(g.Name), strings.ToLower(cmd.Name), cmd.Usage),
 				Inline: false,
 			},
 			{
@@ -209,7 +211,8 @@ func groupCmdEmbed(g *Group, cmd *Command) *discordgo.MessageEmbed {
 	return embed
 }
 
-func cmdEmbed(cmd *Command) *discordgo.MessageEmbed {
+// CmdEmbed ...
+func (ctx *Ctx) CmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 	var aliases string
 
 	if cmd.Aliases == nil {
@@ -225,7 +228,7 @@ func cmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v %v```", cmd.Name, cmd.Usage),
+				Value:  fmt.Sprintf("```%v%v %v```", ctx.GuildPrefix, strings.ToLower(cmd.Name), cmd.Usage),
 				Inline: false,
 			},
 			{

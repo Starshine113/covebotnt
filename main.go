@@ -110,7 +110,7 @@ func main() {
 	git := exec.Command("git", "rev-parse", "--short", "HEAD")
 	gitOut, _ = git.Output()
 
-	router = crouter.NewRouter()
+	router = crouter.NewRouter(config.Bot.BotOwners)
 	// add commands
 	addUserCommands()
 	addHelperCommands()

@@ -43,7 +43,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	// check if the message might be a command
 	if ctx.MatchPrefix() {
-		commandTree(ctx)
+		execute(ctx)
 		return
 	}
 
@@ -57,7 +57,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 			sugar.Errorf("Error getting context: %v", err)
 			return
 		}
-		commandTree(ctx)
+		execute(ctx)
 		return
 	}
 
@@ -124,14 +124,14 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func commandTree(ctx *crouter.Ctx) {
+func execute(ctx *crouter.Ctx) {
 	guildSettings, err := pool.GetGuildSettings(ctx.Message.GuildID)
 	if err != nil {
 		sugar.Errorf("Error running command %v", err)
 	}
 	ctx.AdditionalParams = map[string]interface{}{"config": config, "botVer": botVersion, "gitVer": string(gitOut), "startTime": startTime}
 
-	err = router.Execute(ctx, &guildSettings, config.Bot.BotOwners)
+	err = router.Execute(ctx, &guildSettings)
 	if err != nil {
 		sugar.Errorf("Error running command %v", err)
 	}

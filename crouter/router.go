@@ -8,8 +8,10 @@ import (
 )
 
 // NewRouter creates a Router object
-func NewRouter() *Router {
-	router := &Router{}
+func NewRouter(botOwners []string) *Router {
+	router := &Router{
+		BotOwners: botOwners,
+	}
 
 	router.AddCommand(&Command{
 		Name:        "Help",
@@ -30,6 +32,7 @@ func (r *Router) dummy(ctx *Ctx) error {
 
 // AddCommand adds a command to the router
 func (r *Router) AddCommand(cmd *Command) {
+	cmd.Router = r
 	r.Commands = append(r.Commands, cmd)
 }
 
@@ -73,13 +76,14 @@ func (r *Router) Respond(s *discordgo.Session, m *discordgo.MessageCreate) (err 
 }
 
 // Execute actually executes the router
-func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerIDs []string) (err error) {
+func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
 	// add the guild settings to the additional parameters
 	ctx.AdditionalParams["guildSettings"] = guildSettings
 	ctx.GuildSettings = guildSettings
 
-	if ctx.Match("help") || ctx.Match("usage") || ctx.Match("hlep") {
-		err = r.Help(ctx, guildSettings, ownerIDs)
+	help := r.GetCommand("help")
+	if ctx.Match(append([]string{help.Name}, help.Aliases...)...) {
+		err = r.Help(ctx, guildSettings)
 		return
 	}
 	for _, g := range r.Groups {
@@ -94,14 +98,14 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings, ownerID
 			} else {
 				ctx.Args = []string{}
 			}
-			err = g.Execute(ctx, guildSettings, ownerIDs)
+			err = g.Execute(ctx, guildSettings)
 			return
 		}
 	}
 	for _, cmd := range r.Commands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) || ctx.MatchRegexp(cmd.Regex) {
 			ctx.Cmd = cmd
-			if perms := ctx.Check(ownerIDs); perms != nil {
+			if perms := ctx.Check(r.BotOwners); perms != nil {
 				ctx.CommandError(perms)
 				return nil
 			}

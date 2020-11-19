@@ -45,6 +45,7 @@ type Router struct {
 	Commands      []*Command
 	Groups        []*Group
 	AutoResponses []*AutoResponse
+	BotOwners     []string
 }
 
 // AutoResponse is a single autoresponse, intended for very simple responses to exact messages that don't match commands
@@ -64,4 +65,5 @@ type Command struct {
 	Permissions PermLevel
 	Command     func(*Ctx) error
 	GuildOnly   bool
+	Router      *Router
 }
