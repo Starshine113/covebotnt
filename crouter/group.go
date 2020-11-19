@@ -33,12 +33,13 @@ func (g *Group) AddCommand(cmd *Command) {
 
 // GetGroup returns a group by name
 func (r *Router) GetGroup(name string) (group *Group) {
+	name = strings.ToLower(name)
 	for _, group := range r.Groups {
-		if group.Name == name {
+		if strings.ToLower(group.Name) == name {
 			return group
 		}
 		for _, a := range group.Aliases {
-			if a == name {
+			if strings.ToLower(a) == name {
 				return group
 			}
 		}
@@ -72,8 +73,30 @@ func (g *Group) GetCommand(name string) (c *Command) {
 // Execute executes any command given
 func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
 	g.Subcommands = append(g.Subcommands, g.Command)
+	if ctx.Command == "help" || ctx.Command == "usage" {
+		if len(ctx.Args) > 0 {
+			ctx.Args[0] = g.Name
+		} else {
+			ctx.Args = []string{g.Name}
+		}
+		err = g.Router.Help(ctx, guildSettings)
+		return
+	}
 	for _, cmd := range g.Subcommands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) || ctx.MatchRegexp(cmd.Regex) {
+			if len(ctx.Args) > 0 {
+				if ctx.Args[0] == "help" || ctx.Args[0] == "usage" {
+					ctx.Args[0] = g.Name
+					if len(ctx.Args) > 1 {
+						ctx.Args[1] = ctx.Command
+					} else {
+						ctx.Args = append(ctx.Args, ctx.Command)
+					}
+					err = g.Router.Help(ctx, guildSettings)
+					return
+				}
+			}
+
 			ctx.Cmd = cmd
 			if perms := ctx.Check(g.Router.BotOwners); perms != nil {
 				ctx.CommandError(perms)

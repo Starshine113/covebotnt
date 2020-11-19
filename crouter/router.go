@@ -104,6 +104,13 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err er
 	}
 	for _, cmd := range r.Commands {
 		if ctx.Match(append([]string{cmd.Name}, cmd.Aliases...)...) || ctx.MatchRegexp(cmd.Regex) {
+			if len(ctx.Args) > 0 {
+				if ctx.Args[0] == "help" || ctx.Args[0] == "usage" {
+					ctx.Args[0] = ctx.Command
+					err = r.Help(ctx, guildSettings)
+					return
+				}
+			}
 			ctx.Cmd = cmd
 			if perms := ctx.Check(r.BotOwners); perms != nil {
 				ctx.CommandError(perms)

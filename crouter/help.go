@@ -102,11 +102,7 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error
 		return
 	}
 
-	cmd := r.GetCommand(ctx.Args[0])
-	if cmd != nil {
-		_, err = ctx.Send(ctx.CmdEmbed(cmd))
-		return
-	}
+	var cmd *Command
 	g := r.GetGroup(ctx.Args[0])
 	if g != nil {
 		if len(ctx.Args) == 1 {
@@ -118,6 +114,11 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error
 			_, err = ctx.Send(ctx.GroupCmdEmbed(g, cmd))
 			return
 		}
+	}
+	cmd = r.GetCommand(ctx.Args[0])
+	if cmd != nil {
+		_, err = ctx.Send(ctx.CmdEmbed(cmd))
+		return
 	}
 
 	_, err = ctx.Send(fmt.Sprintf("%v Invalid command or group provided:\n> `%v` is not a known command, group or alias.", ErrorEmoji, ctx.Args[0]))
