@@ -36,34 +36,6 @@ func About(ctx *crouter.Ctx) (err error) {
 		})
 	}
 
-	fields = append(fields, []*discordgo.MessageEmbedField{
-		{
-			Name:   "Bot version",
-			Value:  fmt.Sprintf("v%v-%v", ctx.AdditionalParams["botVer"].(string), ctx.AdditionalParams["gitVer"].(string)),
-			Inline: true,
-		},
-		{
-			Name:   "Go version",
-			Value:  runtime.Version(),
-			Inline: true,
-		},
-		{
-			Name:   "discordgo version",
-			Value:  discordgo.VERSION,
-			Inline: true,
-		},
-		{
-			Name:   "Author",
-			Value:  botAuthor.Mention() + " / " + botAuthor.String(),
-			Inline: false,
-		},
-		{
-			Name:   "Uptime",
-			Value:  fmt.Sprintf("Up %v\n(Since %v)", PrettyDurationString(time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
-			Inline: false,
-		},
-	}...)
-
 	embed := &discordgo.MessageEmbed{
 		Title:       "About " + ctx.BotUser.Username,
 		Description: ctx.BotUser.Username + " is a general purpose bot, with a gatekeeper, moderation commands, and starboard functionality.",
@@ -73,7 +45,33 @@ func About(ctx *crouter.Ctx) (err error) {
 			Text:    "Created with discordgo " + discordgo.VERSION,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
-		Fields:    fields,
+		Fields: append(fields, []*discordgo.MessageEmbedField{
+			{
+				Name:   "Bot version",
+				Value:  fmt.Sprintf("v%v-%v", ctx.AdditionalParams["botVer"].(string), ctx.AdditionalParams["gitVer"].(string)),
+				Inline: true,
+			},
+			{
+				Name:   "Go version",
+				Value:  runtime.Version(),
+				Inline: true,
+			},
+			{
+				Name:   "discordgo version",
+				Value:  discordgo.VERSION,
+				Inline: true,
+			},
+			{
+				Name:   "Author",
+				Value:  botAuthor.Mention() + " / " + botAuthor.String(),
+				Inline: false,
+			},
+			{
+				Name:   "Uptime",
+				Value:  fmt.Sprintf("Up %v\n(Since %v)", PrettyDurationString(time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
+				Inline: false,
+			},
+		}...),
 	}
 
 	_, err = ctx.Send(embed)

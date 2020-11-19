@@ -1,9 +1,7 @@
 package modcommands
 
 import (
-	usercommands "github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/covebotnt/notes"
 )
 
 // BGC is a combination command that runs UserInfo, Notes, and ModLogs for the specified user
@@ -13,13 +11,13 @@ func BGC(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	if err = usercommands.UserInfo(ctx); err != nil {
+	if err = ctx.Cmd.Router.GetCommand("userinfo").Command(ctx); err != nil {
 		return err
 	}
-	if err = notes.CommandNotes(ctx); err != nil {
+	if err = ctx.Cmd.Router.GetCommand("notes").Command(ctx); err != nil {
 		return err
 	}
-	if err = ModLogs(ctx); err != nil {
+	if err = ctx.Cmd.Router.GetCommand("modlogs").Command(ctx); err != nil {
 		return err
 	}
 	return
