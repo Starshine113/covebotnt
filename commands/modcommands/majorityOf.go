@@ -1,4 +1,4 @@
-package commands
+package modcommands
 
 import (
 	"math"

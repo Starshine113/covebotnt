@@ -1,4 +1,4 @@
-package commands
+package modcommands
 
 import (
 	usercommands "github.com/Starshine113/covebotnt/commands/usercommands"

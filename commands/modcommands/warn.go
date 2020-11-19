@@ -1,4 +1,4 @@
-package commands
+package modcommands
 
 import (
 	"fmt"
@@ -6,80 +6,87 @@ import (
 	"time"
 
 	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
-	"github.com/Starshine113/flagparser"
 	"github.com/bwmarrin/discordgo"
 )
 
-// LogMute adds a mute to the mute log
-func LogMute(ctx *crouter.Ctx) (err error) {
-	if len(ctx.Args) < 1 {
+// Warn warns the specified member
+func Warn(ctx *crouter.Ctx) (err error) {
+	if len(ctx.Args) < 2 {
 		ctx.CommandError(&crouter.ErrorNotEnoughArgs{
-			NumRequiredArgs: 1,
+			NumRequiredArgs: 2,
 			SuppliedArgs:    len(ctx.Args),
 		})
 		return nil
 	}
 
-	flagParser, err := flagparser.NewFlagParser(flagparser.Duration("d", "dur", "duration"), flagparser.Bool("hardmute"))
+	member, err := ctx.ParseMember(ctx.Args[0])
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
 	}
 
-	args, err := flagParser.Parse(ctx.Args)
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
-	}
-	if len(args["rest"].([]string)) == 0 {
-		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
-			RequiredArgs: "<user ID/mention>",
-			MissingArgs:  "<user ID/mention>",
-		})
-		return nil
-	}
-	remaining := args["rest"].([]string)
+	warnReason := strings.Join(ctx.Args[1:], " ")
 
-	member, err := ctx.ParseMember(remaining[0])
+	dmChannel, err := ctx.Session.UserChannelCreate(member.User.ID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
 	}
 
-	reason := "None"
-	if len(remaining) > 1 {
-		reason = strings.Join(remaining[1:], " ")
+	warnMessage := fmt.Sprintf("%v You were warned in %v.\n**Reason:** %v", crouter.WarnEmoji, guild.Name, warnReason)
+	_, err = ctx.Session.ChannelMessageSend(dmChannel.ID, warnMessage)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
 	}
-	muteType := "mute"
-	if args["hardmute"].(bool) {
-		muteType = "hardmute"
+
+	currentLogs, err := ctx.Database.GetModLogs(ctx.Message.GuildID, member.User.ID)
+	if err != nil {
+		ctx.CommandError(err)
+		return nil
 	}
-	defaultDuration, _ := time.ParseDuration("876600h")
-	var duration string
-	if args["d"].(time.Duration) == defaultDuration {
-		duration = "none"
-	} else {
-		duration = usercommands.PrettyDurationString(args["d"].(time.Duration))
+
+	var warnCount int
+	for _, entry := range currentLogs {
+		if entry.Type == "warn" {
+			warnCount++
+		}
+	}
+
+	var warnCountStr string
+	switch fmt.Sprint(warnCount + 1)[len(fmt.Sprint(warnCount+1))-1] {
+	case byte('1'):
+		warnCountStr = fmt.Sprintf("%vst", warnCount+1)
+	case byte('2'):
+		warnCountStr = fmt.Sprintf("%vnd", warnCount+1)
+	case byte('3'):
+		warnCountStr = fmt.Sprintf("%vrd", warnCount+1)
+	default:
+		warnCountStr = fmt.Sprintf("%vth", warnCount+1)
+	}
+
+	_, err = ctx.Send(fmt.Sprintf("%v Warned **%v**, this is their %v warning.", crouter.SuccessEmoji, member.User.String(), warnCountStr))
+	if err != nil {
+		return err
 	}
 
 	entry, err := ctx.Database.AddToModLog(&cbdb.ModLogEntry{
 		GuildID: ctx.Message.GuildID,
 		UserID:  member.User.ID,
 		ModID:   ctx.Author.ID,
-		Type:    muteType,
-		Reason:  reason + fmt.Sprintf(" (duration: %v)", duration),
+		Type:    "warn",
+		Reason:  warnReason,
 	})
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
-	}
-
-	_, err = ctx.Send(fmt.Sprintf("%v Added this mute to the mod log.", crouter.SuccessEmoji))
-	if err != nil {
-		return err
 	}
 
 	logEmbed := &discordgo.MessageEmbed{
@@ -88,7 +95,7 @@ func LogMute(ctx *crouter.Ctx) (err error) {
 			IconURL: ctx.Author.AvatarURL("256"),
 		},
 		Color:       0xe5da00,
-		Title:       fmt.Sprintf("User %vd (case #%v)", muteType, entry.ID),
+		Title:       fmt.Sprintf("User warned (case #%v)", entry.ID),
 		Description: fmt.Sprintf("**%v** (ID: %v)", member.User.String(), member.User.ID),
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: member.User.AvatarURL("256"),
@@ -96,12 +103,7 @@ func LogMute(ctx *crouter.Ctx) (err error) {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Reason",
-				Value:  reason,
-				Inline: false,
-			},
-			{
-				Name:   "Duration",
-				Value:  duration,
+				Value:  warnReason,
 				Inline: false,
 			},
 		},

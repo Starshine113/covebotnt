@@ -4,7 +4,9 @@ import (
 	"math/rand"
 	"regexp"
 
-	"github.com/Starshine113/covebotnt/commands"
+	"github.com/Starshine113/covebotnt/commands/modcommands"
+	"github.com/Starshine113/covebotnt/commands/modutilcommands"
+	"github.com/Starshine113/covebotnt/commands/ownercommands"
 	"github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/notes"
@@ -101,7 +103,7 @@ func addUserCommands() {
 		Description: "Get the majority of a number with abstains",
 		Usage:       "<count> [abstains]",
 		Permissions: crouter.PermLevelNone,
-		Command:     commands.MajorityOf,
+		Command:     modcommands.MajorityOf,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -138,7 +140,7 @@ func addHelperCommands() {
 		Description: "Warn a user",
 		Usage:       "<user> <reason>",
 		Permissions: crouter.PermLevelHelper,
-		Command:     commands.Warn,
+		Command:     modcommands.Warn,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -146,7 +148,7 @@ func addHelperCommands() {
 		Description: "Show a user's modlogs",
 		Usage:       "<user>",
 		Permissions: crouter.PermLevelHelper,
-		Command:     commands.ModLogs,
+		Command:     modcommands.ModLogs,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -154,7 +156,7 @@ func addHelperCommands() {
 		Description: "Log a user mute made with another bot",
 		Usage:       "<user> [-d <duration>] [-hardmute] [reason]",
 		Permissions: crouter.PermLevelHelper,
-		Command:     commands.LogMute,
+		Command:     modcommands.LogMute,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -163,7 +165,7 @@ func addHelperCommands() {
 		Description: "Quickly check a user",
 		Usage:       "<user>",
 		Permissions: crouter.PermLevelHelper,
-		Command:     commands.BGC,
+		Command:     modcommands.BGC,
 	})
 }
 
@@ -183,7 +185,7 @@ func addModCommands() {
 		Description: "Change the bot's nickname",
 		Usage:       "<new nickname>",
 		Permissions: crouter.PermLevelMod,
-		Command:     commands.Nickname,
+		Command:     modutilcommands.Nickname,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -192,7 +194,7 @@ func addModCommands() {
 		Description: "Make the bot say something",
 		Usage:       "[-ch <channel>] <message>",
 		Permissions: crouter.PermLevelMod,
-		Command:     commands.Echo,
+		Command:     modutilcommands.Echo,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -201,7 +203,7 @@ func addModCommands() {
 		Description: "Steal an emote by URL + name, or usage in message (with Nitro)",
 		Usage:       "<emoji: url/emoji> [name]",
 		Permissions: crouter.PermLevelMod,
-		Command:     commands.Steal,
+		Command:     modutilcommands.Steal,
 	})
 
 	starboard := router.AddGroup(&crouter.Group{
@@ -264,7 +266,7 @@ func addModCommands() {
 		Description: "Ban users by ID",
 		Usage:       "<user ID> [reason]",
 		Permissions: crouter.PermLevelMod,
-		Command:     commands.Ban,
+		Command:     modcommands.Ban,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -272,7 +274,7 @@ func addModCommands() {
 		Description: "Get the mvc majority",
 		Usage:       "[abstains]",
 		Permissions: crouter.PermLevelMod,
-		Command:     commands.MVC,
+		Command:     modcommands.MVC,
 	})
 
 	gk := router.AddGroup(&crouter.Group{
@@ -285,7 +287,7 @@ func addModCommands() {
 			Description: "Approves a user in the gatekeeper",
 			Usage:       "<user ID>",
 			Permissions: crouter.PermLevelMod,
-			Command:     commands.GkApprove,
+			Command:     modcommands.GkApprove,
 		},
 	})
 
@@ -382,7 +384,7 @@ func addAdminCommands() {
 		Description: "Refresh the mvc role",
 		Usage:       "",
 		Permissions: crouter.PermLevelAdmin,
-		Command:     commands.RefreshMVC,
+		Command:     modutilcommands.RefreshMVC,
 	})
 
 	dm := router.AddGroup(&crouter.Group{
@@ -395,7 +397,7 @@ func addAdminCommands() {
 			Description: "Send a message to a user, showing the moderator's name",
 			Usage:       "<user> <message>",
 			Permissions: crouter.PermLevelAdmin,
-			Command:     commands.DM,
+			Command:     modutilcommands.DM,
 		},
 	})
 
@@ -405,7 +407,7 @@ func addAdminCommands() {
 		Description: "Send a message to a user, hiding the moderator's name",
 		Usage:       "<user> <message>",
 		Permissions: crouter.PermLevelAdmin,
-		Command:     commands.AnonDM,
+		Command:     modutilcommands.AnonDM,
 	})
 }
 
@@ -432,7 +434,7 @@ func addOwnerCommands() {
 		Description: "Send any user sharing a server with the bot a message, including attachment",
 		Usage:       "<user ID> <message>",
 		Permissions: crouter.PermLevelOwner,
-		Command:     commands.AdminDM,
+		Command:     ownercommands.AdminDM,
 	})
 }
 
