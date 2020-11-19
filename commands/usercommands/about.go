@@ -22,10 +22,16 @@ func About(ctx *crouter.Ctx) (err error) {
 		},
 	}
 
-	if ctx.AdditionalParams["config"].(structs.BotConfig).Bot.Invite != "" {
+	c := ctx.AdditionalParams["config"].(structs.BotConfig)
+	botAuthor, err := ctx.Session.User("694563574386786314")
+	if err != nil {
+		return err
+	}
+
+	if c.Bot.Invite != "" {
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   "Invite",
-			Value:  "Invite the bot with [this](" + ctx.AdditionalParams["config"].(structs.BotConfig).Bot.Invite + ") link.",
+			Value:  "Invite the bot with [this](" + c.Bot.Invite + ") link.",
 			Inline: false,
 		})
 	}
@@ -48,7 +54,7 @@ func About(ctx *crouter.Ctx) (err error) {
 		},
 		{
 			Name:   "Author",
-			Value:  "<@694563574386786314> / Starshine System ☀✨#0001",
+			Value:  botAuthor.Mention() + " / " + botAuthor.String(),
 			Inline: false,
 		},
 		{
