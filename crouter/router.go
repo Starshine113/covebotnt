@@ -1,16 +1,23 @@
 package crouter
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
 // NewRouter creates a Router object
 func NewRouter(botOwners []string) *Router {
+	cache := ttlcache.NewCache()
+	cache.SkipTTLExtensionOnHit(true)
+
 	router := &Router{
 		BotOwners: botOwners,
+		Cooldowns: cache,
 	}
 
 	router.AddCommand(&Command{
@@ -33,6 +40,9 @@ func (r *Router) dummy(ctx *Ctx) error {
 // AddCommand adds a command to the router
 func (r *Router) AddCommand(cmd *Command) {
 	cmd.Router = r
+	if cmd.Cooldown == 0 {
+		cmd.Cooldown = 500 * time.Millisecond
+	}
 	r.Commands = append(r.Commands, cmd)
 }
 
@@ -115,6 +125,16 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err er
 			if perms := ctx.Check(r.BotOwners); perms != nil {
 				ctx.CommandError(perms)
 				return nil
+			}
+			if cmd.Cooldown != time.Duration(0) {
+				if _, e := r.Cooldowns.Get(fmt.Sprintf("%v-%v-%v", ctx.Channel.ID, ctx.Author.ID, cmd.Name)); e == nil {
+					_, err = ctx.Sendf("The command `%v` can only be run once every **%v**.", cmd.Name, cmd.Cooldown.Round(time.Millisecond).String())
+					return err
+				}
+				err = r.Cooldowns.SetWithTTL(fmt.Sprintf("%v-%v-%v", ctx.Channel.ID, ctx.Author.ID, cmd.Name), true, cmd.Cooldown)
+				if err != nil {
+					return err
+				}
 			}
 			err = cmd.Command(ctx)
 			return err

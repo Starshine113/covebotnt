@@ -3,7 +3,9 @@ package crouter
 import (
 	"fmt"
 	"regexp"
+	"time"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -46,6 +48,7 @@ type Router struct {
 	Groups        []*Group
 	AutoResponses []*AutoResponse
 	BotOwners     []string
+	Cooldowns     *ttlcache.Cache
 }
 
 // AutoResponse is a single autoresponse, intended for very simple responses to exact messages that don't match commands
@@ -66,4 +69,5 @@ type Command struct {
 	Command     func(*Ctx) error
 	GuildOnly   bool
 	Router      *Router
+	Cooldown    time.Duration
 }

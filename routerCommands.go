@@ -3,6 +3,7 @@ package main
 import (
 	"math/rand"
 	"regexp"
+	"time"
 
 	"github.com/Starshine113/covebotnt/commands/modcommands"
 	"github.com/Starshine113/covebotnt/commands/modutilcommands"
@@ -23,12 +24,21 @@ func addUserCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "Invite",
+		Description: "Send an invite link for the bot",
+		Usage:       "",
+		Permissions: crouter.PermLevelNone,
+		Command:     usercommands.Invite,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "Enlarge",
 		Aliases:     []string{"E", "Emote", "Emoji", "Enlorge"},
 		Description: "Enlarges up to 10 custom emoji",
 		Usage:       "<emoji...>",
 		Permissions: crouter.PermLevelNone,
 		Command:     usercommands.Enlarge,
+		Cooldown:    10 * time.Second,
 	})
 
 	router.AddCommand(&crouter.Command{

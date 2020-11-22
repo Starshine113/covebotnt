@@ -1,9 +1,12 @@
 package crouter
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/structs"
 )
 
@@ -16,11 +19,16 @@ type Group struct {
 	Command     *Command
 	Subcommands []*Command
 	Router      *Router
+	Cooldowns   *ttlcache.Cache
 }
 
 // AddGroup adds a group to the router
 func (r *Router) AddGroup(group *Group) *Group {
+	cache := ttlcache.NewCache()
+	cache.SkipTTLExtensionOnHit(true)
+
 	group.Router = r
+	group.Cooldowns = cache
 	r.Groups = append(r.Groups, group)
 	return r.GetGroup(group.Name)
 }
@@ -28,6 +36,9 @@ func (r *Router) AddGroup(group *Group) *Group {
 // AddCommand adds a command to a group
 func (g *Group) AddCommand(cmd *Command) {
 	cmd.Router = g.Router
+	if cmd.Cooldown == 0 {
+		cmd.Cooldown = 500 * time.Millisecond
+	}
 	g.Subcommands = append(g.Subcommands, cmd)
 }
 
@@ -101,6 +112,16 @@ func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err err
 			if perms := ctx.Check(g.Router.BotOwners); perms != nil {
 				ctx.CommandError(perms)
 				return nil
+			}
+			if cmd.Cooldown != time.Duration(0) {
+				if _, e := g.Cooldowns.Get(fmt.Sprintf("%v-%v-%v", ctx.Channel.ID, ctx.Author.ID, cmd.Name)); e == nil {
+					_, err = ctx.Sendf("The command `%v` can only be run once every **%v**.", cmd.Name, cmd.Cooldown.Round(time.Millisecond).String())
+					return err
+				}
+				err = g.Cooldowns.SetWithTTL(fmt.Sprintf("%v-%v-%v", ctx.Channel.ID, ctx.Author.ID, cmd.Name), true, cmd.Cooldown)
+				if err != nil {
+					return err
+				}
 			}
 			err = cmd.Command(ctx)
 			return
