@@ -9,8 +9,35 @@ import (
 
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
+	"github.com/Starshine113/pkgo"
 	"github.com/bwmarrin/discordgo"
 )
+
+// PKUserInfo runs UserInfo with the user ID returned by
+func PKUserInfo(ctx *crouter.Ctx) (err error) {
+	if err = ctx.CheckRequiredArgs(1); err != nil {
+		_, err = ctx.CommandError(err)
+		return err
+	}
+
+	s := pkgo.NewSession(nil)
+
+	msg, err := s.GetMessage(ctx.Args[0])
+	if err != nil {
+		switch err.(type) {
+		case *pkgo.ErrMsgNotFound:
+			_, err = ctx.Sendf("%v Message with ID `%v` not found by PK. Are you sure this message was proxied and hasn't been deleted?", crouter.ErrorEmoji, ctx.Args[0])
+			return err
+		default:
+			_, err = ctx.CommandError(err)
+			return err
+		}
+	}
+
+	ctx.Args = []string{msg.Sender}
+	err = UserInfo(ctx)
+	return
+}
 
 // UserInfo returns user info, formatted nicely
 func UserInfo(ctx *crouter.Ctx) (err error) {

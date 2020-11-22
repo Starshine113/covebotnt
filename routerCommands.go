@@ -25,8 +25,8 @@ func addUserCommands() {
 	router.AddCommand(&crouter.Command{
 		Name:        "Enlarge",
 		Aliases:     []string{"E", "Emote", "Emoji", "Enlorge"},
-		Description: "Enlarges a custom emoji",
-		Usage:       "<emoji>",
+		Description: "Enlarges up to 10 custom emoji",
+		Usage:       "<emoji...>",
 		Permissions: crouter.PermLevelNone,
 		Command:     usercommands.Enlarge,
 	})
@@ -74,6 +74,16 @@ func addUserCommands() {
 		Usage:       "[user]",
 		Permissions: crouter.PermLevelNone,
 		Command:     usercommands.UserInfo,
+		GuildOnly:   true,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "PKInfo",
+		Aliases:     []string{"PKI", "PKUserInfo", "PKWhois", "PKProfile"},
+		Description: "Show information about the user who sent a PluralKit-proxied message",
+		Usage:       "<message ID>",
+		Permissions: crouter.PermLevelNone,
+		Command:     usercommands.PKUserInfo,
 		GuildOnly:   true,
 	})
 

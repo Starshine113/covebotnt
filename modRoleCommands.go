@@ -269,7 +269,7 @@ func getHelperRoles(s *discordgo.Session, guildID string) (*discordgo.MessageEmb
 	if err != nil {
 		return nil, err
 	}
-	for _, modRole := range gs.Moderation.ModRoles {
+	for _, modRole := range gs.Moderation.HelperRoles {
 		roles = append(roles, "<@&"+modRole+">")
 	}
 
