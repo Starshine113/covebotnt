@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/bwmarrin/discordgo"
 )
 
 // Steal adds an emote by URL/ID
@@ -58,8 +59,13 @@ func Steal(ctx *crouter.Ctx) (err error) {
 
 	emoji, err := ctx.Session.GuildEmojiCreate(ctx.Message.GuildID, name, b64, nil)
 	if err != nil {
-		ctx.CommandError(err)
-		return nil
+		switch err.(type) {
+		case *discordgo.RESTError:
+			_, err = ctx.Sendf("%v REST error occured. Common causes are: maximum emoji limit reached, emote above 256 KB size limit.", crouter.ErrorEmoji)
+		default:
+			_, err = ctx.CommandError(err)
+		}
+		return
 	}
 	_, err = ctx.Send(fmt.Sprintf("Added emoji %v with name %v.", emoji.MessageFormat(), emoji.Name))
 	return err
