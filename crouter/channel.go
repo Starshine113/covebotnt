@@ -25,26 +25,26 @@ func (ctx *Ctx) Send(arg interface{}) (message *discordgo.Message, err error) {
 
 // Sendf sends a fmt.Sprintf-like input string
 func (ctx *Ctx) Sendf(format string, args ...interface{}) (msg *discordgo.Message, err error) {
-	msg, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf(format, args...))
-	return
+	return ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf(format, args...))
 }
 
 // Editf edits a message with Sendf-like syntax
 func (ctx *Ctx) Editf(message *discordgo.Message, format string, args ...interface{}) (msg *discordgo.Message, err error) {
-	msg, err = ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, fmt.Sprintf(format, args...))
-	return
+	return ctx.Session.ChannelMessageEdit(message.ChannelID, message.ID, fmt.Sprintf(format, args...))
 }
 
 // Embed sends the input as an embed
 func (ctx *Ctx) Embed(title, description string, color int) (msg *discordgo.Message, err error) {
+	if color == 0 {
+		color = 0x21a1a8
+	}
 	embed := &discordgo.MessageEmbed{
 		Title:       title,
 		Description: description,
 		Color:       color,
 		Timestamp:   time.Now().UTC().Format(time.RFC3339),
 	}
-	msg, err = ctx.Session.ChannelMessageSendEmbed(ctx.Message.ChannelID, embed)
-	return
+	return ctx.Session.ChannelMessageSendEmbed(ctx.Message.ChannelID, embed)
 }
 
 // Embedf sends a fmt.Sprintf-like input string, in an embed
@@ -55,8 +55,7 @@ func (ctx *Ctx) Embedf(title, format string, args ...interface{}) (msg *discordg
 		Color:       0x21a1a8,
 		Timestamp:   time.Now().UTC().Format(time.RFC3339),
 	}
-	msg, err = ctx.Session.ChannelMessageSendEmbed(ctx.Message.ChannelID, embed)
-	return
+	return ctx.Session.ChannelMessageSendEmbed(ctx.Message.ChannelID, embed)
 }
 
 // EditEmbedf edits an embed with Embedf syntax
@@ -68,8 +67,7 @@ func (ctx *Ctx) EditEmbedf(message *discordgo.Message, title, format string, arg
 		Timestamp:   time.Now().UTC().Format(time.RFC3339),
 	}
 
-	msg, err = ctx.Session.ChannelMessageEditEmbed(message.ChannelID, message.ID, embed)
-	return
+	return ctx.Session.ChannelMessageEditEmbed(message.ChannelID, message.ID, embed)
 }
 
 // Edit a message
@@ -97,6 +95,5 @@ func (ctx *Ctx) React(emoji string) (err error) {
 
 // TriggerTyping triggers typing in the channel the command was invoked in.
 func (ctx *Ctx) TriggerTyping() (err error) {
-	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
-	return
+	return ctx.Session.ChannelTyping(ctx.Message.ChannelID)
 }
