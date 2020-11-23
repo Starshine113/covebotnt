@@ -72,13 +72,19 @@ func Echo(ctx *crouter.Ctx) (err error) {
 		}
 	}
 
+	var m *discordgo.MessageAllowedMentions
+	if ctx.Message.MentionEveryone {
+		m = &discordgo.MessageAllowedMentions{Parse: []discordgo.AllowedMentionType{discordgo.AllowedMentionTypeUsers, discordgo.AllowedMentionTypeEveryone, discordgo.AllowedMentionTypeRoles}}
+	} else {
+		m = &discordgo.MessageAllowedMentions{Parse: []discordgo.AllowedMentionType{discordgo.AllowedMentionTypeUsers}}
+	}
+
 	message := strings.Join(ctx.Args, " ")
+
 	_, err = ctx.Session.ChannelMessageSendComplex(channelID, &discordgo.MessageSend{
-		Content: message,
-		AllowedMentions: &discordgo.MessageAllowedMentions{
-			Parse: []discordgo.AllowedMentionType{discordgo.AllowedMentionTypeUsers},
-		},
-		Files: attachments,
+		Content:         message,
+		AllowedMentions: m,
+		Files:           attachments,
 	})
 	if err != nil {
 		return err
