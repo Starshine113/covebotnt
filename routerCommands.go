@@ -38,7 +38,16 @@ func addUserCommands() {
 		Usage:       "<emoji...>",
 		Permissions: crouter.PermLevelNone,
 		Command:     usercommands.Enlarge,
-		Cooldown:    10 * time.Second,
+		Cooldown:    5 * time.Second,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "EmojiInfo",
+		Aliases:     []string{"EI", "EmoteInfo"},
+		Description: "Get detailed info about a custom emoji",
+		Usage:       "<emoji>",
+		Permissions: crouter.PermLevelNone,
+		Command:     usercommands.EmojiInfo,
 	})
 
 	router.AddCommand(&crouter.Command{
@@ -190,6 +199,14 @@ func addHelperCommands() {
 }
 
 func addModCommands() {
+	router.AddCommand(&crouter.Command{
+		Name:        "Members",
+		Description: "Show all members of a role",
+		Usage:       "<role>",
+		Permissions: crouter.PermLevelMod,
+		Command:     modutilcommands.Members,
+	})
+
 	router.AddCommand(&crouter.Command{
 		Name:        "DelNote",
 		Aliases:     []string{"RemoveNote"},
