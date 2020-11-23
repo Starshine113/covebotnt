@@ -36,6 +36,27 @@ func (ctx *Ctx) CommandError(err error) (error, error) {
 		if msgErr != nil {
 			return nil, msgErr
 		}
+	case *discordgo.RESTError:
+		e := err.(*discordgo.RESTError)
+		if e.Message != nil {
+			_, err = ctx.Send(&discordgo.MessageEmbed{
+				Title:       "REST error occurred",
+				Description: fmt.Sprintf("```%v```", e.Message.Message),
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: fmt.Sprintf("Error code: %v", e.Message.Code),
+				},
+				Color:     0xbf1122,
+				Timestamp: time.Now().UTC().Format(time.RFC3339),
+			})
+		} else {
+			_, err = ctx.Send(&discordgo.MessageEmbed{
+				Title:       "REST error occurred",
+				Description: fmt.Sprintf("```%v```", e.ResponseBody),
+				Color:       0xbf1122,
+				Timestamp:   time.Now().UTC().Format(time.RFC3339),
+			})
+		}
+		return nil, err
 	default:
 		id, cmdErr := uuid.NewRandom()
 		if cmdErr != nil {
