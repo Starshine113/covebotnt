@@ -2,6 +2,7 @@ package usercommands
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -35,7 +36,7 @@ func RoleInfo(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	var count int64 = 0
+	var count int = 0
 	for _, m := range members {
 		for _, r := range m.Roles {
 			if r == role.ID {
@@ -65,11 +66,6 @@ func RoleInfo(ctx *crouter.Ctx) (err error) {
 				Inline: true,
 			},
 			{
-				Name:   "Mentionable",
-				Value:  fmt.Sprint(role.Mentionable),
-				Inline: true,
-			},
-			{
 				Name:   "Color",
 				Value:  fmt.Sprintf("#%v", strconv.FormatInt(int64(role.Color), 16)),
 				Inline: true,
@@ -80,13 +76,19 @@ func RoleInfo(ctx *crouter.Ctx) (err error) {
 				Inline: true,
 			},
 			{
-				Name:   "Hoisted",
-				Value:  fmt.Sprint(role.Hoist),
+				Name:   "Position",
+				Value:  fmt.Sprint(role.Position),
 				Inline: true,
 			},
 			{
-				Name:   "Position",
-				Value:  fmt.Sprint(role.Position),
+				Name:   "Other info",
+				Value:  fmt.Sprintf("Mentionable: %v\nHoisted: %v", role.Mentionable, role.Hoist),
+				Inline: true,
+			},
+			{
+				Name: "Percentage of users",
+				Value: fmt.Sprintf("%v/%v (%v%%)", count, len(members),
+					math.Round(float64(count)/float64(len(members))*100)),
 				Inline: true,
 			},
 			{
