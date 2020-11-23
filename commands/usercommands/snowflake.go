@@ -34,9 +34,7 @@ func Snowflake(ctx *crouter.Ctx) (err error) {
 	if len(desc) > 2000 {
 		desc = desc[:2000]
 	}
-	_, err = ctx.Send(&discordgo.MessageEmbed{
-		Title:       "Timestamps",
-		Description: desc,
-	})
+
+	_, err = ctx.Embed("Timestamps", desc, 0)
 	return
 }
