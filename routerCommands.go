@@ -290,6 +290,14 @@ func addModCommands() {
 		Command:     commandStarboardEmoji,
 	})
 
+	starboard.AddCommand(&crouter.Command{
+		Name:        "ToggleSenderReact",
+		Description: "Toggle whether or not a message's sender can react to it with the star emoji",
+		Usage:       "",
+		Permissions: crouter.PermLevelMod,
+		Command:     modutilcommands.StarboardSenderCanReactToggle,
+	})
+
 	router.AddCommand(&crouter.Command{
 		Name:        "ModLog",
 		Description: "Set the modlog channel",

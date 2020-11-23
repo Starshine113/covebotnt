@@ -48,7 +48,7 @@ func (sb *Sb) ReactionAdd(s *discordgo.Session, reaction *discordgo.MessageReact
 	}
 
 	// check the user, if it's the message author, remove the reaction
-	if message.Author.ID == reaction.UserID {
+	if message.Author.ID == reaction.UserID && !gs.Starboard.SenderCanReact {
 		err = s.MessageReactionRemove(reaction.ChannelID, reaction.MessageID, reaction.Emoji.APIName(), reaction.UserID)
 		if err != nil {
 			sb.Sugar.Errorf("Error removing reaction on message %v: %v", reaction.MessageID, err)
@@ -107,6 +107,10 @@ func (sb *Sb) ReactionRemove(s *discordgo.Session, reaction *discordgo.MessageRe
 	message, err := s.ChannelMessage(reaction.ChannelID, reaction.MessageID)
 	if err != nil {
 		sb.Sugar.Errorf("Error getting message %v: %v", reaction.MessageID, err)
+	}
+
+	if message.Author.ID == reaction.UserID && !gs.Starboard.SenderCanReact {
+		return
 	}
 
 	// check reactions

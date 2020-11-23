@@ -67,3 +67,31 @@ func (db *Db) GetOrigStarboardMessage(m string) (s string) {
 	db.Pool.QueryRow(context.Background(), "select starboard_message_id from public.starboard_messages where starboard_message_id = $1", m).Scan(&s)
 	return s
 }
+
+// ToggleSenderCanReact ...
+func (db *Db) ToggleSenderCanReact(g string) (err error) {
+	s, err := db.GetGuildSettings(g)
+	if err != nil {
+		return err
+	}
+
+	var b bool
+	if s.Starboard.SenderCanReact {
+		b = false
+	} else {
+		b = true
+	}
+
+	commandTag, err := db.Pool.Exec(context.Background(), "update public.guild_settings set sender_can_react = $1 where guild_id = $2", b, g)
+	if err != nil {
+		return err
+	}
+	if commandTag.RowsAffected() != 1 {
+		return errors.New("no rows affected")
+	}
+	err = db.RemoveFromGuildCache(g)
+	if err != nil {
+		return err
+	}
+	return nil
+}
