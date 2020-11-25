@@ -2,11 +2,20 @@ package crouter
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
+
+type cmdList []*Command
+
+func (c cmdList) Len() int      { return len(c) }
+func (c cmdList) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
+func (c cmdList) Less(i, j int) bool {
+	return sort.StringsAreSorted([]string{c[i].Name, c[j].Name})
+}
 
 // Help is the help command
 func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
@@ -36,7 +45,11 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error
 		}
 
 		var ownerCmdString, adminCmdString, modCmdString, helperCmdString, userCmdString string
-		for _, cmd := range r.Commands {
+		var cmds cmdList
+		cmds = append(cmds, r.Commands...)
+		sort.Sort(cmds)
+
+		for _, cmd := range cmds {
 			switch cmd.Permissions {
 			case PermLevelNone:
 				userCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
