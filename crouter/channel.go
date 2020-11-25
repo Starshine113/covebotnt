@@ -11,7 +11,7 @@ import (
 // Send a message to the context channel
 func (ctx *Ctx) Send(arg interface{}) (message *discordgo.Message, err error) {
 	message, err = ctx.SendNoAddXHandler(arg)
-	ctx.AddReactionHandler(message.ID, "❌", func(ctx *Ctx) {
+	ctx.AddReactionHandlerOnce(message.ID, "❌", func(ctx *Ctx) {
 		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, message.ID)
 	})
 	return
@@ -35,7 +35,7 @@ func (ctx *Ctx) SendNoAddXHandler(arg interface{}) (message *discordgo.Message, 
 // Sendf sends a fmt.Sprintf-like input string
 func (ctx *Ctx) Sendf(format string, args ...interface{}) (msg *discordgo.Message, err error) {
 	msg, err = ctx.SendfNoAddXHandler(format, args...)
-	ctx.AddReactionHandler(msg.ID, "❌", func(ctx *Ctx) {
+	ctx.AddReactionHandlerOnce(msg.ID, "❌", func(ctx *Ctx) {
 		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
 	})
 	return
@@ -54,7 +54,7 @@ func (ctx *Ctx) Editf(message *discordgo.Message, format string, args ...interfa
 // Embed sends the input as an embed
 func (ctx *Ctx) Embed(title, description string, color int) (msg *discordgo.Message, err error) {
 	msg, err = ctx.EmbedNoXHandler(title, description, color)
-	ctx.AddReactionHandler(msg.ID, "❌", func(ctx *Ctx) {
+	ctx.AddReactionHandlerOnce(msg.ID, "❌", func(ctx *Ctx) {
 		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
 	})
 	return
@@ -77,7 +77,7 @@ func (ctx *Ctx) EmbedNoXHandler(title, description string, color int) (msg *disc
 // Embedf sends a fmt.Sprintf-like input string, in an embed
 func (ctx *Ctx) Embedf(title, format string, args ...interface{}) (msg *discordgo.Message, err error) {
 	msg, err = ctx.EmbedfNoXHandler(title, format, args...)
-	ctx.AddReactionHandler(msg.ID, "❌", func(ctx *Ctx) {
+	ctx.AddReactionHandlerOnce(msg.ID, "❌", func(ctx *Ctx) {
 		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
 	})
 	return

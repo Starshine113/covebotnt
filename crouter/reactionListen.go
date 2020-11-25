@@ -2,8 +2,8 @@ package crouter
 
 import "github.com/bwmarrin/discordgo"
 
-// AddReactionHandler adds a reaction handler function
-func (ctx *Ctx) AddReactionHandler(messageID, reaction string, f func(ctx *Ctx)) func() {
+// AddReactionHandlerOnce adds a reaction handler function that is only called once
+func (ctx *Ctx) AddReactionHandlerOnce(messageID, reaction string, f func(ctx *Ctx)) func() {
 	returnFunc := ctx.Session.AddHandler(func(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 		if r.UserID != ctx.Message.Author.ID || r.ChannelID != ctx.Channel.ID || r.MessageID != messageID || r.MessageReaction.Emoji.APIName() != reaction {
 			return
@@ -12,6 +12,20 @@ func (ctx *Ctx) AddReactionHandler(messageID, reaction string, f func(ctx *Ctx))
 
 		ctx.Handlers[messageID+reaction]()
 		delete(ctx.Handlers, messageID+reaction)
+
+		return
+	})
+	ctx.Handlers[messageID+reaction] = returnFunc
+	return returnFunc
+}
+
+// AddReactionHandler adds a reaction handler function
+func (ctx *Ctx) AddReactionHandler(messageID, reaction string, f func(ctx *Ctx)) func() {
+	returnFunc := ctx.Session.AddHandler(func(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
+		if r.UserID != ctx.Message.Author.ID || r.ChannelID != ctx.Channel.ID || r.MessageID != messageID || r.MessageReaction.Emoji.APIName() != reaction {
+			return
+		}
+		f(ctx)
 
 		return
 	})
