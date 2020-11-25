@@ -10,12 +10,14 @@ func (ctx *Ctx) AddReactionHandlerOnce(messageID, reaction string, f func(ctx *C
 		}
 		f(ctx)
 
-		ctx.Handlers[messageID+reaction]()
-		delete(ctx.Handlers, messageID+reaction)
+		if v, e := ctx.Handlers.Get(messageID + reaction); e == nil {
+			v.(func())()
+			ctx.Handlers.Remove(messageID + reaction)
+		}
 
 		return
 	})
-	ctx.Handlers[messageID+reaction] = returnFunc
+	ctx.Handlers.Set(messageID+reaction, returnFunc)
 	return returnFunc
 }
 
@@ -29,7 +31,7 @@ func (ctx *Ctx) AddReactionHandler(messageID, reaction string, f func(ctx *Ctx))
 
 		return
 	})
-	ctx.Handlers[messageID+reaction] = returnFunc
+	ctx.Handlers.Set(messageID+reaction, returnFunc)
 	return returnFunc
 }
 
@@ -52,11 +54,13 @@ func (ctx *Ctx) AddYesNoHandler(messageID string, yesFunc, noFunc func(ctx *Ctx)
 			return
 		}
 
-		ctx.Handlers[messageID]()
-		delete(ctx.Handlers, messageID)
+		if v, e := ctx.Handlers.Get(messageID); e == nil {
+			v.(func())()
+			ctx.Handlers.Remove(messageID)
+		}
 
 		return
 	})
-	ctx.Handlers[messageID] = returnFunc
+	ctx.Handlers.Set(messageID, returnFunc)
 	return returnFunc
 }

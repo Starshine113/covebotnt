@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/etc"
 	"github.com/Starshine113/covebotnt/structs"
@@ -31,7 +32,7 @@ type Ctx struct {
 	BotUser          *discordgo.User
 	Database         *cbdb.Db
 	BoltDb           *cbdb.BoltDb
-	Handlers         map[string]func()
+	Handlers         *ttlcache.Cache
 	AdditionalParams map[string]interface{}
 	GuildSettings    *structs.GuildSettings
 	Cmd              *Command
@@ -44,7 +45,7 @@ func Context(
 	m *discordgo.MessageCreate,
 	db *cbdb.Db,
 	boltDb *cbdb.BoltDb,
-	handlerMap map[string]func()) (ctx *Ctx, err error) {
+	handlerMap *ttlcache.Cache) (ctx *Ctx, err error) {
 
 	botUser, err := s.User("@me")
 	if err != nil {

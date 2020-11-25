@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/starboard"
@@ -17,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const botVersion = "0.95"
+const botVersion = "0.96"
 
 var (
 	config    structs.BotConfig
@@ -27,7 +28,7 @@ var (
 	router    *crouter.Router
 	startTime time.Time
 
-	handlerMap map[string]func()
+	handlerMap *ttlcache.Cache
 )
 
 var (
@@ -88,7 +89,12 @@ func initialise(token, databaseURL string) (err error) {
 		return err
 	}
 
-	handlerMap = make(map[string]func())
+	handlerMap = ttlcache.NewCache()
+	handlerMap.SetCacheSizeLimit(10000)
+	handlerMap.SetTTL(15 * time.Minute)
+	handlerMap.SetExpirationCallback(func(key string, value interface{}) {
+		value.(func())()
+	})
 
 	return nil
 }
