@@ -31,7 +31,7 @@ type Ctx struct {
 	BotUser          *discordgo.User
 	Database         *cbdb.Db
 	BoltDb           *cbdb.BoltDb
-	Handlers         *map[string]func()
+	Handlers         map[string]func()
 	AdditionalParams map[string]interface{}
 	GuildSettings    *structs.GuildSettings
 	Cmd              *Command
@@ -44,7 +44,7 @@ func Context(
 	m *discordgo.MessageCreate,
 	db *cbdb.Db,
 	boltDb *cbdb.BoltDb,
-	handlerMap *map[string]func()) (ctx *Ctx, err error) {
+	handlerMap map[string]func()) (ctx *Ctx, err error) {
 
 	botUser, err := s.User("@me")
 	if err != nil {

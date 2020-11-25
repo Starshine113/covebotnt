@@ -10,6 +10,15 @@ import (
 
 // Send a message to the context channel
 func (ctx *Ctx) Send(arg interface{}) (message *discordgo.Message, err error) {
+	message, err = ctx.SendNoAddXHandler(arg)
+	ctx.AddReactionHandler(message.ID, "❌", func(ctx *Ctx) {
+		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, message.ID)
+	})
+	return
+}
+
+// SendNoAddXHandler sends a message without adding a handler for :x:
+func (ctx *Ctx) SendNoAddXHandler(arg interface{}) (message *discordgo.Message, err error) {
 	switch arg.(type) {
 	case string:
 		message, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, arg.(string))
@@ -25,6 +34,15 @@ func (ctx *Ctx) Send(arg interface{}) (message *discordgo.Message, err error) {
 
 // Sendf sends a fmt.Sprintf-like input string
 func (ctx *Ctx) Sendf(format string, args ...interface{}) (msg *discordgo.Message, err error) {
+	msg, err = ctx.SendfNoAddXHandler(format, args...)
+	ctx.AddReactionHandler(msg.ID, "❌", func(ctx *Ctx) {
+		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
+	})
+	return
+}
+
+// SendfNoAddXHandler ...
+func (ctx *Ctx) SendfNoAddXHandler(format string, args ...interface{}) (msg *discordgo.Message, err error) {
 	return ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, fmt.Sprintf(format, args...))
 }
 
@@ -35,6 +53,15 @@ func (ctx *Ctx) Editf(message *discordgo.Message, format string, args ...interfa
 
 // Embed sends the input as an embed
 func (ctx *Ctx) Embed(title, description string, color int) (msg *discordgo.Message, err error) {
+	msg, err = ctx.EmbedNoXHandler(title, description, color)
+	ctx.AddReactionHandler(msg.ID, "❌", func(ctx *Ctx) {
+		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
+	})
+	return
+}
+
+// EmbedNoXHandler ...
+func (ctx *Ctx) EmbedNoXHandler(title, description string, color int) (msg *discordgo.Message, err error) {
 	if color == 0 {
 		color = 0x21a1a8
 	}
@@ -49,6 +76,15 @@ func (ctx *Ctx) Embed(title, description string, color int) (msg *discordgo.Mess
 
 // Embedf sends a fmt.Sprintf-like input string, in an embed
 func (ctx *Ctx) Embedf(title, format string, args ...interface{}) (msg *discordgo.Message, err error) {
+	msg, err = ctx.EmbedfNoXHandler(title, format, args...)
+	ctx.AddReactionHandler(msg.ID, "❌", func(ctx *Ctx) {
+		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
+	})
+	return
+}
+
+// EmbedfNoXHandler ...
+func (ctx *Ctx) EmbedfNoXHandler(title, format string, args ...interface{}) (msg *discordgo.Message, err error) {
 	embed := &discordgo.MessageEmbed{
 		Title:       title,
 		Description: fmt.Sprintf(format, args...),

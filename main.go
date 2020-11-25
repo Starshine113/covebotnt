@@ -17,7 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const botVersion = "0.94"
+const botVersion = "0.95"
 
 var (
 	config    structs.BotConfig
@@ -87,6 +87,8 @@ func initialise(token, databaseURL string) (err error) {
 	if err != nil {
 		return err
 	}
+
+	handlerMap = make(map[string]func())
 
 	return nil
 }

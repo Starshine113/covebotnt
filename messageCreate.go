@@ -36,7 +36,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// get prefix for the guild
 	prefix := getPrefix(m.GuildID)
 
-	ctx, err := crouter.Context(prefix, m.Content, s, m, pool, boltDb, &handlerMap)
+	ctx, err := crouter.Context(prefix, m.Content, s, m, pool, boltDb, handlerMap)
 	if err != nil {
 		sugar.Errorf("Error getting context: %v", err)
 		return
@@ -52,7 +52,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	match, _ := regexp.MatchString(fmt.Sprintf("<@!?%v>.*hello$", s.State.User.ID), content)
 	match2, _ := regexp.MatchString(fmt.Sprintf("%vhello$", regexp.QuoteMeta(prefix)), content)
 	if match || match2 {
-		ctx, err = crouter.Context("--", "--hello", s, m, pool, boltDb, &handlerMap)
+		ctx, err = crouter.Context("--", "--hello", s, m, pool, boltDb, handlerMap)
 		if err != nil {
 			sugar.Errorf("Error getting context: %v", err)
 			return
