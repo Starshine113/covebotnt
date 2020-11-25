@@ -2,8 +2,11 @@ package crouter
 
 import (
 	"fmt"
+	"math"
+	"runtime"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
@@ -24,111 +27,20 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error
 		return
 	}
 
-	embeds := make([]*discordgo.MessageEmbed, 0)
-
 	if len(ctx.Args) == 0 {
-		level := 0
 		permLevel := PermLevelNone
 
 		if err = checkOwner(ctx.Author.ID, r.BotOwners); err == nil {
-			level = 4
 			permLevel = PermLevelOwner
 		} else if err = checkAdmin(ctx); err == nil {
-			level = 3
 			permLevel = PermLevelAdmin
 		} else if err = checkModPerm(ctx, guildSettings); err == nil {
-			level = 2
 			permLevel = PermLevelMod
 		} else if err = checkHelperPerm(ctx, guildSettings); err == nil {
-			level = 1
 			permLevel = PermLevelHelper
 		}
 
-		var ownerCmdString, adminCmdString, modCmdString, helperCmdString, userCmdString string
-		var cmds cmdList
-		cmds = append(cmds, r.Commands...)
-		sort.Sort(cmds)
-
-		for _, cmd := range cmds {
-			switch cmd.Permissions {
-			case PermLevelNone:
-				userCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
-			case PermLevelHelper:
-				helperCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
-			case PermLevelMod:
-				modCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
-			case PermLevelAdmin:
-				adminCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
-			case PermLevelOwner:
-				ownerCmdString += fmt.Sprintf("`%v`: %v\n", cmd.Name, cmd.Description)
-			}
-		}
-		var groupCmds string
-		for _, g := range r.Groups {
-			groupCmds += fmt.Sprintf("`%v`: %v\n", g.Name, g.Description)
-		}
-
-		embeds = append(embeds, &discordgo.MessageEmbed{
-			Title:       ctx.BotUser.Username + " help",
-			Description: "Use ⬅️ ➡️ to navigate between pages, and ❌ to delete this message.",
-			Color:       0x21a1a8,
-			Fields: []*discordgo.MessageEmbedField{{
-				Name:   "** **",
-				Value:  fmt.Sprintf("This server's prefix is `%v`.\nYou can also mention the bot (%v) to invoke commands.\nYour bot permission level is `%v`.", ctx.GuildPrefix, ctx.BotUser.Mention(), permLevel.String()),
-				Inline: false,
-			}},
-			Footer: &discordgo.MessageEmbedFooter{
-				Text: "Use `help <cmd>` for more information on a command",
-			},
-		}, &discordgo.MessageEmbed{
-			Title:       "Groups",
-			Description: groupCmds,
-			Color:       0x21a1a8,
-			Footer: &discordgo.MessageEmbedFooter{
-				Text: "Use `help <cmd>` for more information on a command",
-			},
-		}, &discordgo.MessageEmbed{
-			Title:       fmt.Sprintf("User commands (%v)", len(strings.Split(userCmdString, "\n"))-1),
-			Description: userCmdString,
-			Color:       0x21a1a8,
-			Footer: &discordgo.MessageEmbedFooter{
-				Text: "Use `help <cmd>` for more information on a command",
-			},
-		})
-
-		if level >= 1 {
-			embeds = append(embeds, &discordgo.MessageEmbed{
-				Title:       fmt.Sprintf("Helper commands (%v)", len(strings.Split(helperCmdString, "\n"))-1),
-				Description: helperCmdString,
-				Color:       0x21a1a8,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: "Use `help <cmd>` for more information on a command",
-				},
-			})
-		}
-		if level >= 2 {
-			embeds = append(embeds, &discordgo.MessageEmbed{
-				Title:       fmt.Sprintf("Mod commands (%v)", len(strings.Split(modCmdString, "\n"))-1),
-				Description: modCmdString,
-				Color:       0x21a1a8,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: "Use `help <cmd>` for more information on a command",
-				},
-			})
-		}
-		if level >= 3 {
-			embeds = append(embeds, &discordgo.MessageEmbed{
-				Title:       fmt.Sprintf("Admin commands (%v)", len(strings.Split(adminCmdString, "\n"))-1),
-				Description: adminCmdString,
-				Color:       0x21a1a8,
-				Footer: &discordgo.MessageEmbedFooter{
-					Text: "Use `help <cmd>` for more information on a command",
-				},
-			})
-		}
-
-		_, err = ctx.PagedEmbed(embeds)
-		return err
+		return r.details(ctx, permLevel)
 	}
 
 	var cmd *Command
@@ -275,4 +187,202 @@ func (ctx *Ctx) CmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 	}
 
 	return embed
+}
+
+func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
+	if err = ctx.TriggerTyping(); err != nil {
+		return err
+	}
+
+	var cmds cmdList
+	for _, c := range r.Commands {
+		if c.Permissions <= p {
+			cmds = append(cmds, c)
+		}
+	}
+
+	for _, g := range r.Groups {
+		if g.Command.Permissions <= p {
+			cmd := *g.Command
+			cmd.Name = fmt.Sprintf("%v %v", g.Name, g.Command.Name)
+			cmds = append(cmds, &cmd)
+		}
+		for _, c := range g.Subcommands {
+			if c.Permissions <= p {
+				cmd := *c
+				cmd.Name = fmt.Sprintf("%v %v", g.Name, c.Name)
+				cmds = append(cmds, &cmd)
+			}
+		}
+	}
+
+	sort.Sort(cmds)
+	cmdSlices := make([][]*Command, 0)
+
+	for i := 0; i < len(cmds); i += 5 {
+		end := i + 5
+
+		if end > len(cmds) {
+			end = len(cmds)
+		}
+
+		cmdSlices = append(cmdSlices, cmds[i:end])
+	}
+
+	embeds := make([]*discordgo.MessageEmbed, 0)
+
+	fields := []*discordgo.MessageEmbedField{
+		{
+			Name:   "Source code",
+			Value:  "CoveBotn't is licensed under the GNU AGPLv3. The source code can be found [here](https://github.com/Starshine113/covebotnt).",
+			Inline: false,
+		},
+	}
+
+	startTime := ctx.AdditionalParams["startTime"].(time.Time).UTC()
+	c := ctx.AdditionalParams["config"].(structs.BotConfig)
+	botAuthor, err := ctx.Session.User("694563574386786314")
+	if err != nil {
+		return err
+	}
+
+	if c.Bot.Invite != "" {
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   "Invite",
+			Value:  "Invite the bot with [this](" + c.Bot.Invite + ") link.",
+			Inline: false,
+		})
+	}
+
+	embeds = append(embeds, &discordgo.MessageEmbed{
+		Author: &discordgo.MessageEmbedAuthor{
+			Name: ctx.BotUser.Username + " help",
+		},
+		Title:       "Page 1/" + fmt.Sprint(len(cmdSlices)+1),
+		Description: ctx.BotUser.Username + " is a general purpose bot, with a gatekeeper, moderation commands, and starboard functionality.",
+		Color:       0x21a1a8,
+		Footer: &discordgo.MessageEmbedFooter{
+			IconURL: ctx.BotUser.AvatarURL("256"),
+			Text:    "Made with discordgo " + discordgo.VERSION,
+		},
+		Timestamp: time.Now().Format(time.RFC3339),
+		Fields: append(fields, []*discordgo.MessageEmbedField{
+			{
+				Name:   "Bot version",
+				Value:  fmt.Sprintf("v%v-%v", ctx.AdditionalParams["botVer"].(string), ctx.AdditionalParams["gitVer"].(string)),
+				Inline: true,
+			},
+			{
+				Name:   "Go version",
+				Value:  runtime.Version(),
+				Inline: true,
+			},
+			{
+				Name:   "discordgo version",
+				Value:  discordgo.VERSION,
+				Inline: true,
+			},
+			{
+				Name:   "Author",
+				Value:  botAuthor.Mention() + " / " + botAuthor.String(),
+				Inline: false,
+			},
+			{
+				Name:   "Uptime",
+				Value:  fmt.Sprintf("Up %v\n(Since %v)", PrettyDurationString(time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
+				Inline: false,
+			},
+			{
+				Name:   "** **",
+				Value:  "Use ⬅️ ➡️ to navigate between pages, the numbers to choose a command, and ❌ to delete this message.",
+				Inline: false,
+			},
+		}...)})
+
+	for i, c := range cmdSlices {
+		embeds = append(embeds, ctx.detailEmbed(i, len(cmdSlices)+1, c))
+	}
+
+	msg, err := ctx.PagedEmbed(embeds)
+
+	ctx.AdditionalParams["cmdList"] = cmdSlices
+
+	for i, e := range emoji {
+		emoji := e
+		if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, emoji); err != nil {
+			return
+		}
+
+		index := i
+		ctx.AddReactionHandler(msg.ID, e, func(ctx *Ctx) {
+			page := ctx.AdditionalParams["page"].(int) - 1
+			if page == -1 {
+				ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, emoji, ctx.Author.ID)
+				return
+			}
+			cmdList := ctx.AdditionalParams["cmdList"].([][]*Command)
+
+			cmdSlice := cmdList[page]
+			if index >= len(cmdSlice) {
+				return
+			}
+
+			ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
+			ctx.Send(ctx.CmdEmbed(cmdSlice[index]))
+		})
+	}
+
+	return
+}
+
+var emoji = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"}
+
+func (ctx *Ctx) detailEmbed(i, pages int, cmds []*Command) *discordgo.MessageEmbed {
+	if len(cmds) > 5 {
+		return nil
+	}
+
+	commands := make([]string, 0)
+
+	for i, cmd := range cmds {
+		commands = append(commands, fmt.Sprintf("%v `%v`: %v", emoji[i], cmd.Name, cmd.Description))
+	}
+	embed := &discordgo.MessageEmbed{
+		Author: &discordgo.MessageEmbedAuthor{
+			Name: ctx.BotUser.Username + " help",
+		},
+		Title:       fmt.Sprintf("Page %v/%v", i+2, pages),
+		Description: strings.Join(commands, "\n\n"),
+		Fields: []*discordgo.MessageEmbedField{{
+			Name:   "Usage",
+			Value:  "Use ⬅️ ➡️ to navigate between pages, the numbers to choose a command, and ❌ to delete this message.",
+			Inline: false,
+		}},
+		Color: 0x21a1a8,
+	}
+	return embed
+}
+
+// PrettyDurationString ...
+func PrettyDurationString(duration time.Duration) (out string) {
+	var days, hours, hoursFrac, minutes float64
+
+	hours = duration.Hours()
+	hours, hoursFrac = math.Modf(hours)
+	minutes = hoursFrac * 60
+
+	hoursFrac = math.Mod(hours, 24)
+	days = (hours - hoursFrac) / 24
+	hours = hours - (days * 24)
+	minutes = minutes - math.Mod(minutes, 1)
+
+	if days != 0 {
+		out += fmt.Sprintf("%v days, ", days)
+	}
+	if hours != 0 {
+		out += fmt.Sprintf("%v hours, ", hours)
+	}
+	out += fmt.Sprintf("%v minutes", minutes)
+
+	return
 }
