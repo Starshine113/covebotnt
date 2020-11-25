@@ -3,7 +3,6 @@ package crouter
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
@@ -15,6 +14,8 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error
 	if err != nil {
 		return
 	}
+
+	embeds := make([]*discordgo.MessageEmbed, 0)
 
 	if len(ctx.Args) == 0 {
 		level := 0
@@ -31,7 +32,7 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error
 			permLevel = PermLevelMod
 		} else if err = checkHelperPerm(ctx, guildSettings); err == nil {
 			level = 1
-			permLevel = PermLevelNone
+			permLevel = PermLevelHelper
 		}
 
 		var ownerCmdString, adminCmdString, modCmdString, helperCmdString, userCmdString string
@@ -54,52 +55,113 @@ func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error
 			groupCmds += fmt.Sprintf("`%v`: %v\n", g.Name, g.Description)
 		}
 
-		fields := []*discordgo.MessageEmbedField{
-			{
-				Name:   fmt.Sprintf("User commands (%v)", len(strings.Split(userCmdString, "\n"))-1),
-				Value:  userCmdString,
-				Inline: false,
-			},
-		}
-		if level >= 1 {
-			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:   fmt.Sprintf("Helper commands (%v)", len(strings.Split(helperCmdString, "\n"))-1),
-				Value:  helperCmdString,
-				Inline: false,
-			})
-		}
-		if level >= 2 {
-			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:   fmt.Sprintf("Mod commands (%v)", len(strings.Split(modCmdString, "\n"))-1),
-				Value:  modCmdString,
-				Inline: false,
-			})
-		}
-		if level >= 3 {
-			fields = append(fields, &discordgo.MessageEmbedField{
-				Name:   fmt.Sprintf("Admin commands (%v)", len(strings.Split(adminCmdString, "\n"))-1),
-				Value:  adminCmdString,
-				Inline: false,
-			})
-		}
-
-		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   fmt.Sprintf("Groups (%v)", len(strings.Split(groupCmds, "\n"))-1),
-			Value:  groupCmds,
-			Inline: false,
-		})
-
-		_, err = ctx.Send(&discordgo.MessageEmbed{
-			Title:       "Help",
-			Description: fmt.Sprintf("This server's prefix is `%v`.\nYou can also mention the bot (%v) to invoke commands.\nYour bot permission level is `%v`.", ctx.GuildPrefix, ctx.BotUser.Mention(), permLevel.String()),
+		embeds = append(embeds, &discordgo.MessageEmbed{
+			Title:       ctx.BotUser.Username + " help",
+			Description: "Use ⬅️ ➡️ to navigate between pages, and ❌ to delete this message.",
 			Color:       0x21a1a8,
-			Fields:      fields,
+			Fields: []*discordgo.MessageEmbedField{{
+				Name:   "** **",
+				Value:  fmt.Sprintf("This server's prefix is `%v`.\nYou can also mention the bot (%v) to invoke commands.\nYour bot permission level is `%v`.", ctx.GuildPrefix, ctx.BotUser.Mention(), permLevel.String()),
+				Inline: false,
+			}},
 			Footer: &discordgo.MessageEmbedFooter{
 				Text: "Use `help <cmd>` for more information on a command",
 			},
-			Timestamp: time.Now().Format(time.RFC3339),
+		}, &discordgo.MessageEmbed{
+			Title:       "Groups",
+			Description: groupCmds,
+			Color:       0x21a1a8,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: "Use `help <cmd>` for more information on a command",
+			},
+		}, &discordgo.MessageEmbed{
+			Title:       fmt.Sprintf("User commands (%v)", len(strings.Split(userCmdString, "\n"))-1),
+			Description: userCmdString,
+			Color:       0x21a1a8,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: "Use `help <cmd>` for more information on a command",
+			},
 		})
-		return
+
+		if level >= 1 {
+			embeds = append(embeds, &discordgo.MessageEmbed{
+				Title:       fmt.Sprintf("Helper commands (%v)", len(strings.Split(helperCmdString, "\n"))-1),
+				Description: helperCmdString,
+				Color:       0x21a1a8,
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: "Use `help <cmd>` for more information on a command",
+				},
+			})
+		}
+		if level >= 2 {
+			embeds = append(embeds, &discordgo.MessageEmbed{
+				Title:       fmt.Sprintf("Mod commands (%v)", len(strings.Split(modCmdString, "\n"))-1),
+				Description: modCmdString,
+				Color:       0x21a1a8,
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: "Use `help <cmd>` for more information on a command",
+				},
+			})
+		}
+		if level >= 3 {
+			embeds = append(embeds, &discordgo.MessageEmbed{
+				Title:       fmt.Sprintf("Admin commands (%v)", len(strings.Split(adminCmdString, "\n"))-1),
+				Description: adminCmdString,
+				Color:       0x21a1a8,
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: "Use `help <cmd>` for more information on a command",
+				},
+			})
+		}
+
+		msg, err := ctx.Send(embeds[0])
+		if err != nil {
+			return err
+		}
+		if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "⬅️"); err != nil {
+			return err
+		}
+		if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "➡️"); err != nil {
+			return err
+		}
+		if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "❌"); err != nil {
+			return err
+		}
+
+		ctx.AdditionalParams["page"] = 0
+		ctx.AdditionalParams["embeds"] = embeds
+
+		ctx.AddReactionHandler(msg.ID, "⬅️", func(ctx *Ctx) {
+			page := ctx.AdditionalParams["page"].(int)
+			embeds := ctx.AdditionalParams["embeds"].([]*discordgo.MessageEmbed)
+
+			if ctx.Message.GuildID != "" {
+				ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, "⬅️", ctx.Author.ID)
+			}
+
+			if page == 0 {
+				return
+			}
+			ctx.Edit(msg, embeds[page-1])
+			ctx.AdditionalParams["page"] = page - 1
+		})
+
+		ctx.AddReactionHandler(msg.ID, "➡️", func(ctx *Ctx) {
+			page := ctx.AdditionalParams["page"].(int)
+			embeds := ctx.AdditionalParams["embeds"].([]*discordgo.MessageEmbed)
+
+			if ctx.Message.GuildID != "" {
+				ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, "➡️", ctx.Author.ID)
+			}
+
+			if page >= len(embeds)-1 {
+				return
+			}
+			ctx.Edit(msg, embeds[page+1])
+			ctx.AdditionalParams["page"] = page + 1
+		})
+
+		return nil
 	}
 
 	var cmd *Command
