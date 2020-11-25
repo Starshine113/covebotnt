@@ -32,6 +32,15 @@ func addUserCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "DetailedHelp",
+		Aliases:     []string{"Detail"},
+		Description: "Show a paginated list of commands",
+		Usage:       "",
+		Permissions: crouter.PermLevelNone,
+		Command:     usercommands.Details,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "Enlarge",
 		Aliases:     []string{"E", "Emote", "Emoji", "Enlorge"},
 		Description: "Enlarges up to 10 custom emoji",
