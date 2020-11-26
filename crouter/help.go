@@ -256,14 +256,13 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 
 	embeds = append(embeds, &discordgo.MessageEmbed{
 		Author: &discordgo.MessageEmbedAuthor{
-			Name: ctx.BotUser.Username + " help",
+			Name:    ctx.BotUser.Username + " help",
+			IconURL: ctx.BotUser.AvatarURL("128"),
 		},
-		Title:       "Page 1/" + fmt.Sprint(len(cmdSlices)+1),
 		Description: ctx.BotUser.Username + " is a general purpose bot, with a gatekeeper, moderation commands, and starboard functionality.",
 		Color:       0x21a1a8,
 		Footer: &discordgo.MessageEmbedFooter{
-			IconURL: ctx.BotUser.AvatarURL("256"),
-			Text:    "Made with discordgo " + discordgo.VERSION,
+			Text: fmt.Sprintf("Page 1/%v | Made with discordgo %v", len(cmdSlices)+1, discordgo.VERSION),
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 		Fields: append(fields, []*discordgo.MessageEmbedField{
@@ -349,9 +348,13 @@ func (ctx *Ctx) detailEmbed(i, pages int, cmds []*Command) *discordgo.MessageEmb
 	}
 	embed := &discordgo.MessageEmbed{
 		Author: &discordgo.MessageEmbedAuthor{
-			Name: ctx.BotUser.Username + " help",
+			Name:    ctx.BotUser.Username + " help",
+			IconURL: ctx.BotUser.AvatarURL("128"),
 		},
-		Title:       fmt.Sprintf("Page %v/%v", i+2, pages),
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: fmt.Sprintf("Page %v/%v", i+2, pages),
+		},
+		Timestamp:   time.Now().Format(time.RFC3339),
 		Description: strings.Join(commands, "\n\n"),
 		Fields: []*discordgo.MessageEmbedField{{
 			Name:   "Usage",
