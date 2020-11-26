@@ -95,3 +95,19 @@ func (db *Db) ToggleSenderCanReact(g string) (err error) {
 	}
 	return nil
 }
+
+// StarboardEmoji ...
+func (db *Db) StarboardEmoji(g, e string) (err error) {
+	commandTag, err := db.Pool.Exec(context.Background(), "update public.guild_settings set emoji = $1 where guild_id = $2", e, g)
+	if err != nil {
+		return err
+	}
+	if commandTag.RowsAffected() != 1 {
+		return errors.New("no rows affected")
+	}
+	err = db.RemoveFromGuildCache(g)
+	if err != nil {
+		return err
+	}
+	return nil
+}

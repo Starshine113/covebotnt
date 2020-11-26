@@ -31,7 +31,7 @@ func (sb *Sb) ReactionAdd(s *discordgo.Session, reaction *discordgo.MessageReact
 		return
 	}
 	// if the emoji is not the server's starboard emoji, do nothing
-	if reaction.Emoji.APIName() != gs.Starboard.Emoji {
+	if reaction.Emoji.MessageFormat() != gs.Starboard.Emoji {
 		return
 	}
 	// if the channel is blacklisted, return
@@ -93,7 +93,7 @@ func (sb *Sb) ReactionRemove(s *discordgo.Session, reaction *discordgo.MessageRe
 		return
 	}
 	// if the emoji is not the server's starboard emoji, do nothing
-	if reaction.Emoji.APIName() != gs.Starboard.Emoji {
+	if reaction.Emoji.MessageFormat() != gs.Starboard.Emoji {
 		return
 	}
 	// if the channel is blacklisted, return

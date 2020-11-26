@@ -276,10 +276,11 @@ func addModCommands() {
 
 	starboard.AddCommand(&crouter.Command{
 		Name:        "Emoji",
+		Aliases:     []string{"React", "Reaction"},
 		Description: "Change the starboard emoji",
 		Usage:       "<emoji>",
 		Permissions: crouter.PermLevelMod,
-		Command:     commandStarboardEmoji,
+		Command:     modutilcommands.StarboardReact,
 	})
 
 	starboard.AddCommand(&crouter.Command{
