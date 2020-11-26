@@ -10,13 +10,19 @@ func (ctx *Ctx) PagedEmbed(embeds []*discordgo.MessageEmbed) (msg *discordgo.Mes
 	if err != nil {
 		return
 	}
+	if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "❌"); err != nil {
+		return
+	}
+	if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "⏪"); err != nil {
+		return
+	}
 	if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "⬅️"); err != nil {
 		return
 	}
 	if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "➡️"); err != nil {
 		return
 	}
-	if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "❌"); err != nil {
+	if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, "⏩"); err != nil {
 		return
 	}
 
@@ -51,6 +57,28 @@ func (ctx *Ctx) PagedEmbed(embeds []*discordgo.MessageEmbed) (msg *discordgo.Mes
 		}
 		ctx.Edit(msg, embeds[page+1])
 		ctx.AdditionalParams["page"] = page + 1
+	})
+
+	ctx.AddReactionHandler(msg.ID, "⏪", func(ctx *Ctx) {
+		embeds := ctx.AdditionalParams["embeds"].([]*discordgo.MessageEmbed)
+
+		if ctx.Message.GuildID != "" {
+			ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, "⏪", ctx.Author.ID)
+		}
+
+		ctx.Edit(msg, embeds[0])
+		ctx.AdditionalParams["page"] = 0
+	})
+
+	ctx.AddReactionHandler(msg.ID, "⏩", func(ctx *Ctx) {
+		embeds := ctx.AdditionalParams["embeds"].([]*discordgo.MessageEmbed)
+
+		if ctx.Message.GuildID != "" {
+			ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, "⏩", ctx.Author.ID)
+		}
+
+		ctx.Edit(msg, embeds[len(embeds)-1])
+		ctx.AdditionalParams["page"] = len(embeds) - 1
 	})
 
 	return msg, err
