@@ -35,6 +35,11 @@ func DM(ctx *crouter.Ctx) (err error) {
 			IconURL: guild.IconURL(),
 			Text:    "Message ID: " + ctx.Message.ID,
 		},
+		Fields: []*discordgo.MessageEmbedField{{
+			Name:   "Note",
+			Value:  "You cannot reply to this message via the bot. To reply, contact the server's mod team through the usual methods.",
+			Inline: false,
+		}},
 	}
 
 	ch, err := ctx.Session.UserChannelCreate(m.User.ID)
@@ -87,6 +92,11 @@ func AnonDM(ctx *crouter.Ctx) (err error) {
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: "Message ID: " + ctx.Message.ID,
 		},
+		Fields: []*discordgo.MessageEmbedField{{
+			Name:   "Note",
+			Value:  "You cannot reply to this message via the bot. To reply, contact the server's mod team through the usual methods.",
+			Inline: false,
+		}},
 	}
 
 	ch, err := ctx.Session.UserChannelCreate(m.User.ID)
