@@ -48,6 +48,12 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 		features = []string{"NONE"}
 	}
 
+	ownerString := "<@" + guild.OwnerID + ">"
+	owner, err := ctx.Session.User(guild.OwnerID)
+	if err == nil {
+		ownerString = owner.String()
+	}
+
 	embed := &discordgo.MessageEmbed{
 		Title: fmt.Sprintf("Info for %v", guild.Name),
 		Footer: &discordgo.MessageEmbedFooter{
@@ -61,7 +67,7 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Owner",
-				Value:  "<@" + guild.OwnerID + ">",
+				Value:  ownerString,
 				Inline: true,
 			},
 			{
