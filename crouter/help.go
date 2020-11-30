@@ -20,6 +20,23 @@ func (c cmdList) Less(i, j int) bool {
 	return sort.StringsAreSorted([]string{c[i].Name, c[j].Name})
 }
 
+// Invite returns an invite link for the bot
+func (ctx *Ctx) Invite() string {
+	// perms is the list of permissions the bot will be granted by default
+	var perms = discordgo.PermissionReadMessages +
+		discordgo.PermissionReadMessageHistory +
+		discordgo.PermissionSendMessages +
+		discordgo.PermissionManageMessages +
+		discordgo.PermissionManageEmojis +
+		discordgo.PermissionChangeNickname +
+		discordgo.PermissionEmbedLinks +
+		discordgo.PermissionAttachFiles +
+		discordgo.PermissionUseExternalEmojis +
+		discordgo.PermissionAddReactions
+
+	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&redirect_uri=https%%3A%%2F%%2Fstarshines.xyz%%2Fcovebot%%2Fsetup.html&scope=bot", ctx.BotUser.ID, perms)
+}
+
 // Help is the help command
 func (r *Router) Help(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
 	err = ctx.TriggerTyping()
@@ -233,6 +250,11 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 
 	fields := []*discordgo.MessageEmbedField{
 		{
+			Name:   "Setup",
+			Value:  "For help setting up the bot, check out the [docs](https://starshines.xyz/covebot/setup.html).",
+			Inline: false,
+		},
+		{
 			Name:   "Source code",
 			Value:  "CoveBotn't is licensed under the GNU AGPLv3. The source code can be found [here](https://github.com/Starshine113/covebotnt).",
 			Inline: false,
@@ -249,7 +271,7 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 	if c.Bot.Invite != "" {
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   "Invite",
-			Value:  "Invite the bot with [this](" + c.Bot.Invite + ") link.",
+			Value:  "Invite the bot with [this](" + ctx.Invite() + ") link.",
 			Inline: false,
 		})
 	}
