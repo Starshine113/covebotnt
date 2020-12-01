@@ -20,4 +20,12 @@ type BotConfig struct {
 			Status string `toml:"status"`
 		} `toml:"custom_status"`
 	} `toml:"bot"`
+	Logging struct {
+		LogLevel string `toml:"log_level"`
+		DebugURL string `toml:"debug_url"`
+		InfoURL  string `toml:"info_url"`
+		WarnURL  string `toml:"warn_url"`
+		ErrorURL string `toml:"error_url"`
+		PanicURL string `toml:"panic_url"`
+	} `toml:"logging"`
 }

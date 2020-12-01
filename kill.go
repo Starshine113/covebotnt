@@ -18,7 +18,7 @@ func commandKill(ctx *crouter.Ctx) (err error) {
 	pool.Pool.Close()
 	sugar.Infof("Closed database connection.")
 
-	logger.Sync()
+	sugar.Flush()
 	boltDb.Bolt.Close()
 
 	os.Exit(0)

@@ -54,7 +54,7 @@ func commandGkMessage(ctx *crouter.Ctx) (err error) {
 	var msgB bytes.Buffer
 	tmpl, err := template.New("gatekeeper").Parse(msg)
 	if err != nil {
-		sugar.Error(err)
+		sugar.Errorf("Error parsing template: %v", err)
 		return err
 	}
 	exampleData := struct {
@@ -63,7 +63,7 @@ func commandGkMessage(ctx *crouter.Ctx) (err error) {
 		User: ctx.Message.Author,
 	}
 	if err := tmpl.Execute(&msgB, exampleData); err != nil {
-		sugar.Error(err)
+		sugar.Errorf("Error executing template: %v", err)
 		return err
 	}
 
@@ -141,7 +141,7 @@ func commandWelcomeMessage(ctx *crouter.Ctx) (err error) {
 	var msgB bytes.Buffer
 	tmpl, err := template.New("gatekeeper").Parse(msg)
 	if err != nil {
-		sugar.Error(err)
+		sugar.Errorf("Error parsing template: %v", err)
 		return err
 	}
 	exampleData := struct {
@@ -150,7 +150,7 @@ func commandWelcomeMessage(ctx *crouter.Ctx) (err error) {
 		User: ctx.Message.Author,
 	}
 	if err := tmpl.Execute(&msgB, exampleData); err != nil {
-		sugar.Error(err)
+		sugar.Errorf("Error executing template: %v", err)
 		return err
 	}
 

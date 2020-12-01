@@ -5,6 +5,9 @@ import (
 )
 
 func onReady(s *discordgo.Session, _ *discordgo.Ready) {
+	sugar.Name = s.State.User.Username
+	sugar.AvatarURL = s.State.User.AvatarURL("128")
+
 	err := updateStatus(s)
 	if err != nil {
 		sugar.Errorf("Error updating status: %v", err)

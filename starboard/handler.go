@@ -4,13 +4,13 @@ import (
 	"log"
 
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/wlog"
 	"github.com/bwmarrin/discordgo"
-	"go.uber.org/zap"
 )
 
 // Sb ...
 type Sb struct {
-	Sugar *zap.SugaredLogger
+	Sugar *wlog.Wlog
 	Pool  *cbdb.Db
 }
 

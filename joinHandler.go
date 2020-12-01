@@ -21,17 +21,17 @@ func onJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 		var msgB bytes.Buffer
 		tmpl, err := template.New("gatekeeper").Parse(guildConf.Gatekeeper.GatekeeperMessage)
 		if err != nil {
-			sugar.Error(err)
+			sugar.Errorf("Error loading template: %v", err)
 			return
 		}
 		if err := tmpl.Execute(&msgB, m); err != nil {
-			sugar.Error(err)
+			sugar.Errorf("Error executing template: %v", err)
 			return
 		}
 
 		_, err = s.ChannelMessageSend(guildConf.Gatekeeper.GatekeeperChannel, msgB.String())
 		if err != nil {
-			sugar.Error(err)
+			sugar.Errorf("Error sending message: %v", err)
 			return
 		}
 	}

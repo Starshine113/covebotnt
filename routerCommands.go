@@ -418,6 +418,13 @@ func addAdminCommands() {
 	})
 
 	router.AddCommand(&crouter.Command{
+		Name:        "Archive",
+		Description: "Archive the current channel",
+		Permissions: crouter.PermLevelAdmin,
+		Command:     modutilcommands.Archive,
+	})
+
+	router.AddCommand(&crouter.Command{
 		Name:        "RefreshMVC",
 		Description: "Refresh the mvc role",
 		Usage:       "",

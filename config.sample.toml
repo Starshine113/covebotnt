@@ -13,3 +13,11 @@ status = "c;help"
 token = 'secretDiscordString'
 database_url = 'postgresql://starbot:starbot@localhost/starbot'
 bolt_path = "bolt.db" # path to the Bolt databse, relative to current directory
+
+[logging]
+log_level = "DEBUG"
+debug_url = ""
+info_url = ""
+warn_url = ""
+error_url = ""
+panic_url = ""

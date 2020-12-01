@@ -13,9 +13,9 @@ import (
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/starboard"
 	"github.com/Starshine113/covebotnt/structs"
+	"github.com/Starshine113/covebotnt/wlog"
 	"github.com/bwmarrin/discordgo"
 	bolt "go.etcd.io/bbolt"
-	"go.uber.org/zap"
 )
 
 const botVersion = "0.99"
@@ -32,9 +32,8 @@ var (
 )
 
 var (
-	logger *zap.Logger
-	sugar  *zap.SugaredLogger
-	dg     *discordgo.Session
+	sugar *wlog.Wlog
+	dg    *discordgo.Session
 )
 
 func loadDB(c structs.BotConfig) (err error) {
@@ -44,18 +43,19 @@ func loadDB(c structs.BotConfig) (err error) {
 
 // basic initialisation routines
 func initialise(token, databaseURL string) (err error) {
-	logger, err = zap.NewDevelopment()
-	if err != nil {
-		return err
-	}
-	zap.RedirectStdLog(logger)
-	sugar = logger.Sugar()
-
 	// load config
 	config, err = getConfig()
 	if err != nil {
 		return err
 	}
+
+	sugar = wlog.Logger(wlog.URLs{
+		DebugURL: config.Logging.DebugURL,
+		InfoURL:  config.Logging.InfoURL,
+		WarnURL:  config.Logging.WarnURL,
+		ErrorURL: config.Logging.ErrorURL,
+		PanicURL: config.Logging.PanicURL,
+	}, config.Logging.LogLevel)
 
 	// open Bolt db
 	bolt, err := bolt.Open(config.Auth.BoltPath, 0666, &bolt.Options{Timeout: 1 * time.Second})
@@ -163,7 +163,7 @@ func main() {
 		pool.Pool.Close()
 		sugar.Infof("Closed database connection.")
 
-		logger.Sync()
+		sugar.Flush()
 		boltDb.Bolt.Close()
 	}()
 

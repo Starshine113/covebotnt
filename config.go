@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -18,7 +19,7 @@ func getConfig() (config structs.BotConfig, err error) {
 		if err != nil {
 			return config, err
 		}
-		sugar.Errorf("config.toml was not found, created sample configuration.")
+		fmt.Println("config.toml was not found, created sample configuration.")
 		os.Exit(1)
 		return config, nil
 	}
@@ -27,6 +28,6 @@ func getConfig() (config structs.BotConfig, err error) {
 		return config, err
 	}
 	err = toml.Unmarshal(configFile, &config)
-	sugar.Infof("Loaded configuration file.")
+	fmt.Println("Loaded configuration file.")
 	return config, err
 }
