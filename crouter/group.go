@@ -128,6 +128,8 @@ func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err err
 		}
 	}
 	ctx.Cmd = g.Command
+	ctx.Args = append([]string{ctx.Command}, ctx.Args...)
+	ctx.Command = g.Name
 	if perms := ctx.Check(g.Router.BotOwners); perms != nil {
 		ctx.CommandError(perms)
 		return nil

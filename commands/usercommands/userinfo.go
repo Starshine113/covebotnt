@@ -9,6 +9,7 @@ import (
 
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
+	"github.com/Starshine113/embedutil"
 	"github.com/Starshine113/pkgo"
 	"github.com/bwmarrin/discordgo"
 )
@@ -39,6 +40,31 @@ func PKUserInfo(ctx *crouter.Ctx) (err error) {
 	return
 }
 
+func noMemberInfo(ctx *crouter.Ctx) (err error) {
+	ctx.Send(strings.Join(ctx.Args, " "))
+	user, err := ctx.Session.User(strings.Join(ctx.Args, " "))
+	if err != nil {
+		_, err = ctx.CommandError(err)
+		return err
+	}
+
+	ts, _ := discordgo.SnowflakeTimestamp(user.ID)
+
+	e := embedutil.NewEmbed().SetAuthor(user.String(), user.AvatarURL("128"))
+
+	e.Description(user.ID)
+	e.ThumbnailURL(user.AvatarURL("256"))
+	e.SetFooter("ID: " + user.ID + " | Created")
+	e.Timestamp(ts)
+	e.Color(0x21a1a8)
+
+	e.AddField("Username", user.String()).Inline()
+	e.AddField("Created", fmt.Sprintf("%v\n(%v ago)", ts.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(ts)))).Inline()
+
+	_, err = ctx.Send(e.Build())
+	return err
+}
+
 // UserInfo returns user info, formatted nicely
 func UserInfo(ctx *crouter.Ctx) (err error) {
 	user, err := ctx.ParseMember(ctx.Author.ID)
@@ -47,10 +73,15 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 		return nil
 	}
 	if len(ctx.Args) == 1 {
-		user, err = ctx.ParseMember(ctx.Args[0])
+		user, err = ctx.ParseMember(strings.Join(ctx.Args, " "))
 		if err != nil {
-			ctx.CommandError(err)
-			return nil
+			switch err.(type) {
+			case *discordgo.RESTError:
+				return noMemberInfo(ctx)
+			default:
+				ctx.CommandError(err)
+				return nil
+			}
 		}
 	}
 
