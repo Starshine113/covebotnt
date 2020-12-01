@@ -9,7 +9,6 @@ import (
 
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/structs"
-	"github.com/Starshine113/embedutil"
 	"github.com/Starshine113/pkgo"
 	"github.com/bwmarrin/discordgo"
 )
@@ -41,7 +40,6 @@ func PKUserInfo(ctx *crouter.Ctx) (err error) {
 }
 
 func noMemberInfo(ctx *crouter.Ctx) (err error) {
-	ctx.Send(strings.Join(ctx.Args, " "))
 	user, err := ctx.Session.User(strings.Join(ctx.Args, " "))
 	if err != nil {
 		_, err = ctx.CommandError(err)
@@ -50,18 +48,36 @@ func noMemberInfo(ctx *crouter.Ctx) (err error) {
 
 	ts, _ := discordgo.SnowflakeTimestamp(user.ID)
 
-	e := embedutil.NewEmbed().SetAuthor(user.String(), user.AvatarURL("128"))
+	embed := &discordgo.MessageEmbed{
+		Author: &discordgo.MessageEmbedAuthor{
+			Name:    user.String(),
+			IconURL: user.AvatarURL("128"),
+		},
+		Description: user.ID,
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: user.AvatarURL("256"),
+		},
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: fmt.Sprintf("ID: %v | Created", user.ID),
+		},
+		Timestamp: ts.UTC().Format(time.RFC3339),
+		Color:     0x21a1a8,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "Username",
+				Value:  user.String(),
+				Inline: true,
+			},
+			{
+				Name:   "Created",
+				Value:  fmt.Sprintf("%v\n(%v ago)", ts.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(ts))),
+				Inline: true,
+			},
+		},
+	}
 
-	e.Description(user.ID)
-	e.ThumbnailURL(user.AvatarURL("256"))
-	e.SetFooter("ID: " + user.ID + " | Created")
-	e.Timestamp(ts)
-	e.Color(0x21a1a8)
+	_, err = ctx.Send(embed)
 
-	e.AddField("Username", user.String()).Inline()
-	e.AddField("Created", fmt.Sprintf("%v\n(%v ago)", ts.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(ts)))).Inline()
-
-	_, err = ctx.Send(e.Build())
 	return err
 }
 

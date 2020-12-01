@@ -9,8 +9,6 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/ReneKroon/ttlcache/v2 v2.1.0 h1:5GQZXf7Pl68S4O/Mps4kAXQ+ObEqwHskC8WKT77mHiQ=
 github.com/ReneKroon/ttlcache/v2 v2.1.0/go.mod h1:0E5EIhFJrGmcn/niHrqnnvQHvihj+DdPzJlOEzBS3o4=
-github.com/Starshine113/embedutil v0.0.0-20201126103543-8f3c06413c72 h1:B0VT1ElGlH8S2N7b8lQKXo+yYFty1V1wJXpC5j7PcUo=
-github.com/Starshine113/embedutil v0.0.0-20201126103543-8f3c06413c72/go.mod h1:we8NiYoPvs7753F3WotlcaxOt1pJ3jrvFHDnGEkTvls=
 github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655 h1:jaOY4gG1dYyHcy6LP7aazRnfXA96/6ui6X4R7vUf5qQ=
 github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655/go.mod h1:xu7tCzkCWcronW9zn5WQarF/FHplLGEJkAPRNjAOEik=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=

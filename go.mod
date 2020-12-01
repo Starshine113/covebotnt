@@ -7,7 +7,6 @@ require (
 	codeberg.org/eviedelta/dwhook v0.0.0-20201015021046-043084b306b3
 	github.com/BurntSushi/toml v0.3.1
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/Starshine113/embedutil v0.0.0-20201126103543-8f3c06413c72
 	github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655
 	github.com/Starshine113/pkgo v0.1.0
 	github.com/bwmarrin/discordgo v0.22.0
