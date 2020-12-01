@@ -474,6 +474,14 @@ func addOwnerCommands() {
 		Permissions: crouter.PermLevelOwner,
 		Command:     ownercommands.AdminDM,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "Guilds",
+		Description: "Show all guilds",
+		Usage:       "",
+		Permissions: crouter.PermLevelOwner,
+		Command:     ownercommands.Guilds,
+	})
 }
 
 func addAutoResponses() {
