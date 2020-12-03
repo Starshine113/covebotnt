@@ -150,6 +150,11 @@ func main() {
 	// add ready handler
 	dg.AddHandler(onReady)
 
+	// add guild member handlers
+	dg.AddHandler(getGuildMembers)
+	dg.AddHandler(guildMemberChunk)
+	dg.AddHandler(guildMemberUpdate)
+
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsGuildMembers)
 
 	// Get start time for uptime command
