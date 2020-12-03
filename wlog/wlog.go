@@ -8,6 +8,10 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	bufferSize = 3
+)
+
 // Wlog is a wrapper for Zap's sugared logger that also logs to Discord webhooks
 type Wlog struct {
 	sugar       *zap.SugaredLogger
