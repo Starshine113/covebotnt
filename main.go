@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/Starshine113/covebotnt/bot"
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/Starshine113/covebotnt/starboard"
@@ -27,6 +28,7 @@ var (
 	gitOut    []byte
 	router    *crouter.Router
 	startTime time.Time
+	b         *bot.Bot
 
 	handlerMap *ttlcache.Cache
 )
@@ -95,6 +97,8 @@ func initialise(token, databaseURL string) (err error) {
 	handlerMap.SetExpirationCallback(func(key string, value interface{}) {
 		value.(func())()
 	})
+
+	b = bot.NewBot(dg)
 
 	return nil
 }
