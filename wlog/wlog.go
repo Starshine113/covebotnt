@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	bufferSize = 3
+	bufferSize = 9
 )
 
 // Wlog is a wrapper for Zap's sugared logger that also logs to Discord webhooks

@@ -39,7 +39,7 @@ func (w *Wlog) Infof(template string, args ...interface{}) {
 		w.infoMu.Lock()
 		w.infoBuffer = append(w.infoBuffer, embed("Info", msg, 0x93ea2e))
 
-		if len(w.infoBuffer) > bufferSize {
+		if len(w.infoBuffer) >= bufferSize {
 			w.send(w.urls.InfoURL, "Info", w.infoBuffer...)
 			w.infoBuffer = make([]dwhook.Embed, 0)
 		}
@@ -64,7 +64,7 @@ func (w *Wlog) Debugf(template string, args ...interface{}) {
 		w.debugMu.Lock()
 		w.debugBuffer = append(w.debugBuffer, embed("Debug", msg, 0x93ea2e))
 
-		if len(w.infoBuffer) > bufferSize {
+		if len(w.infoBuffer) >= bufferSize {
 			w.send(w.urls.DebugURL, "Debug", w.debugBuffer...)
 			w.debugBuffer = make([]dwhook.Embed, 0)
 		}
