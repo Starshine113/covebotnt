@@ -47,11 +47,8 @@ func CommandSetNote(ctx *crouter.Ctx) (err error) {
 	return nil
 }
 
-func noteField(s *discordgo.Session, note *cbdb.Note) (field *discordgo.MessageEmbedField, err error) {
-	mod, err := s.State.Member(note.GuildID, note.ModID)
-	if err == discordgo.ErrStateNotFound {
-		mod, err = s.GuildMember(note.GuildID, note.ModID)
-	}
+func noteField(ctx *crouter.Ctx, note *cbdb.Note) (field *discordgo.MessageEmbedField, err error) {
+	mod, err := ctx.Bot.MemberCache.Get(note.GuildID, note.ModID)
 	var noteHeader string
 	if err == nil {
 		noteHeader = fmt.Sprintf("#%v (%v)", note.ID, mod.User.String())

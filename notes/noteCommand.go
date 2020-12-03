@@ -75,7 +75,7 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 	noteSlice := notes[minRange:maxRange]
 
 	for _, note := range noteSlice {
-		field, err := noteField(ctx.Session, note)
+		field, err := noteField(ctx, note)
 		if err != nil {
 			return err
 		}
