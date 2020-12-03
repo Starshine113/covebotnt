@@ -121,9 +121,19 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
+
 	var permStrings []string
+	g, err := ctx.Session.State.Guild(ctx.Message.GuildID)
+	if err == nil {
+		if g.OwnerID == user.User.ID {
+			permStrings = append(permStrings, "Server Owner")
+			perms = discordgo.PermissionAll
+		}
+	}
+
 	if perms&discordgo.PermissionAdministrator == discordgo.PermissionAdministrator {
 		permStrings = append(permStrings, "Administrator")
+		perms = discordgo.PermissionAll
 	}
 	if perms&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
 		permStrings = append(permStrings, "Manage Server")
