@@ -65,7 +65,7 @@ func (ctx *Ctx) ParseRole(role string) (*discordgo.Role, error) {
 			}
 			role, _ = detc.Between(role, "<@&", ">")
 		}
-		return ctx.Session.State.Role(ctx.Message.GuildID, role)
+		return ctx.Bot.RoleCache.Get(ctx.Message.GuildID, role)
 	}
 
 	role = strings.ToLower(role)
@@ -97,10 +97,7 @@ func (ctx *Ctx) ParseMember(member string) (*discordgo.Member, error) {
 				member = member[1:]
 			}
 		}
-		m, err := ctx.Session.State.Member(ctx.Message.GuildID, member)
-		if err == discordgo.ErrStateNotFound {
-			m, err = ctx.Session.GuildMember(ctx.Message.GuildID, member)
-		}
+		m, err := ctx.Bot.MemberCache.Get(ctx.Message.GuildID, member)
 		return m, err
 	}
 

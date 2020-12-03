@@ -150,10 +150,11 @@ func main() {
 	// add ready handler
 	dg.AddHandler(onReady)
 
-	// add guild member handlers
+	// add guild member/role handlers
 	dg.AddHandler(getGuildMembers)
 	dg.AddHandler(guildMemberChunk)
 	dg.AddHandler(guildMemberUpdate)
+	dg.AddHandler(guildRoleUpdate)
 
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsGuildMembers)
 

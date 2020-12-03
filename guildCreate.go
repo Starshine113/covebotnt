@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -15,4 +17,8 @@ func guildJoin(s *discordgo.Session, guild *discordgo.GuildCreate) {
 		return
 	}
 	sugar.Infof("Initialised settings for guild %v", guild.ID)
+
+	for _, r := range guild.Roles {
+		b.RoleCache.Cache.Cache.SetWithTTL(fmt.Sprintf("%v-%v", guild.ID, r.ID), r, 0)
+	}
 }

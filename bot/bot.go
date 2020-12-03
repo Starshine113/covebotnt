@@ -20,17 +20,17 @@ func NewBot(s *discordgo.Session) *Bot {
 	bot := &Bot{Session: s}
 
 	m := ttlcache.NewCache()
-	m.SetTTL(15 * time.Minute)
+	m.SetTTL(time.Hour)
 	m.SkipTTLExtensionOnHit(true)
 	bot.MemberCache = &MemberCache{&Cache{Cache: m, s: s}}
 
 	u := ttlcache.NewCache()
-	u.SetTTL(15 * time.Minute)
+	u.SetTTL(time.Hour)
 	m.SkipTTLExtensionOnHit(true)
 	bot.UserCache = &UserCache{&Cache{Cache: u, s: s}}
 
 	r := ttlcache.NewCache()
-	u.SetTTL(15 * time.Minute)
+	u.SetTTL(time.Hour)
 	m.SkipTTLExtensionOnHit(true)
 	bot.RoleCache = &RoleCache{&Cache{Cache: r, s: s}}
 
