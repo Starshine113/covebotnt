@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/Starshine113/covebotnt/bot"
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/etc"
 	"github.com/Starshine113/covebotnt/structs"
@@ -26,6 +27,7 @@ type Ctx struct {
 	Command          string
 	Args             []string
 	Session          *discordgo.Session
+	Bot              *bot.Bot
 	Message          *discordgo.MessageCreate
 	Channel          *discordgo.Channel
 	Author           *discordgo.User
@@ -45,7 +47,8 @@ func Context(
 	m *discordgo.MessageCreate,
 	db *cbdb.Db,
 	boltDb *cbdb.BoltDb,
-	handlerMap *ttlcache.Cache) (ctx *Ctx, err error) {
+	handlerMap *ttlcache.Cache,
+	b *bot.Bot) (ctx *Ctx, err error) {
 
 	botUser, err := s.User("@me")
 	if err != nil {
@@ -60,7 +63,7 @@ func Context(
 		args = message[1:]
 	}
 
-	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb, Handlers: handlerMap}
+	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb, Handlers: handlerMap, Bot: b}
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {
