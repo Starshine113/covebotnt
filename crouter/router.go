@@ -6,17 +6,19 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/Starshine113/covebotnt/bot"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
 // NewRouter creates a Router object
-func NewRouter(botOwners []string) *Router {
+func NewRouter(b *bot.Bot) *Router {
 	cache := ttlcache.NewCache()
 	cache.SkipTTLExtensionOnHit(true)
 
 	router := &Router{
-		BotOwners: botOwners,
+		BotOwners: b.Config.Bot.BotOwners,
+		Bot:       b,
 		Cooldowns: cache,
 	}
 

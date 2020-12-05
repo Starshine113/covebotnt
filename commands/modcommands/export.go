@@ -1,4 +1,4 @@
-package main
+package modcommands
 
 import (
 	"bytes"
@@ -19,7 +19,8 @@ type export struct {
 	ModLogs   []*cbdb.ModLogEntry `json:"mod_logs"`
 }
 
-func commandExport(ctx *crouter.Ctx) (err error) {
+// Export ...
+func Export(ctx *crouter.Ctx) (err error) {
 	err = ctx.TriggerTyping()
 	if err != nil {
 		return err

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/Starshine113/covebotnt/bot"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -49,6 +50,7 @@ type Router struct {
 	AutoResponses []*AutoResponse
 	BotOwners     []string
 	Cooldowns     *ttlcache.Cache
+	Bot           *bot.Bot
 }
 
 // AutoResponse is a single autoresponse, intended for very simple responses to exact messages that don't match commands

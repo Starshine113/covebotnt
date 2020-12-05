@@ -11,7 +11,13 @@ import (
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/Starshine113/covebotnt/bot"
 	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/Starshine113/covebotnt/commands/admincommands"
+	"github.com/Starshine113/covebotnt/commands/modcommands"
+	"github.com/Starshine113/covebotnt/commands/modutilcommands"
+	"github.com/Starshine113/covebotnt/commands/ownercommands"
+	"github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/Starshine113/covebotnt/notes"
 	"github.com/Starshine113/covebotnt/starboard"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/Starshine113/covebotnt/wlog"
@@ -98,7 +104,10 @@ func initialise(token, databaseURL string) (err error) {
 		value.(func())()
 	})
 
-	b = bot.NewBot(dg)
+	git := exec.Command("git", "rev-parse", "--short", "HEAD")
+	gitOut, _ = git.Output()
+
+	b = bot.NewBot(dg, sugar, pool, boltDb, config, handlerMap, botVersion, string(gitOut), time.Now())
 
 	return nil
 }
@@ -119,21 +128,26 @@ func main() {
 		Pool:  pool,
 	}
 
-	git := exec.Command("git", "rev-parse", "--short", "HEAD")
-	gitOut, _ = git.Output()
-
-	router = crouter.NewRouter(config.Bot.BotOwners)
+	router = crouter.NewRouter(b)
 	// add commands
-	addUserCommands()
-	addHelperCommands()
-	addModCommands()
+	modcommands.Init(router)
+	modutilcommands.Init(router)
+	ownercommands.Init(router)
+	usercommands.Init(router)
+	admincommands.Init(router)
+	notes.Init(router)
+
+	addStarboardCommands()
+	addGkCommands()
+
 	addAdminCommands()
 	addOwnerCommands()
+
 	// add autoresponses
 	addAutoResponses()
 
 	// add message create handler for commands
-	dg.AddHandler(messageCreateCommand)
+	dg.AddHandler(router.MessageCreate)
 
 	// add guild create handler to initialise data
 	dg.AddHandler(guildJoin)
@@ -150,16 +164,7 @@ func main() {
 	// add ready handler
 	dg.AddHandler(onReady)
 
-	// add guild member/role handlers
-	dg.AddHandler(getGuildMembers)
-	dg.AddHandler(guildMemberChunk)
-	dg.AddHandler(guildMemberUpdate)
-	dg.AddHandler(guildRoleUpdate)
-
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildEmojis | discordgo.IntentsDirectMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsGuildMembers)
-
-	// Get start time for uptime command
-	startTime = time.Now()
 
 	err = dg.Open()
 	if err != nil {

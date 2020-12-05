@@ -41,17 +41,9 @@ type Ctx struct {
 }
 
 // Context creates a new Ctx
-func Context(
-	prefix, messageContent string,
-	s *discordgo.Session,
-	m *discordgo.MessageCreate,
-	db *cbdb.Db,
-	boltDb *cbdb.BoltDb,
-	handlerMap *ttlcache.Cache,
-	b *bot.Bot) (ctx *Ctx, err error) {
-
-	botUser, err := s.User("@me")
-	if err != nil {
+func Context(prefix, messageContent string, m *discordgo.MessageCreate, b *bot.Bot) (ctx *Ctx, err error) {
+	botUser := b.Session.State.User
+	if botUser == nil {
 		return
 	}
 
@@ -63,9 +55,9 @@ func Context(
 		args = message[1:]
 	}
 
-	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: s, Message: m, Author: m.Author, Database: db, BoltDb: boltDb, Handlers: handlerMap, Bot: b}
+	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: b.Session, Message: m, Author: m.Author, Database: b.Pool, BoltDb: b.Bolt, Handlers: b.Handlers, Bot: b}
 
-	channel, err := s.Channel(m.ChannelID)
+	channel, err := b.Session.Channel(m.ChannelID)
 	if err != nil {
 		return ctx, err
 	}

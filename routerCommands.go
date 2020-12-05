@@ -3,238 +3,14 @@ package main
 import (
 	"math/rand"
 	"regexp"
-	"time"
 
 	"github.com/Starshine113/covebotnt/commands/modcommands"
 	"github.com/Starshine113/covebotnt/commands/modutilcommands"
-	"github.com/Starshine113/covebotnt/commands/ownercommands"
-	"github.com/Starshine113/covebotnt/commands/usercommands"
 	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/covebotnt/notes"
 	"github.com/bwmarrin/discordgo"
 )
 
-func addUserCommands() {
-	router.AddCommand(&crouter.Command{
-		Name:        "Ping",
-		Description: "Ping pong!",
-		Usage:       "",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.Ping,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Invite",
-		Description: "Send an invite link for the bot",
-		Usage:       "",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.Invite,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Enlarge",
-		Aliases:     []string{"E", "Emote", "Emoji", "Enlorge"},
-		Description: "Enlarges up to 10 custom emoji",
-		Usage:       "<emoji...>",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.Enlarge,
-		Cooldown:    5 * time.Second,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "EmojiInfo",
-		Aliases:     []string{"EI", "EmoteInfo"},
-		Description: "Get detailed info about a custom emoji",
-		Usage:       "<emoji>",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.EmojiInfo,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Color",
-		Aliases:     []string{"Colour"},
-		Description: "Previews a color",
-		Usage:       "<color>",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.Color,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Avatar",
-		Aliases:     []string{"Pfp", "A"},
-		Description: "Show a user's avatar",
-		Usage:       "[user]",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.Avatar,
-		GuildOnly:   true,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Snowflake",
-		Aliases:     []string{"IDTime"},
-		Description: "Get timestamps from the given ID(s)",
-		Usage:       "[...IDs]",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.Snowflake,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "UserInfo",
-		Aliases:     []string{"I", "Info", "Whois", "Profile"},
-		Description: "Show information about a user (or yourself)",
-		Usage:       "[user]",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.UserInfo,
-		GuildOnly:   true,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "PKInfo",
-		Aliases:     []string{"PKI", "PKUserInfo", "PKWhois", "PKProfile"},
-		Description: "Show information about the user who sent a PluralKit-proxied message",
-		Usage:       "<message ID>",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.PKUserInfo,
-		GuildOnly:   true,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "RoleInfo",
-		Aliases:     []string{"Ri"},
-		Description: "Show information about a role",
-		Usage:       "<role>",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.RoleInfo,
-		GuildOnly:   true,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "ServerInfo",
-		Aliases:     []string{"Si", "GuildInfo"},
-		Description: "Show information about the current server",
-		Usage:       "",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.GuildInfo,
-		GuildOnly:   true,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "MajorityOf",
-		Aliases:     []string{"Majority"},
-		Description: "Get the majority of a number with abstains",
-		Usage:       "<count> [abstains]",
-		Permissions: crouter.PermLevelNone,
-		Command:     modcommands.MajorityOf,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Hello",
-		Aliases:     []string{"Hi", "Henlo", "Heya", "Heyo"},
-		Description: "Say hi to the bot",
-		Usage:       "",
-		Permissions: crouter.PermLevelNone,
-		Command:     usercommands.Hello,
-		GuildOnly:   true,
-	})
-}
-
-func addHelperCommands() {
-	router.AddCommand(&crouter.Command{
-		Name:        "Notes",
-		Description: "Shows a user's notes",
-		Usage:       "<user>",
-		Permissions: crouter.PermLevelHelper,
-		Command:     notes.CommandNotes,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "SetNote",
-		Aliases:     []string{"AddNote"},
-		Description: "Set a note for a user",
-		Usage:       "<user> <note>",
-		Permissions: crouter.PermLevelHelper,
-		Command:     notes.CommandSetNote,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Warn",
-		Description: "Warn a user",
-		Usage:       "<user> <reason>",
-		Permissions: crouter.PermLevelHelper,
-		Command:     modcommands.Warn,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "ModLogs",
-		Description: "Show a user's modlogs",
-		Usage:       "<user>",
-		Permissions: crouter.PermLevelHelper,
-		Command:     modcommands.ModLogs,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "LogMute",
-		Description: "Log a user mute made with another bot",
-		Usage:       "<user> [-d <duration>] [-hardmute] [reason]",
-		Permissions: crouter.PermLevelHelper,
-		Command:     modcommands.LogMute,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "BGC",
-		Aliases:     []string{"BackgroundCheck"},
-		Description: "Quickly check a user",
-		Usage:       "<user>",
-		Permissions: crouter.PermLevelHelper,
-		Command:     modcommands.BGC,
-	})
-}
-
-func addModCommands() {
-	router.AddCommand(&crouter.Command{
-		Name:        "Members",
-		Description: "Show all members of a role",
-		Usage:       "<role>",
-		Permissions: crouter.PermLevelMod,
-		Command:     modutilcommands.Members,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "DelNote",
-		Aliases:     []string{"RemoveNote"},
-		Description: "Remove a note by ID",
-		Usage:       "<id>",
-		Permissions: crouter.PermLevelMod,
-		Command:     notes.CommandDelNote,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Nickname",
-		Aliases:     []string{"Nick"},
-		Description: "Change the bot's nickname",
-		Usage:       "<new nickname>",
-		Permissions: crouter.PermLevelMod,
-		Command:     modutilcommands.Nickname,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Echo",
-		Aliases:     []string{"Say", "Send"},
-		Description: "Make the bot say something",
-		Usage:       "[-ch <channel>] <message>",
-		Permissions: crouter.PermLevelMod,
-		Command:     modutilcommands.Echo,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Steal",
-		Aliases:     []string{"AddEmote", "AddEmoji"},
-		Description: "Steal an emote by URL + name, or usage in message (with Nitro)",
-		Usage:       "<emoji: url/emoji> [name]",
-		Permissions: crouter.PermLevelMod,
-		Command:     modutilcommands.Steal,
-	})
-
+func addStarboardCommands() {
 	starboard := router.AddGroup(&crouter.Group{
 		Name:        "Starboard",
 		Aliases:     []string{"Sb"},
@@ -298,23 +74,9 @@ func addModCommands() {
 		Permissions: crouter.PermLevelMod,
 		Command:     commandModLogChannel,
 	})
+}
 
-	router.AddCommand(&crouter.Command{
-		Name:        "Ban",
-		Description: "Ban users by ID",
-		Usage:       "<user ID> [reason]",
-		Permissions: crouter.PermLevelMod,
-		Command:     modcommands.Ban,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "MVC",
-		Description: "Get the mvc majority",
-		Usage:       "[abstains]",
-		Permissions: crouter.PermLevelMod,
-		Command:     modcommands.MVC,
-	})
-
+func addGkCommands() {
 	gk := router.AddGroup(&crouter.Group{
 		Name:        "Gatekeeper",
 		Aliases:     []string{"Gk", "G"},
@@ -383,55 +145,6 @@ func addModCommands() {
 }
 
 func addAdminCommands() {
-	router.AddCommand(&crouter.Command{
-		Name:        "Export",
-		Description: "Export this server's mod logs",
-		Usage:       "",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     commandExport,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Prefix",
-		Description: "Show this server's prefix or change it",
-		Usage:       "[new prefix]",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     commandPrefix,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "ModRoles",
-		Aliases:     []string{"ModRole"},
-		Description: "List/modify this server's mod roles",
-		Usage:       "[add|remove <role>]",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     commandModRoles,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "HelperRoles",
-		Aliases:     []string{"HelperRole"},
-		Description: "List/modify this server's helper roles",
-		Usage:       "[add|remove <role>]",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     commandHelperRoles,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Archive",
-		Description: "Archive the current channel",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     modutilcommands.Archive,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "RefreshMVC",
-		Description: "Refresh the mvc role",
-		Usage:       "",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     modutilcommands.RefreshMVC,
-	})
-
 	dm := router.AddGroup(&crouter.Group{
 		Name:        "DM",
 		Aliases:     []string{"DirectMessage"},
@@ -472,30 +185,6 @@ func addOwnerCommands() {
 		Usage:       "",
 		Permissions: crouter.PermLevelOwner,
 		Command:     commandKill,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "AdminDM",
-		Description: "Send any user sharing a server with the bot a message, including attachment",
-		Usage:       "<user ID> <message>",
-		Permissions: crouter.PermLevelOwner,
-		Command:     ownercommands.AdminDM,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Guilds",
-		Description: "Show all guilds",
-		Usage:       "",
-		Permissions: crouter.PermLevelOwner,
-		Command:     ownercommands.Guilds,
-	})
-
-	router.AddCommand(&crouter.Command{
-		Name:        "Guild",
-		Description: "Get info about a specific guild",
-		Usage:       "<id>",
-		Permissions: crouter.PermLevelOwner,
-		Command:     ownercommands.Guild,
 	})
 }
 

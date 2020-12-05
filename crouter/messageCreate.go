@@ -1,4 +1,4 @@
-package main
+package crouter
 
 import (
 	"fmt"
@@ -7,18 +7,17 @@ import (
 	"time"
 
 	"codeberg.org/eviedelta/dwhook"
-	"github.com/Starshine113/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 
-// command handler
-func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+// MessageCreate handles message create events
+func (r *Router) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var err error
 
 	// if message was sent by a bot return; not only to ignore bots, but also to make sure PluralKit users don't trigger commands twice.
 	if m.Author.Bot {
 		allowed := false
-		for _, bot := range config.Bot.AllowedBots {
+		for _, bot := range r.Bot.Config.Bot.AllowedBots {
 			if bot == m.Author.ID {
 				allowed = true
 			}
@@ -28,22 +27,22 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	err = router.Respond(s, m)
+	err = r.Respond(s, m)
 	if err != nil {
-		sugar.Errorf("Error sending autoresponse: %v", err)
+		r.Bot.Sugar.Errorf("Error sending autoresponse: %v", err)
 	}
 
 	// get prefix for the guild
-	prefix := getPrefix(m.GuildID)
+	prefix := r.Bot.Prefix(m.GuildID)
 
-	ctx, err := crouter.Context(prefix, m.Content, s, m, pool, boltDb, handlerMap, b)
+	ctx, err := Context(prefix, m.Content, m, r.Bot)
 	if err != nil {
-		sugar.Errorf("Error getting context: %v", err)
+		r.Bot.Sugar.Errorf("Error getting context: %v", err)
 		return
 	}
 	// check if the message might be a command
 	if ctx.MatchPrefix() {
-		execute(ctx)
+		r.execute(ctx)
 		return
 	}
 
@@ -52,12 +51,12 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	match, _ := regexp.MatchString(fmt.Sprintf("<@!?%v>.*hello$", s.State.User.ID), content)
 	match2, _ := regexp.MatchString(fmt.Sprintf("%vhello$", regexp.QuoteMeta(prefix)), content)
 	if match || match2 {
-		ctx, err = crouter.Context("--", "--hello", s, m, pool, boltDb, handlerMap, b)
+		ctx, err = Context("--", "--hello", m, r.Bot)
 		if err != nil {
-			sugar.Errorf("Error getting context: %v", err)
+			r.Bot.Sugar.Errorf("Error getting context: %v", err)
 			return
 		}
-		execute(ctx)
+		r.execute(ctx)
 		return
 	}
 
@@ -65,7 +64,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if match {
 		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current prefix is `%v`", prefix))
 		if err != nil {
-			sugar.Errorf("Error sending message: %v", err)
+			r.Bot.Sugar.Errorf("Error sending message: %v", err)
 			return
 		}
 		return
@@ -75,12 +74,12 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.GuildID != "" {
 		return
 	}
-	if config.Bot.DMWebhook != "" && m.Author.ID != s.State.User.ID {
-		for _, u := range config.Bot.BlockedUsers {
+	if r.Bot.Config.Bot.DMWebhook != "" && m.Author.ID != s.State.User.ID {
+		for _, u := range r.Bot.Config.Bot.BlockedUsers {
 			if m.Author.ID == u {
 				_, err = s.ChannelMessageSend(m.ChannelID, "You are blocked from DMing the bot. Please DM a bot admin if you think this is in error.")
 				if err != nil {
-					sugar.Errorf("Error sending message: %v", err)
+					r.Bot.Sugar.Errorf("Error sending message: %v", err)
 				}
 				return
 			}
@@ -88,7 +87,7 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		timestamp, err := discordgo.SnowflakeTimestamp(m.ID)
 		if err != nil {
-			sugar.Errorf("Error when getting timestamp for message %v: %v", m.ID, err)
+			r.Bot.Sugar.Errorf("Error when getting timestamp for message %v: %v", m.ID, err)
 		}
 
 		var attachmentLink string
@@ -120,19 +119,19 @@ func messageCreateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}},
 		}
 
-		dwhook.SendTo(config.Bot.DMWebhook, msg)
+		dwhook.SendTo(r.Bot.Config.Bot.DMWebhook, msg)
 	}
 }
 
-func execute(ctx *crouter.Ctx) {
-	guildSettings, err := pool.GetGuildSettings(ctx.Message.GuildID)
+func (r *Router) execute(ctx *Ctx) {
+	guildSettings, err := r.Bot.Pool.GetGuildSettings(ctx.Message.GuildID)
 	if err != nil {
-		sugar.Errorf("Error running command %v", err)
+		r.Bot.Sugar.Errorf("Error running command %v", err)
 	}
-	ctx.AdditionalParams = map[string]interface{}{"config": config, "botVer": botVersion, "gitVer": string(gitOut), "startTime": startTime}
+	ctx.AdditionalParams = map[string]interface{}{"config": r.Bot.Config, "botVer": r.Bot.Version, "gitVer": r.Bot.GitVer, "startTime": r.Bot.StartTime}
 
-	err = router.Execute(ctx, &guildSettings)
+	err = r.Execute(ctx, &guildSettings)
 	if err != nil {
-		sugar.Errorf("Error running command %v", err)
+		r.Bot.Sugar.Errorf("Error running command %v", err)
 	}
 }
