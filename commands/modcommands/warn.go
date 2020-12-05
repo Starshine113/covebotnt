@@ -2,6 +2,7 @@ package modcommands
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -26,10 +27,53 @@ func Warn(ctx *crouter.Ctx) (err error) {
 		ctx.CommandError(err)
 		return nil
 	}
+
+	mod, err := ctx.ParseMember(ctx.Author.ID)
+	if err != nil {
+		_, err = ctx.CommandError(err)
+		return err
+	}
+
+	if member.User.ID == ctx.Author.ID {
+		_, err = ctx.Send("Can't warn yourself.")
+		return err
+	}
+
 	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
+	}
+
+	var memberRoles, modRoles discordgo.Roles
+
+	for _, r := range guild.Roles {
+		for _, m := range mod.Roles {
+			if r.ID == m {
+				modRoles = append(modRoles, r)
+			}
+		}
+		for _, m := range member.Roles {
+			if r.ID == m {
+				memberRoles = append(memberRoles, r)
+			}
+		}
+	}
+
+	sort.Sort(modRoles)
+	sort.Sort(memberRoles)
+
+	if len(modRoles) == 0 {
+		if guild.OwnerID != mod.User.ID {
+			_, err = ctx.Send("You're not high enough in the role hierarchy to do that.")
+			return err
+		}
+	}
+	if len(memberRoles) != 0 {
+		if modRoles[0].Position <= memberRoles[0].Position {
+			_, err = ctx.Send("You're not high enough in the role hierarchy to do that.")
+			return err
+		}
 	}
 
 	warnReason := strings.Join(ctx.Args[1:], " ")
