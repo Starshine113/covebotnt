@@ -4,3 +4,4 @@ covebotnt
 *.code-workspace
 *.db
 *.pgsql
+export-*
