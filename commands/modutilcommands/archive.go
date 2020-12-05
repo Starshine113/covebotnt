@@ -40,7 +40,7 @@ type author struct {
 func Archive(ctx *crouter.Ctx) (err error) {
 	archive := arc{InvokedBy: ctx.Author, Channel: ctx.Channel}
 
-	fp, _ := flagparser.NewFlagParser(flagparser.Bool("gzip", "gz"))
+	fp, _ := flagparser.NewFlagParser(flagparser.Bool("gzip", "gz"), flagparser.String("out", "o", "output"))
 
 	args, err := fp.Parse(ctx.Args)
 	if err != nil {
@@ -51,9 +51,18 @@ func Archive(ctx *crouter.Ctx) (err error) {
 	if args["gzip"].(bool) {
 		gz = true
 	}
+	out := ctx.Channel.ID
+	if args["out"].(string) != "" {
+		channel, err := ctx.ParseChannel(args["out"].(string))
+		if err != nil {
+			_, err = ctx.CommandError(err)
+			return err
+		}
+		out = channel.ID
+	}
 
 	ctx.Send("Working, please wait...")
-	if err = ctx.TriggerTyping(); err != nil {
+	if err = ctx.Session.ChannelTyping(out); err != nil {
 		return err
 	}
 
@@ -123,7 +132,7 @@ func Archive(ctx *crouter.Ctx) (err error) {
 		Reader: buf,
 	}
 
-	_, err = ctx.Send(&discordgo.MessageSend{
+	_, err = ctx.Session.ChannelMessageSendComplex(out, &discordgo.MessageSend{
 		Content: fmt.Sprintf("Done!\n> Archive of %v (#%v), invoked by %v at %v.", ctx.Channel.Mention(), ctx.Channel.Name, ctx.Author.String(), ctx.Message.Timestamp),
 		Files:   []*discordgo.File{&file},
 		AllowedMentions: &discordgo.MessageAllowedMentions{
