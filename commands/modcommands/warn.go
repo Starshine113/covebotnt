@@ -39,6 +39,16 @@ func Warn(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
+	if member.User.ID == ctx.BotUser.ID {
+		_, err = ctx.Send("<:blobsob:766276787814531093> What did I do wrong?")
+		return err
+	}
+
+	if member.User.Bot {
+		_, err = ctx.Send("Can't warn bots.")
+		return err
+	}
+
 	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
 	if err != nil {
 		ctx.CommandError(err)
