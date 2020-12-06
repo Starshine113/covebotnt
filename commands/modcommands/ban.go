@@ -2,6 +2,8 @@ package modcommands
 
 import (
 	"fmt"
+	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -11,6 +13,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 )
+
+var idRegex = regexp.MustCompile("\\d{16,}")
 
 // Ban bans the specified user from the server
 func Ban(ctx *crouter.Ctx) (err error) {
@@ -28,10 +32,69 @@ func Ban(ctx *crouter.Ctx) (err error) {
 		reason = strings.Join(ctx.Args[1:], " ")
 	}
 
-	user, err := ctx.Session.User(ctx.Args[0])
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
+	var user *discordgo.User
+	var m bool
+	member, err := ctx.ParseMember(ctx.Args[0])
+	if err == nil {
+		m = true
+		user = member.User
+	} else {
+		if !idRegex.MatchString(ctx.Args[0]) {
+			_, err = ctx.Sendf("`%v` is not a valid Discord user ID.", ctx.Args[0])
+			return err
+		}
+		m = false
+		user, err = ctx.Session.User(ctx.Args[0])
+		if err != nil {
+			ctx.CommandError(err)
+			return nil
+		}
+	}
+
+	var guild *discordgo.Guild
+	if m {
+		var memberRoles, modRoles discordgo.Roles
+
+		guild, err = ctx.Session.Guild(ctx.Message.GuildID)
+		if err != nil {
+			_, err = ctx.CommandError(err)
+			return err
+		}
+
+		mod, err := ctx.ParseMember(ctx.Author.ID)
+		if err != nil {
+			_, err = ctx.CommandError(err)
+			return err
+		}
+
+		for _, r := range guild.Roles {
+			for _, m := range mod.Roles {
+				if r.ID == m {
+					modRoles = append(modRoles, r)
+				}
+			}
+			for _, m := range member.Roles {
+				if r.ID == m {
+					memberRoles = append(memberRoles, r)
+				}
+			}
+		}
+
+		sort.Sort(modRoles)
+		sort.Sort(memberRoles)
+
+		if len(modRoles) == 0 {
+			if guild.OwnerID != mod.User.ID {
+				_, err = ctx.Send("You're not high enough in the role hierarchy to do that.")
+				return err
+			}
+		}
+		if len(memberRoles) != 0 {
+			if modRoles[0].Position <= memberRoles[0].Position {
+				_, err = ctx.Send("You're not high enough in the role hierarchy to do that.")
+				return err
+			}
+		}
 	}
 
 	currentBans, err := ctx.Session.GuildBans(ctx.Message.GuildID)
@@ -52,6 +115,20 @@ func Ban(ctx *crouter.Ctx) (err error) {
 	}
 
 	formattedReason := fmt.Sprintf("%v: %v", ctx.Author.String(), reason)
+
+	if m && !user.Bot {
+		dmChannel, err := ctx.Session.UserChannelCreate(member.User.ID)
+		if err != nil {
+			ctx.CommandError(err)
+			return nil
+		}
+
+		_, err = ctx.Session.ChannelMessageSend(dmChannel.ID, fmt.Sprintf("You were banned from %v. Reason: %v", guild.Name, reason))
+		if err != nil {
+			ctx.CommandError(err)
+			return nil
+		}
+	}
 
 	err = ctx.Session.GuildBanCreateWithReason(ctx.Message.GuildID, user.ID, formattedReason, 2)
 	if err != nil {
