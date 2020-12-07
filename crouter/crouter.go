@@ -48,9 +48,10 @@ type Router struct {
 	Commands      []*Command
 	Groups        []*Group
 	AutoResponses []*AutoResponse
-	BotOwners     []string
-	Cooldowns     *ttlcache.Cache
-	Bot           *bot.Bot
+
+	BotOwners []string
+	Cooldowns *ttlcache.Cache
+	Bot       *bot.Bot
 }
 
 // AutoResponse is a single autoresponse, intended for very simple responses to exact messages that don't match commands
@@ -62,15 +63,19 @@ type AutoResponse struct {
 
 // Command is a single command
 type Command struct {
-	Name            string
-	Aliases         []string
-	Regex           *regexp.Regexp
+	Name    string
+	Aliases []string
+	Regex   *regexp.Regexp
+
 	Description     string
 	LongDescription string
 	Usage           string
-	Permissions     PermLevel
-	Command         func(*Ctx) error
-	GuildOnly       bool
-	Router          *Router
-	Cooldown        time.Duration
+
+	Command func(*Ctx) error
+
+	Permissions PermLevel
+	GuildOnly   bool
+	Cooldown    time.Duration
+
+	Router *Router
 }

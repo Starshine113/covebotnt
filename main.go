@@ -20,6 +20,7 @@ import (
 	"github.com/Starshine113/covebotnt/notes"
 	"github.com/Starshine113/covebotnt/starboard"
 	"github.com/Starshine113/covebotnt/structs"
+	"github.com/Starshine113/covebotnt/triggers"
 	"github.com/Starshine113/covebotnt/wlog"
 	"github.com/bwmarrin/discordgo"
 	bolt "go.etcd.io/bbolt"
@@ -136,6 +137,7 @@ func main() {
 	usercommands.Init(router)
 	admincommands.Init(router)
 	notes.Init(router)
+	triggers.Init(router)
 
 	addStarboardCommands()
 	addGkCommands()

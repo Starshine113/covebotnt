@@ -1,7 +1,7 @@
 package cbdb
 
 // DBVersion is the current database version
-const DBVersion = 3
+const DBVersion = 4
 
 // DBVersions is a slice of schemas for every database version
 var DBVersions []string = []string{
@@ -27,6 +27,17 @@ var DBVersions []string = []string{
 	);
 	
 	update public.info set schema_version = 3;`,
+
+	`create table if not exists triggers (
+		id			serial		primary key,
+		guild_id	text		not null,
+		created_by	text		not null,
+		modified	timestamp	not null default (current_timestamp at time zone 'utc'),
+		trigger		text		not null,
+		response	text		not null
+	);
+	
+	update public.info set schema_version = 4;`,
 }
 
 // initDBSql is the initial SQL database schema

@@ -70,8 +70,9 @@ func (r *Router) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate)
 		return
 	}
 
-	// no commands were triggered, so check if it's a DM, if not, return
+	// no commands were triggered, so check if it's a DM, if not, try triggers, otherwise continue
 	if m.GuildID != "" {
+		r.triggers(m.ChannelID, m.GuildID, m.Content)
 		return
 	}
 	if r.Bot.Config.Bot.DMWebhook != "" && m.Author.ID != s.State.User.ID {
