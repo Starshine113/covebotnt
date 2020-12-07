@@ -62,14 +62,15 @@ type AutoResponse struct {
 
 // Command is a single command
 type Command struct {
-	Name        string
-	Aliases     []string
-	Regex       *regexp.Regexp
-	Description string
-	Usage       string
-	Permissions PermLevel
-	Command     func(*Ctx) error
-	GuildOnly   bool
-	Router      *Router
-	Cooldown    time.Duration
+	Name            string
+	Aliases         []string
+	Regex           *regexp.Regexp
+	Description     string
+	LongDescription string
+	Usage           string
+	Permissions     PermLevel
+	Command         func(*Ctx) error
+	GuildOnly       bool
+	Router          *Router
+	Cooldown        time.Duration
 }

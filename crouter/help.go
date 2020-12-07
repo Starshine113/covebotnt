@@ -144,27 +144,39 @@ func (ctx *Ctx) GroupCmdEmbed(g *Group, cmd *Command) *discordgo.MessageEmbed {
 		aliases = strings.Join(cmd.Aliases, ", ")
 	}
 
+	fields := make([]*discordgo.MessageEmbedField, 0)
+
+	if cmd.LongDescription != "" {
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   "Description",
+			Value:  cmd.LongDescription,
+			Inline: false,
+		})
+	}
+
+	fields = append(fields, []*discordgo.MessageEmbedField{
+		{
+			Name:   "Usage",
+			Value:  fmt.Sprintf("```%v%v %v %v```", ctx.GuildPrefix, strings.ToLower(g.Name), strings.ToLower(cmd.Name), cmd.Usage),
+			Inline: false,
+		},
+		{
+			Name:   "Aliases",
+			Value:  fmt.Sprintf("```%v```", aliases),
+			Inline: false,
+		},
+		{
+			Name:   "Permission level",
+			Value:  "```" + cmd.Permissions.String() + "```",
+			Inline: false,
+		},
+	}...)
+
 	embed := &discordgo.MessageEmbed{
 		Title:       fmt.Sprintf("```%v %v```", strings.ToUpper(g.Name), strings.ToUpper(cmd.Name)),
 		Description: cmd.Description,
 		Color:       0x21a1a8,
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v%v %v %v```", ctx.GuildPrefix, strings.ToLower(g.Name), strings.ToLower(cmd.Name), cmd.Usage),
-				Inline: false,
-			},
-			{
-				Name:   "Aliases",
-				Value:  fmt.Sprintf("```%v```", aliases),
-				Inline: false,
-			},
-			{
-				Name:   "Permission level",
-				Value:  "```" + cmd.Permissions.String() + "```",
-				Inline: false,
-			},
-		},
+		Fields:      fields,
 	}
 
 	return embed
@@ -180,27 +192,39 @@ func (ctx *Ctx) CmdEmbed(cmd *Command) *discordgo.MessageEmbed {
 		aliases = strings.Join(cmd.Aliases, ", ")
 	}
 
+	fields := make([]*discordgo.MessageEmbedField, 0)
+
+	if cmd.LongDescription != "" {
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   "Description",
+			Value:  cmd.LongDescription,
+			Inline: false,
+		})
+	}
+
+	fields = append(fields, []*discordgo.MessageEmbedField{
+		{
+			Name:   "Usage",
+			Value:  fmt.Sprintf("```%v%v %v```", ctx.GuildPrefix, strings.ToLower(cmd.Name), cmd.Usage),
+			Inline: false,
+		},
+		{
+			Name:   "Aliases",
+			Value:  fmt.Sprintf("```%v```", aliases),
+			Inline: false,
+		},
+		{
+			Name:   "Permission level",
+			Value:  "```" + cmd.Permissions.String() + "```",
+			Inline: false,
+		},
+	}...)
+
 	embed := &discordgo.MessageEmbed{
 		Title:       fmt.Sprintf("```%v```", strings.ToUpper(cmd.Name)),
 		Description: cmd.Description,
 		Color:       0x21a1a8,
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v%v %v```", ctx.GuildPrefix, strings.ToLower(cmd.Name), cmd.Usage),
-				Inline: false,
-			},
-			{
-				Name:   "Aliases",
-				Value:  fmt.Sprintf("```%v```", aliases),
-				Inline: false,
-			},
-			{
-				Name:   "Permission level",
-				Value:  "```" + cmd.Permissions.String() + "```",
-				Inline: false,
-			},
-		},
+		Fields:      fields,
 	}
 
 	return embed
