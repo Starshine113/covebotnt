@@ -39,9 +39,34 @@ func (db *Db) AddTrigger(t *Trigger) (*Trigger, error) {
 	return t, err
 }
 
+// EditTrigger ...
+func (db *Db) EditTrigger(guildID string, triggerID int, t *Trigger) (*Trigger, error) {
+	if t == nil {
+		return nil, errors.New("trigger was nil")
+	}
+	if t.Trigger == "" || t.Response == "" {
+		return nil, errors.New("one or more required fields was nil")
+	}
+	if len(t.Trigger) > 99 {
+		t.Trigger = t.Trigger[:99]
+	}
+	if len(t.Response) > 1999 {
+		t.Response = t.Response[:1999]
+	}
+
+	var modified time.Time
+
+	err := db.Pool.QueryRow(context.Background(), "update public.triggers set trigger = $1, response = $2, modified = $3 where guild_id = $4 and id = $5 returning modified", t.Trigger, t.Response, time.Now().UTC(), guildID, triggerID).Scan(&modified)
+	if err != nil {
+		return t, err
+	}
+	t.Modified = modified
+	return t, nil
+}
+
 // Triggers gets all triggers for a guild
 func (db *Db) Triggers(id string) (out []*Trigger, err error) {
-	rows, err := db.Pool.Query(context.Background(), "select * from public.triggers where guild_id = $1 order by id desc", id)
+	rows, err := db.Pool.Query(context.Background(), "select * from public.triggers where guild_id = $1 order by id asc", id)
 	if err != nil {
 		return
 	}

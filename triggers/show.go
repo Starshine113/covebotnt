@@ -51,8 +51,8 @@ func show(ctx *crouter.Ctx) (err error) {
 
 	triggerSlices := make([][]*cbdb.Trigger, 0)
 
-	for i := 0; i < len(triggers); i += 5 {
-		end := i + 5
+	for i := 0; i < len(triggers); i += 10 {
+		end := i + 10
 
 		if end > len(triggers) {
 			end = len(triggers)

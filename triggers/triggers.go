@@ -32,12 +32,30 @@ func Init(router *crouter.Router) {
 
 	g.AddCommand(&crouter.Command{
 		Name:    "Remove",
-		Aliases: []string{"Delete"},
+		Aliases: []string{"Delete", "Yeet"},
 
 		Description: "Remove a trigger",
 		Usage:       "<trigger>",
 
 		Permissions: crouter.PermLevelMod,
 		Command:     remove,
+	})
+
+	g.AddCommand(&crouter.Command{
+		Name: "Export",
+
+		Description: "Exports all triggers as a .json file",
+
+		Permissions: crouter.PermLevelMod,
+		Command:     cmdexport,
+	})
+
+	g.AddCommand(&crouter.Command{
+		Name: "Import",
+
+		Description: "Imports triggers from a previous export",
+
+		Permissions: crouter.PermLevelMod,
+		Command:     cmdimport,
 	})
 }
