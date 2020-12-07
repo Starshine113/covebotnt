@@ -17,21 +17,23 @@ func Init(router *crouter.Router) {
 	})
 
 	router.AddCommand(&crouter.Command{
-		Name:        "ModRoles",
-		Aliases:     []string{"ModRole"},
-		Description: "List/modify this server's mod roles",
-		Usage:       "[add|remove <role>]",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     ModRoles,
+		Name:            "ModRoles",
+		Aliases:         []string{"ModRole"},
+		Description:     "List/modify this server's mod roles",
+		LongDescription: "Use `ModRoles Add` to add a moderator role.\nUse `ModRoles Remove` to remove a role.\nCalling `ModRoles` with no arguments will show the current list of moderator roles.",
+		Usage:           "[add|remove <role>]",
+		Permissions:     crouter.PermLevelAdmin,
+		Command:         ModRoles,
 	})
 
 	router.AddCommand(&crouter.Command{
-		Name:        "HelperRoles",
-		Aliases:     []string{"HelperRole"},
-		Description: "List/modify this server's helper roles",
-		Usage:       "[add|remove <role>]",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     HelperRoles,
+		Name:            "HelperRoles",
+		Aliases:         []string{"HelperRole"},
+		Description:     "List/modify this server's helper roles",
+		LongDescription: "Use `HelperRoles Add` to add a helper role.\nUse `HelperRoles Remove` to remove a role.\nCalling `HelperRoles` with no arguments will show the current list of helper roles.",
+		Usage:           "[add|remove <role>]",
+		Permissions:     crouter.PermLevelAdmin,
+		Command:         HelperRoles,
 	})
 }
 
