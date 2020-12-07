@@ -53,4 +53,12 @@ func Init(router *crouter.Router) {
 		Permissions: crouter.PermLevelAdmin,
 		Command:     RefreshMVC,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "CreateInvite",
+		Description: "Create an invite for the given channel",
+		Usage:       "[channel]",
+		Permissions: crouter.PermLevelMod,
+		Command:     invite,
+	})
 }
