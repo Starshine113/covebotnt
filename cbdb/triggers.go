@@ -41,7 +41,7 @@ func (db *Db) AddTrigger(t *Trigger) (*Trigger, error) {
 
 // Triggers gets all triggers for a guild
 func (db *Db) Triggers(id string) (out []*Trigger, err error) {
-	rows, err := db.Pool.Query(context.Background(), "select * from public.triggers where guild_id = $1", id)
+	rows, err := db.Pool.Query(context.Background(), "select * from public.triggers where guild_id = $1 order by id desc", id)
 	if err != nil {
 		return
 	}

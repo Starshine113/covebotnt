@@ -142,5 +142,8 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err er
 			return err
 		}
 	}
+	if ctx.Message.GuildID != "" {
+		r.triggers(ctx.Message.ChannelID, ctx.Message.GuildID, ctx.Message.Content)
+	}
 	return
 }
