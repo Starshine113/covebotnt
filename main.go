@@ -26,7 +26,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-const botVersion = "0.99.99"
+const botVersion = "0.99.999"
 
 var (
 	config    structs.BotConfig
