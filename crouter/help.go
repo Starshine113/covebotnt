@@ -95,7 +95,7 @@ func (ctx *Ctx) GroupEmbed(g *Group) *discordgo.MessageEmbed {
 
 	var subCmds []string
 	for _, cmd := range g.Subcommands {
-		subCmds = append(subCmds, cmd.Name)
+		subCmds = append(subCmds, fmt.Sprintf("[%d] %s", cmd.Permissions, cmd.Name))
 	}
 
 	embed := &discordgo.MessageEmbed{
