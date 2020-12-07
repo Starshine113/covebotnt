@@ -145,9 +145,6 @@ func main() {
 	addAdminCommands()
 	addOwnerCommands()
 
-	// add autoresponses
-	addAutoResponses()
-
 	// add message create handler for commands
 	dg.AddHandler(router.MessageCreate)
 
