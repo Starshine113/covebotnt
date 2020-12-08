@@ -35,6 +35,7 @@ func (y *yag) bulk(ctx *crouter.Ctx) (err error) {
 		messages = append(messages, msgs...)
 	}
 
+	messages = reverseMsgs(messages)
 	total := len(messages)
 	var processed int
 
@@ -48,4 +49,16 @@ func (y *yag) bulk(ctx *crouter.Ctx) (err error) {
 
 	_, err = ctx.SendfNoAddXHandler("Got %v messages; processed %v messages.", total, processed)
 	return
+}
+
+func reverseMsgs(s []*discordgo.Message) []*discordgo.Message {
+	a := make([]*discordgo.Message, len(s))
+	copy(a, s)
+
+	for i := len(a)/2 - 1; i >= 0; i-- {
+		opp := len(a) - 1 - i
+		a[i], a[opp] = a[opp], a[i]
+	}
+
+	return a
 }
