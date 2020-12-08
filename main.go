@@ -142,7 +142,6 @@ func main() {
 	addStarboardCommands()
 	addGkCommands()
 
-	addAdminCommands()
 	addOwnerCommands()
 
 	// add message create handler for commands
