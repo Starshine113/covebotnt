@@ -133,7 +133,7 @@ func (y *yag) muteEmbed(g string, e *discordgo.MessageEmbed) *cbdb.ModLogEntry {
 }
 
 func (y *yag) unmuteEmbed(g string, e *discordgo.MessageEmbed) *cbdb.ModLogEntry {
-	groups := warnRegexp.FindStringSubmatch(e.Description)
+	groups := unmuteRegexp.FindStringSubmatch(e.Description)
 	if len(groups) < 3 {
 		return nil
 	}
