@@ -2,7 +2,7 @@ package modcommands
 
 import (
 	"fmt"
-	"strconv"
+	"time"
 
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/crouter"
@@ -20,87 +20,83 @@ func ModLogs(ctx *crouter.Ctx) (err error) {
 		return nil
 	}
 
-	var page int64 = 0
-
-	if len(ctx.Args) > 1 {
-		page, err = strconv.ParseInt(ctx.Args[1], 0, 0)
-		if err != nil {
-			ctx.CommandError(err)
-			return nil
-		}
-		page = page - 1
-		if page < 0 {
-			page = 0
-		}
-	}
-
-	msg, err := ctx.Send("Working, please wait...")
-	if err != nil {
-		return err
-	}
 	err = ctx.TriggerTyping()
 	if err != nil {
 		return err
 	}
 
+	var user *discordgo.User
+
 	member, err := ctx.ParseMember(ctx.Args[0])
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
-	}
-
-	logs, err := ctx.Database.GetModLogs(ctx.Message.GuildID, member.User.ID)
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
-	}
-	logs = reverseLogs(logs)
-
-	logFields := make([]*discordgo.MessageEmbedField, 0)
-
-	minRange := page * 10
-	maxRange := ((page + 1) * 10)
-	if int64(len(logs)) < maxRange {
-		maxRange = int64(len(logs))
-	}
-	if int64(len(logs)) < minRange {
-		minRange = int64(len(logs)) - 10
-		if minRange < 0 {
-			minRange = 0
-		}
-	}
-	logSlice := logs[minRange:maxRange]
-
-	for _, log := range logSlice {
-		field, err := logField(ctx, log)
+	if err == nil {
+		user = member.User
+	} else {
+		user, err = ctx.Session.User(ctx.Args[0])
 		if err != nil {
-			return err
+			ctx.CommandError(err)
+			return nil
 		}
-		logFields = append(logFields, field)
 	}
 
-	embed := &discordgo.MessageEmbed{
-		Author: &discordgo.MessageEmbedAuthor{
-			Name:    member.User.String(),
-			IconURL: member.User.AvatarURL("256"),
-		},
-		Title: "Mod logs",
-		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("%v-%v out of %v shown | ID: %v", minRange+1, minRange+int64(len(logSlice)), len(logs), member.User.ID),
-		},
-		Fields:    logFields,
-		Timestamp: string(ctx.Message.Timestamp),
-	}
-
-	_, err = ctx.Send(embed)
+	logs, err := ctx.Database.GetModLogs(ctx.Message.GuildID, user.ID)
 	if err != nil {
+		ctx.CommandError(err)
+		return nil
+	}
+
+	if len(logs) == 0 {
+		_, err = ctx.SendfNoAddXHandler("**%v** has no log entries.", user.String())
 		return err
 	}
-	err = ctx.Session.ChannelMessageDelete(msg.ChannelID, msg.ID)
+
+	logs = reverseLogs(logs)
+
+	logEntries := make([][]*cbdb.ModLogEntry, 0)
+
+	for i := 0; i < len(logs); i += 5 {
+		end := i + 5
+
+		if end > len(logs) {
+			end = len(logs)
+		}
+
+		logEntries = append(logEntries, logs[i:end])
+	}
+
+	embeds := make([]*discordgo.MessageEmbed, 0)
+
+	for i, s := range logEntries {
+		x := make([]*discordgo.MessageEmbedField, 0)
+		for _, t := range s {
+			if t == nil {
+				continue
+			}
+			x = append(x, logField(ctx, t))
+		}
+		embeds = append(embeds, &discordgo.MessageEmbed{
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    user.String(),
+				IconURL: user.AvatarURL("128"),
+			},
+			Title: "Mod logs",
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: fmt.Sprintf("Page %v/%v | User ID: %v", i+1, len(logEntries), user.ID),
+			},
+			Fields:    x,
+			Timestamp: time.Now().Format(time.RFC3339),
+			Color:     0x21a1a8,
+		})
+	}
+
+	if len(embeds) == 1 {
+		_, err = ctx.Send(embeds[0])
+		return
+	}
+	_, err = ctx.PagedEmbed(embeds)
 	return
 }
 
-func logField(ctx *crouter.Ctx, log *cbdb.ModLogEntry) (field *discordgo.MessageEmbedField, err error) {
+func logField(ctx *crouter.Ctx, log *cbdb.ModLogEntry) (field *discordgo.MessageEmbedField) {
 	mod, err := ctx.Bot.MemberCache.Get(log.GuildID, log.ModID)
 	var logValue string
 	if err == nil {
@@ -113,7 +109,7 @@ func logField(ctx *crouter.Ctx, log *cbdb.ModLogEntry) (field *discordgo.Message
 		Name:   fmt.Sprintf("#%v | %v | %v", log.ID, log.Type, log.Time.Format("2006-01-02")),
 		Value:  logValue,
 		Inline: false,
-	}, nil
+	}
 }
 
 func reverseLogs(s []*cbdb.ModLogEntry) []*cbdb.ModLogEntry {
