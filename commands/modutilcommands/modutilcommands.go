@@ -61,4 +61,31 @@ func Init(router *crouter.Router) {
 		Permissions: crouter.PermLevelMod,
 		Command:     invite,
 	})
+
+	dm(router)
+}
+
+func dm(router *crouter.Router) {
+	dm := router.AddGroup(&crouter.Group{
+		Name:        "DM",
+		Aliases:     []string{"DirectMessage"},
+		Description: "DM a server user",
+		Command: &crouter.Command{
+			Name:        "Standard",
+			Aliases:     []string{"Std"},
+			Description: "Send a message to a user, showing the moderator's name",
+			Usage:       "<user> <message>",
+			Permissions: crouter.PermLevelAdmin,
+			Command:     DM,
+		},
+	})
+
+	dm.AddCommand(&crouter.Command{
+		Name:        "Anonymous",
+		Aliases:     []string{"Anon"},
+		Description: "Send a message to a user, hiding the moderator's name",
+		Usage:       "<user> <message>",
+		Permissions: crouter.PermLevelAdmin,
+		Command:     AnonDM,
+	})
 }
