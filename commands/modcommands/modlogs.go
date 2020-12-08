@@ -72,7 +72,7 @@ func ModLogs(ctx *crouter.Ctx) (err error) {
 	logSlice := logs[minRange:maxRange]
 
 	for _, log := range logSlice {
-		field, err := logField(ctx.Session, log)
+		field, err := logField(ctx, log)
 		if err != nil {
 			return err
 		}
@@ -100,11 +100,8 @@ func ModLogs(ctx *crouter.Ctx) (err error) {
 	return
 }
 
-func logField(s *discordgo.Session, log *cbdb.ModLogEntry) (field *discordgo.MessageEmbedField, err error) {
-	mod, err := s.State.Member(log.GuildID, log.ModID)
-	if err == discordgo.ErrStateNotFound {
-		mod, err = s.GuildMember(log.GuildID, log.ModID)
-	}
+func logField(ctx *crouter.Ctx, log *cbdb.ModLogEntry) (field *discordgo.MessageEmbedField, err error) {
+	mod, err := ctx.Bot.MemberCache.Get(log.GuildID, log.ModID)
 	var logValue string
 	if err == nil {
 		logValue = fmt.Sprintf("**Responsible moderator:** %v\n**Reason:** %v", mod.User.String(), log.Reason)
