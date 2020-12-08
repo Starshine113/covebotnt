@@ -47,7 +47,7 @@ func CommandSetNote(ctx *crouter.Ctx) (err error) {
 	return nil
 }
 
-func noteField(ctx *crouter.Ctx, note *cbdb.Note) (field *discordgo.MessageEmbedField, err error) {
+func noteField(ctx *crouter.Ctx, note *cbdb.Note) (field *discordgo.MessageEmbedField) {
 	mod, err := ctx.Bot.MemberCache.Get(note.GuildID, note.ModID)
 	var noteHeader string
 	if err == nil {
@@ -60,5 +60,5 @@ func noteField(ctx *crouter.Ctx, note *cbdb.Note) (field *discordgo.MessageEmbed
 		Name:   noteHeader,
 		Value:  fmt.Sprintf("%v\nCreated at %v", note.Note, note.Created.Format(time.RFC1123)),
 		Inline: false,
-	}, nil
+	}
 }

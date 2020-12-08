@@ -2,7 +2,7 @@ package notes
 
 import (
 	"fmt"
-	"strconv"
+	"time"
 
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/crouter"
@@ -17,19 +17,6 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 			MissingArgs:  "user: id/mention",
 		})
 		return nil
-	}
-	var page int64 = 0
-
-	if len(ctx.Args) > 1 {
-		page, err = strconv.ParseInt(ctx.Args[1], 0, 0)
-		if err != nil {
-			ctx.CommandError(err)
-			return nil
-		}
-		page = page - 1
-		if page < 0 {
-			page = 0
-		}
 	}
 
 	msg, err := ctx.Send("Working, please wait...")
@@ -59,43 +46,48 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 		return
 	}
 
-	noteFields := make([]*discordgo.MessageEmbedField, 0)
+	noteSlices := make([][]*cbdb.Note, 0)
 
-	minRange := page * 10
-	maxRange := ((page + 1) * 10)
-	if int64(len(notes)) < maxRange {
-		maxRange = int64(len(notes))
-	}
-	if int64(len(notes)) < minRange {
-		minRange = int64(len(notes)) - 10
-		if minRange < 0 {
-			minRange = 0
+	for i := 0; i < len(notes); i += 5 {
+		end := i + 5
+
+		if end > len(notes) {
+			end = len(notes)
 		}
-	}
-	noteSlice := notes[minRange:maxRange]
 
-	for _, note := range noteSlice {
-		field, err := noteField(ctx, note)
-		if err != nil {
-			return err
+		noteSlices = append(noteSlices, notes[i:end])
+	}
+
+	embeds := make([]*discordgo.MessageEmbed, 0)
+
+	for i, s := range noteSlices {
+		x := make([]*discordgo.MessageEmbedField, 0)
+		for _, t := range s {
+			if t == nil {
+				continue
+			}
+			x = append(x, noteField(ctx, t))
 		}
-		noteFields = append(noteFields, field)
+		embeds = append(embeds, &discordgo.MessageEmbed{
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    member.User.String(),
+				IconURL: member.User.AvatarURL("128"),
+			},
+			Title: "Notes",
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: fmt.Sprintf("Page %v/%v", i+1, len(noteSlices)),
+			},
+			Fields:    x,
+			Timestamp: time.Now().Format(time.RFC3339),
+			Color:     0x21a1a8,
+		})
 	}
 
-	embed := &discordgo.MessageEmbed{
-		Author: &discordgo.MessageEmbedAuthor{
-			Name:    member.User.String(),
-			IconURL: member.User.AvatarURL("256"),
-		},
-		Title: "Notes",
-		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("%v-%v out of %v shown | ID: %v", minRange+1, minRange+int64(len(noteSlice)), len(notes), member.User.ID),
-		},
-		Fields:    noteFields,
-		Timestamp: string(ctx.Message.Timestamp),
+	if len(embeds) == 1 {
+		_, err = ctx.Send(embeds[0])
+		return
 	}
-
-	_, err = ctx.Send(embed)
+	_, err = ctx.PagedEmbed(embeds)
 	if err != nil {
 		return err
 	}
