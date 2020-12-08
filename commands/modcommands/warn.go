@@ -137,6 +137,7 @@ func Warn(ctx *crouter.Ctx) (err error) {
 		ModID:   ctx.Author.ID,
 		Type:    "warn",
 		Reason:  warnReason,
+		Time:    time.Now().UTC(),
 	})
 	if err != nil {
 		ctx.CommandError(err)

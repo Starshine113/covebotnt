@@ -27,7 +27,7 @@ func (db *Db) AddToModLog(entry *ModLogEntry) (out *ModLogEntry, err error) {
 	var id int
 	var timestamp time.Time
 
-	err = db.Pool.QueryRow(context.Background(), "insert into public.mod_log (guild_id, user_id, mod_id, type, reason) values ($1, $2, $3, $4, $5) returning id, created", entry.GuildID, entry.UserID, entry.ModID, entry.Type, entry.Reason).Scan(&id, &timestamp)
+	err = db.Pool.QueryRow(context.Background(), "insert into public.mod_log (guild_id, user_id, mod_id, type, reason, created) values ($1, $2, $3, $4, $5, $6) returning id, created", entry.GuildID, entry.UserID, entry.ModID, entry.Type, entry.Reason, entry.Time).Scan(&id, &timestamp)
 	if err != nil {
 		return
 	}
@@ -39,7 +39,7 @@ func (db *Db) AddToModLog(entry *ModLogEntry) (out *ModLogEntry, err error) {
 
 // GetModLogs gets all the mod logs for a user
 func (db *Db) GetModLogs(guildID, userID string) (out []*ModLogEntry, err error) {
-	rows, err := db.Pool.Query(context.Background(), "select * from public.mod_log where user_id = $1 and guild_id = $2", userID, guildID)
+	rows, err := db.Pool.Query(context.Background(), "select id, guild_id, user_id, mod_id, type, reason, created from public.mod_log where user_id = $1 and guild_id = $2", userID, guildID)
 	if err != nil {
 		return
 	}
@@ -68,7 +68,7 @@ func (db *Db) GetModLogs(guildID, userID string) (out []*ModLogEntry, err error)
 
 // GetAllLogs gets *all* the mod logs for a guild
 func (db *Db) GetAllLogs(guildID string) (out []*ModLogEntry, err error) {
-	rows, err := db.Pool.Query(context.Background(), "select * from public.mod_log where guild_id = $1", guildID)
+	rows, err := db.Pool.Query(context.Background(), "select id, guild_id, user_id, mod_id, type, reason, created from public.mod_log where guild_id = $1", guildID)
 	if err != nil {
 		return
 	}

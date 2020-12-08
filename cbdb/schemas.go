@@ -1,7 +1,7 @@
 package cbdb
 
 // DBVersion is the current database version
-const DBVersion = 4
+const DBVersion = 6
 
 // DBVersions is a slice of schemas for every database version
 var DBVersions []string = []string{
@@ -38,6 +38,18 @@ var DBVersions []string = []string{
 	);
 	
 	update public.info set schema_version = 4;`,
+
+	`create table if not exists yag_import (
+		guild_id		text primary key	references public.guild_settings (guild_id)	on delete cascade,
+		log_channel		text not null default '',
+		enabled			boolean default false
+	);
+	
+	update public.info set schema_version = 5;`,
+
+	`alter table public.mod_log add column yag_id int;
+	
+	update public.info set schema_version = 6;`,
 }
 
 // initDBSql is the initial SQL database schema

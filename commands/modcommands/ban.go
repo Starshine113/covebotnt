@@ -147,6 +147,7 @@ func Ban(ctx *crouter.Ctx) (err error) {
 		ModID:   ctx.Author.ID,
 		Type:    "ban",
 		Reason:  reason,
+		Time:    time.Now().UTC(),
 	})
 	if err != nil {
 		ctx.CommandError(err)

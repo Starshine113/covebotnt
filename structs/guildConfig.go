@@ -6,6 +6,13 @@ type GuildSettings struct {
 	Starboard  StarboardSettings
 	Moderation ModSettings
 	Gatekeeper GatekeeperSettings
+	YAG        YAGImport
+}
+
+// YAGImport holds the settings for importing mod logs from YAGPDB
+type YAGImport struct {
+	Channel string
+	Enabled bool
 }
 
 // StarboardSettings holds the starboard settings

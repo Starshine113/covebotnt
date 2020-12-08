@@ -46,24 +46,59 @@ func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) 
 		gatekeeperRoles, memberRoles      []string
 		gatekeeperChannel, welcomeChannel string
 		gatekeeperMessage, welcomeMessage string
+
+		yagLog     string
+		yagEnabled bool
 	)
 
-	row := db.Pool.QueryRow(context.Background(), "select * from public.guild_settings where guild_id=$1", g)
+	row := db.Pool.QueryRow(context.Background(), `select
+	g.prefix, g.starboard_channel, g.react_limit,
+	g.emoji, g.sender_can_react, g.react_to_starboard,
+	g.mod_roles, g.helper_roles, g.mod_log, g.mute_role,
+	g.pause_role, g.gatekeeper_roles, g.member_roles,
+	g.gatekeeper_channel, g.gatekeeper_message,
+	g.welcome_channel, g.welcome_message,
+	y.log_channel, y.enabled
+	from public.guild_settings as g, public.yag_import as y
+	where g.guild_id=$1 and y.guild_id = $1`, g)
 
-	err = row.Scan(&g, &prefix, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
+	err = row.Scan(&prefix, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
 		&modRoles, &helperRoles, &modLog, &muteRole, &pauseRole,
 		&gatekeeperRoles, &memberRoles, &gatekeeperChannel,
-		&gatekeeperMessage, &welcomeChannel, &welcomeMessage)
+		&gatekeeperMessage, &welcomeChannel, &welcomeMessage, &yagLog, &yagEnabled)
 	if err != nil {
 		return s, err
 	}
 
 	s = structs.GuildSettings{
-		Prefix:     prefix,
-		Starboard:  structs.StarboardSettings{starboardChannel, reactLimit, emoji, senderCanReact, reactToStarboard},
-		Moderation: structs.ModSettings{modRoles, helperRoles, modLog, muteRole, pauseRole},
-		Gatekeeper: structs.GatekeeperSettings{gatekeeperRoles, memberRoles, gatekeeperChannel,
-			gatekeeperMessage, welcomeChannel, welcomeMessage}}
+		Prefix: prefix,
+		Starboard: structs.StarboardSettings{
+			StarboardID:      starboardChannel,
+			ReactLimit:       reactLimit,
+			Emoji:            emoji,
+			SenderCanReact:   senderCanReact,
+			ReactToStarboard: reactToStarboard,
+		},
+		Moderation: structs.ModSettings{
+			ModRoles:    modRoles,
+			HelperRoles: helperRoles,
+			ModLog:      modLog,
+			MuteRole:    muteRole,
+			PauseRole:   pauseRole,
+		},
+		Gatekeeper: structs.GatekeeperSettings{
+			GatekeeperRoles:   gatekeeperRoles,
+			MemberRoles:       memberRoles,
+			GatekeeperChannel: gatekeeperChannel,
+			GatekeeperMessage: gatekeeperMessage,
+			WelcomeChannel:    welcomeChannel,
+			WelcomeMessage:    welcomeMessage,
+		},
+		YAG: structs.YAGImport{
+			Channel: yagLog,
+			Enabled: yagEnabled,
+		},
+	}
 
 	return s, nil
 }

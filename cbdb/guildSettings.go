@@ -9,10 +9,19 @@ func (db *Db) InitSettingsForGuild(guildID string) (err error) {
 	if err != nil {
 		return err
 	}
-	if exists {
-		return nil
+	if !exists {
+		_, err = db.Pool.Exec(context.Background(), "insert into public.guild_settings (guild_id) values ($1)", guildID)
+		if err != nil {
+			return err
+		}
 	}
 
-	_, err = db.Pool.Exec(context.Background(), "insert into public.guild_settings (guild_id) values ($1)", guildID)
+	err = db.Pool.QueryRow(context.Background(), "select exists (select from public.yag_import where guild_id = $1)", guildID).Scan(&exists)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		_, err = db.Pool.Exec(context.Background(), "insert into public.yag_import (guild_id) values ($1)", guildID)
+	}
 	return err
 }

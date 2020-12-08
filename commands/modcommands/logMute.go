@@ -71,6 +71,7 @@ func LogMute(ctx *crouter.Ctx) (err error) {
 		ModID:   ctx.Author.ID,
 		Type:    muteType,
 		Reason:  reason + fmt.Sprintf(" (duration: %v)", duration),
+		Time:    time.Now().UTC(),
 	})
 	if err != nil {
 		ctx.CommandError(err)

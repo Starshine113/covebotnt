@@ -68,9 +68,6 @@ func ModLogs(ctx *crouter.Ctx) (err error) {
 	for i, s := range logEntries {
 		x := make([]*discordgo.MessageEmbedField, 0)
 		for _, t := range s {
-			if t == nil {
-				continue
-			}
 			x = append(x, logField(ctx, t))
 		}
 		embeds = append(embeds, &discordgo.MessageEmbed{

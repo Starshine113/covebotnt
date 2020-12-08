@@ -22,11 +22,12 @@ import (
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/Starshine113/covebotnt/triggers"
 	"github.com/Starshine113/covebotnt/wlog"
+	"github.com/Starshine113/covebotnt/yagimport"
 	"github.com/bwmarrin/discordgo"
 	bolt "go.etcd.io/bbolt"
 )
 
-const botVersion = "0.99.999"
+const botVersion = "0.99.9999"
 
 var (
 	config    structs.BotConfig
@@ -138,6 +139,7 @@ func main() {
 	admincommands.Init(router)
 	notes.Init(router)
 	triggers.Init(router)
+	yagimport.Init(router)
 
 	addStarboardCommands()
 	addGkCommands()
