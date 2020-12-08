@@ -9,15 +9,14 @@ import (
 )
 
 func commandSetStatus(ctx *crouter.Ctx) (err error) {
-	err = ctx.Session.ChannelTyping(ctx.Message.ChannelID)
-	if err != nil {
+	if err = ctx.TriggerTyping(); err != nil {
 		return err
 	}
 
 	// this command needs at least 1 arguments
-	if len(ctx.Args) < 1 {
-		ctx.CommandError(&crouter.ErrorNotEnoughArgs{1, len(ctx.Args)})
-		return nil
+	if err = ctx.CheckMinArgs(1); err != nil {
+		_, err = ctx.CommandError(err)
+		return err
 	}
 
 	// check the first arg
@@ -62,7 +61,7 @@ func commandSetStatus(ctx *crouter.Ctx) (err error) {
 
 	_, err = ctx.Send("Set status to `" + config.Bot.CustomStatus.Status + "`")
 	if err != nil {
-		sugar.Errorf("Error when sending message: ", err)
+		sugar.Errorf("Error when sending message: %v", err)
 		return err
 	}
 	sugar.Infof("Updated status to \"%v\"", config.Bot.CustomStatus.Status)
