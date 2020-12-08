@@ -19,30 +19,39 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 		return nil
 	}
 
-	msg, err := ctx.Send("Working, please wait...")
-	if err != nil {
-		return err
-	}
 	err = ctx.TriggerTyping()
 	if err != nil {
 		return err
 	}
 
+	var user *discordgo.User
+
 	member, err := ctx.ParseMember(ctx.Args[0])
+	if err == nil {
+		user = member.User
+	} else {
+		user, err = ctx.Session.User(ctx.Args[0])
+		if err != nil {
+			ctx.CommandError(err)
+			return nil
+		}
+	}
+
+	notes, err := ctx.Database.Notes(ctx.Message.GuildID, user.ID)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil
 	}
 
-	notes, err := ctx.Database.Notes(ctx.Message.GuildID, member.User.ID)
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
+	if len(notes) == 0 {
+		_, err = ctx.SendfNoAddXHandler("**%v** has no log entries.", user.String())
+		return err
 	}
+
 	notes = reverseNotes(notes)
 
 	if len(notes) == 0 {
-		_, err = ctx.Send(fmt.Sprintf("User **%v** has no notes.", member.User.String()))
+		_, err = ctx.Send(fmt.Sprintf("User **%v** has no notes.", user.String()))
 		return
 	}
 
@@ -70,12 +79,12 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 		}
 		embeds = append(embeds, &discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
-				Name:    member.User.String(),
-				IconURL: member.User.AvatarURL("128"),
+				Name:    user.String(),
+				IconURL: user.AvatarURL("128"),
 			},
 			Title: "Notes",
 			Footer: &discordgo.MessageEmbedFooter{
-				Text: fmt.Sprintf("Page %v/%v", i+1, len(noteSlices)),
+				Text: fmt.Sprintf("Page %v/%v | User ID: %v", i+1, len(noteSlices), user.ID),
 			},
 			Fields:    x,
 			Timestamp: time.Now().Format(time.RFC3339),
@@ -88,10 +97,6 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 		return
 	}
 	_, err = ctx.PagedEmbed(embeds)
-	if err != nil {
-		return err
-	}
-	err = ctx.Session.ChannelMessageDelete(msg.ChannelID, msg.ID)
 	return
 }
 
