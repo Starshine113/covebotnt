@@ -390,7 +390,7 @@ func (ctx *Ctx) detailEmbed(i, pages int, cmds []*Command) *discordgo.MessageEmb
 	commands := make([]string, 0)
 
 	for i, cmd := range cmds {
-		commands = append(commands, fmt.Sprintf("%v `%v`: %v", emoji[i], cmd.Name, cmd.Description))
+		commands = append(commands, fmt.Sprintf("%v `[%d] %v`: %v", emoji[i], cmd.Permissions, cmd.Name, cmd.Description))
 	}
 	embed := &discordgo.MessageEmbed{
 		Author: &discordgo.MessageEmbedAuthor{
