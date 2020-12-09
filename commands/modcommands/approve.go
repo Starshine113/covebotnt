@@ -3,7 +3,6 @@ package modcommands
 import (
 	"bytes"
 	"fmt"
-	"strings"
 	"text/template"
 	"time"
 
@@ -14,14 +13,15 @@ import (
 
 // GkApprove approves the given member, giving them the member roles
 func GkApprove(ctx *crouter.Ctx) (err error) {
-	if len(ctx.Args) < 1 {
-		ctx.CommandError(&crouter.ErrorMissingRequiredArgs{
-			RequiredArgs: "<member>",
-			MissingArgs:  "<member>",
-		})
-		return
+	if err = ctx.CheckMinArgs(1); err != nil {
+		_, err = ctx.CommandError(err)
+		return err
 	}
-	member, err := ctx.ParseMember(strings.Join(ctx.Args, " "))
+	if ctx.RawArgs == "" {
+		_, err = ctx.Send(crouter.ErrorEmoji + " No user supplied.")
+		return err
+	}
+	member, err := ctx.ParseMember(ctx.RawArgs)
 	if err != nil {
 		ctx.CommandError(err)
 		return nil

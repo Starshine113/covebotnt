@@ -41,7 +41,12 @@ func (ctx *Ctx) CommandError(err error) (error, error) {
 		if e.Message != nil {
 			_, err = ctx.Send(&discordgo.MessageEmbed{
 				Title:       "REST error occurred",
-				Description: fmt.Sprintf("```%v```", e.Message.Message),
+				Description: fmt.Sprintf("```%v ```", e.Message.Message),
+				Fields: []*discordgo.MessageEmbedField{{
+					Name:   "Raw",
+					Value:  string(e.ResponseBody),
+					Inline: false,
+				}},
 				Footer: &discordgo.MessageEmbedFooter{
 					Text: fmt.Sprintf("Error code: %v", e.Message.Code),
 				},
