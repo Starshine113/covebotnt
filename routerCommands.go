@@ -54,6 +54,31 @@ func addStarboardCommands() {
 		Command:     modutilcommands.StarboardSenderCanReactToggle,
 	})
 
+	starboard.AddCommand(&crouter.Command{
+		Name:        "Blacklist",
+		Description: "Show the current starboard blacklist",
+		Usage:       "",
+		Permissions: crouter.PermLevelMod,
+		Command:     modutilcommands.SbBlacklist,
+	})
+
+	starboard.AddCommand(&crouter.Command{
+		Name:        "BlacklistAdd",
+		Description: "Add a channel to the blacklist",
+		Usage:       "",
+		Permissions: crouter.PermLevelMod,
+		Command:     modutilcommands.SbBlacklistAdd,
+	})
+
+	starboard.AddCommand(&crouter.Command{
+		Name:        "BlacklistRemove",
+		Aliases:     []string{"BlacklistDelete"},
+		Description: "Remove a channel from the blacklist",
+		Usage:       "",
+		Permissions: crouter.PermLevelMod,
+		Command:     modutilcommands.SbBlacklistRemove,
+	})
+
 	router.AddCommand(&crouter.Command{
 		Name:        "ModLog",
 		Description: "Set the modlog channel",

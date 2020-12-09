@@ -34,12 +34,10 @@ func (sb *Sb) ReactionAdd(s *discordgo.Session, reaction *discordgo.MessageReact
 	if reaction.Emoji.MessageFormat() != gs.Starboard.Emoji {
 		return
 	}
-	// if the channel is blacklisted, return
-	// for _, channel := range channelBlacklist[reaction.GuildID] {
-	// 	if channel == reaction.ChannelID {
-	// 		return
-	// 	}
-	// }
+
+	if sb.Pool.InStarboardBlacklist(reaction.GuildID, reaction.ChannelID) {
+		return
+	}
 
 	// get the message
 	message, err := s.ChannelMessage(reaction.ChannelID, reaction.MessageID)
@@ -96,12 +94,10 @@ func (sb *Sb) ReactionRemove(s *discordgo.Session, reaction *discordgo.MessageRe
 	if reaction.Emoji.MessageFormat() != gs.Starboard.Emoji {
 		return
 	}
-	// if the channel is blacklisted, return
-	// for _, channel := range channelBlacklist[reaction.GuildID] {
-	// 	if channel == reaction.ChannelID {
-	// 		return
-	// 	}
-	// }
+
+	if sb.Pool.InStarboardBlacklist(reaction.GuildID, reaction.ChannelID) {
+		return
+	}
 
 	// get the message
 	message, err := s.ChannelMessage(reaction.ChannelID, reaction.MessageID)

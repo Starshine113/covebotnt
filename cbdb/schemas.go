@@ -1,7 +1,7 @@
 package cbdb
 
 // DBVersion is the current database version
-const DBVersion = 6
+const DBVersion = 7
 
 // DBVersions is a slice of schemas for every database version
 var DBVersions []string = []string{
@@ -50,6 +50,13 @@ var DBVersions []string = []string{
 	`alter table public.mod_log add column yag_id int;
 	
 	update public.info set schema_version = 6;`,
+
+	`drop table starboard_blacklisted_channels;
+
+	alter table public.guild_settings add column sb_blacklist text[] not null default array[]::text[];
+	alter table public.guild_settings add column cmd_blacklist text[] not null default array[]::text[];
+
+	update public.info set schema_version = 7;`,
 }
 
 // initDBSql is the initial SQL database schema
