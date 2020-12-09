@@ -49,8 +49,6 @@ func ModLogs(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	logs = reverseLogs(logs)
-
 	logEntries := make([][]*cbdb.ModLogEntry, 0)
 
 	for i := 0; i < len(logs); i += 5 {

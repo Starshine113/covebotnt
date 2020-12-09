@@ -29,7 +29,7 @@ func (db *Db) DelNote(guildID string, id int) (err error) {
 
 // Notes gets all the notes for a user in a guild
 func (db *Db) Notes(guildID, userID string) (notes []*Note, err error) {
-	rows, err := db.Pool.Query(context.Background(), "select * from public.notes where user_id = $1 and guild_id = $2", userID, guildID)
+	rows, err := db.Pool.Query(context.Background(), "select * from public.notes where user_id = $1 and guild_id = $2 order by created desc", userID, guildID)
 	if err != nil {
 		return
 	}

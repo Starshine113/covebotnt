@@ -39,7 +39,7 @@ func (db *Db) AddToModLog(entry *ModLogEntry) (out *ModLogEntry, err error) {
 
 // GetModLogs gets all the mod logs for a user
 func (db *Db) GetModLogs(guildID, userID string) (out []*ModLogEntry, err error) {
-	rows, err := db.Pool.Query(context.Background(), "select id, guild_id, user_id, mod_id, type, reason, created from public.mod_log where user_id = $1 and guild_id = $2", userID, guildID)
+	rows, err := db.Pool.Query(context.Background(), "select id, guild_id, user_id, mod_id, type, reason, created from public.mod_log where user_id = $1 and guild_id = $2 order by created desc", userID, guildID)
 	if err != nil {
 		return
 	}

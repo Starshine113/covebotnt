@@ -48,8 +48,6 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	notes = reverseNotes(notes)
-
 	if len(notes) == 0 {
 		_, err = ctx.Send(fmt.Sprintf("User **%v** has no notes.", user.String()))
 		return
@@ -98,16 +96,4 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 	}
 	_, err = ctx.PagedEmbed(embeds)
 	return
-}
-
-func reverseNotes(s []*cbdb.Note) []*cbdb.Note {
-	a := make([]*cbdb.Note, len(s))
-	copy(a, s)
-
-	for i := len(a)/2 - 1; i >= 0; i-- {
-		opp := len(a) - 1 - i
-		a[i], a[opp] = a[opp], a[i]
-	}
-
-	return a
 }
