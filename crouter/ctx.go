@@ -23,17 +23,21 @@ const (
 
 // Ctx is the context for a command
 type Ctx struct {
-	GuildPrefix      string
-	Command          string
-	Args             []string
-	Session          *discordgo.Session
-	Bot              *bot.Bot
-	Message          *discordgo.MessageCreate
-	Channel          *discordgo.Channel
-	Author           *discordgo.User
-	BotUser          *discordgo.User
-	Database         *cbdb.Db
-	BoltDb           *cbdb.BoltDb
+	GuildPrefix string
+	Command     string
+	Args        []string
+	RawArgs     string
+
+	Session  *discordgo.Session
+	Bot      *bot.Bot
+	BotUser  *discordgo.User
+	Database *cbdb.Db
+	BoltDb   *cbdb.BoltDb
+
+	Message *discordgo.MessageCreate
+	Channel *discordgo.Channel
+	Author  *discordgo.User
+
 	Handlers         *ttlcache.Cache
 	AdditionalParams map[string]interface{}
 	GuildSettings    *structs.GuildSettings
@@ -55,7 +59,7 @@ func Context(prefix, messageContent string, m *discordgo.MessageCreate, b *bot.B
 		args = message[1:]
 	}
 
-	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: b.Session, Message: m, Author: m.Author, Database: b.Pool, BoltDb: b.Bolt, Handlers: b.Handlers, Bot: b}
+	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: b.Session, Message: m, Author: m.Author, Database: b.Pool, BoltDb: b.Bolt, Handlers: b.Handlers, Bot: b, RawArgs: strings.Join(args, " ")}
 
 	channel, err := b.Session.Channel(m.ChannelID)
 	if err != nil {
