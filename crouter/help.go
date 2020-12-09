@@ -244,24 +244,19 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 
 	for _, g := range r.Groups {
 		if g.Command.Permissions <= p {
-			cmd := *g.Command
-			cmd.Name = fmt.Sprintf("%v %v", g.Name, g.Command.Name)
-			cmds = append(cmds, &cmd)
-		}
-		for _, c := range g.Subcommands {
-			if c.Permissions <= p {
-				cmd := *c
-				cmd.Name = fmt.Sprintf("%v %v", g.Name, c.Name)
-				cmds = append(cmds, &cmd)
-			}
+			cmds = append(cmds, &Command{
+				Name:        g.Name,
+				Permissions: g.Command.Permissions,
+				Description: g.Command.Description,
+			})
 		}
 	}
 
 	sort.Sort(cmds)
 	cmdSlices := make([][]*Command, 0)
 
-	for i := 0; i < len(cmds); i += 5 {
-		end := i + 5
+	for i := 0; i < len(cmds); i += 10 {
+		end := i + 10
 
 		if end > len(cmds) {
 			end = len(cmds)
@@ -345,71 +340,31 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 		}...)})
 
 	for i, c := range cmdSlices {
-		embeds = append(embeds, ctx.detailEmbed(i, len(cmdSlices)+1, c))
-	}
-
-	msg, err := ctx.PagedEmbed(embeds)
-
-	ctx.AdditionalParams["cmdList"] = cmdSlices
-
-	for i, e := range emoji {
-		emoji := e
-		if err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, msg.ID, emoji); err != nil {
-			return
+		x := make([]string, 0)
+		for _, cmd := range c {
+			x = append(x, fmt.Sprintf("`[%d] %v`: %v", cmd.Permissions, cmd.Name, cmd.Description))
 		}
-
-		index := i
-		ctx.AddReactionHandler(msg.ID, e, func(ctx *Ctx) {
-			page := ctx.AdditionalParams["page"].(int) - 1
-			if page == -1 {
-				ctx.Session.MessageReactionRemove(ctx.Channel.ID, msg.ID, emoji, ctx.Author.ID)
-				return
-			}
-			cmdList := ctx.AdditionalParams["cmdList"].([][]*Command)
-
-			cmdSlice := cmdList[page]
-			if index >= len(cmdSlice) {
-				return
-			}
-
-			ctx.Session.ChannelMessageDelete(ctx.Channel.ID, msg.ID)
-			ctx.Send(ctx.CmdEmbed(cmdSlice[index]))
+		embeds = append(embeds, &discordgo.MessageEmbed{
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    ctx.BotUser.Username + " help",
+				IconURL: ctx.BotUser.AvatarURL("128"),
+			},
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: fmt.Sprintf("Page %v/%v", i+2, len(cmdSlices)+1),
+			},
+			Timestamp:   time.Now().Format(time.RFC3339),
+			Description: strings.Join(x, "\n"),
+			Fields: []*discordgo.MessageEmbedField{{
+				Name:   "Usage",
+				Value:  "Use ⬅️ ➡️ to navigate between pages, and use ❌ to delete this message.",
+				Inline: false,
+			}},
+			Color: 0x21a1a8,
 		})
 	}
 
+	_, err = ctx.PagedEmbed(embeds)
 	return
-}
-
-var emoji = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"}
-
-func (ctx *Ctx) detailEmbed(i, pages int, cmds []*Command) *discordgo.MessageEmbed {
-	if len(cmds) > 5 {
-		return nil
-	}
-
-	commands := make([]string, 0)
-
-	for i, cmd := range cmds {
-		commands = append(commands, fmt.Sprintf("%v `[%d] %v`: %v", emoji[i], cmd.Permissions, cmd.Name, cmd.Description))
-	}
-	embed := &discordgo.MessageEmbed{
-		Author: &discordgo.MessageEmbedAuthor{
-			Name:    ctx.BotUser.Username + " help",
-			IconURL: ctx.BotUser.AvatarURL("128"),
-		},
-		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("Page %v/%v", i+2, pages),
-		},
-		Timestamp:   time.Now().Format(time.RFC3339),
-		Description: strings.Join(commands, "\n\n"),
-		Fields: []*discordgo.MessageEmbedField{{
-			Name:   "Usage",
-			Value:  "Use ⬅️ ➡️ to navigate between pages, the numbers to choose a command, and ❌ to delete this message.",
-			Inline: false,
-		}},
-		Color: 0x21a1a8,
-	}
-	return embed
 }
 
 // PrettyDurationString ...
