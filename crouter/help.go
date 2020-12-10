@@ -270,6 +270,11 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 
 	fields := []*discordgo.MessageEmbedField{
 		{
+			Name:   "Invite",
+			Value:  fmt.Sprintf("Invite the bot with [this](%v) link.", ctx.Invite()),
+			Inline: false,
+		},
+		{
 			Name:   "Setup",
 			Value:  "For help setting up the bot, check out the [docs](https://starshines.xyz/covebot/setup.html).",
 			Inline: false,
@@ -281,19 +286,10 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 		},
 	}
 
-	startTime := ctx.AdditionalParams["startTime"].(time.Time).UTC()
-	c := ctx.AdditionalParams["config"].(structs.BotConfig)
+	startTime := ctx.Bot.StartTime.UTC()
 	botAuthor, err := ctx.Session.User("694563574386786314")
 	if err != nil {
 		return err
-	}
-
-	if c.Bot.Invite != "" {
-		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   "Invite",
-			Value:  "Invite the bot with [this](" + ctx.Invite() + ") link.",
-			Inline: false,
-		})
 	}
 
 	embeds = append(embeds, &discordgo.MessageEmbed{
@@ -334,7 +330,7 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 				Inline: false,
 			},
 			{
-				Name:   "** **",
+				Name:   "Usage",
 				Value:  "Use ⬅️ ➡️ to navigate between pages, the numbers to choose a command, and ❌ to delete this message.",
 				Inline: false,
 			},
