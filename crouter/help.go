@@ -32,9 +32,10 @@ func (ctx *Ctx) Invite() string {
 		discordgo.PermissionEmbedLinks +
 		discordgo.PermissionAttachFiles +
 		discordgo.PermissionUseExternalEmojis +
-		discordgo.PermissionAddReactions
+		discordgo.PermissionAddReactions +
+		discordgo.PermissionCreateInstantInvite
 
-	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&redirect_uri=https%%3A%%2F%%2Fstarshines.xyz%%2Fcovebot%%2Fsetup.html&scope=bot", ctx.BotUser.ID, perms)
+	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&redirect_uri=https%%3A%%2F%%2Fstarshines.xyz%%2Fcovebot%%2Fsetup.html&response_type=code&scope=bot%%20identify", ctx.BotUser.ID, perms)
 }
 
 // Help is the help command
