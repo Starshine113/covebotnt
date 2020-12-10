@@ -120,4 +120,11 @@ func Init(router *crouter.Router) {
 		Command:     Hello,
 		GuildOnly:   true,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "About",
+		Description: "Show some info about the bot",
+		Permissions: crouter.PermLevelNone,
+		Command:     about,
+	})
 }
