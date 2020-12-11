@@ -30,6 +30,7 @@ func Init(router *crouter.Router) {
 
 	p := router.AddGroup(&crouter.Group{
 		Name:        "Prefix",
+		Aliases:     []string{"Prefixes"},
 		Description: "Manage the server's prefixes",
 		Command: &crouter.Command{
 			Name:        "Show",
