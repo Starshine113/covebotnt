@@ -11,7 +11,6 @@ func Init(router *crouter.Router) {
 	router.AddCommand(&crouter.Command{
 		Name:        "Ping",
 		Description: "Ping pong!",
-		Usage:       "",
 		Permissions: crouter.PermLevelNone,
 		Command:     Ping,
 	})
@@ -19,7 +18,6 @@ func Init(router *crouter.Router) {
 	router.AddCommand(&crouter.Command{
 		Name:        "Invite",
 		Description: "Send an invite link for the bot",
-		Usage:       "",
 		Permissions: crouter.PermLevelNone,
 		Command:     Invite,
 	})
@@ -113,9 +111,8 @@ func Init(router *crouter.Router) {
 
 	router.AddCommand(&crouter.Command{
 		Name:        "Hello",
-		Aliases:     []string{"Hi", "Henlo", "Heya", "Heyo"},
+		Aliases:     []string{"Hi", "Henlo", "Heya", "Heyo", "Hewwo"},
 		Description: "Say hi to the bot",
-		Usage:       "",
 		Permissions: crouter.PermLevelNone,
 		Command:     Hello,
 		GuildOnly:   true,
