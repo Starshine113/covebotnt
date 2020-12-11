@@ -121,7 +121,7 @@ func (ctx *Ctx) GroupEmbed(g *Group) *discordgo.MessageEmbed {
 			},
 			{
 				Name:   "Usage",
-				Value:  fmt.Sprintf("```%v%v %v```", ctx.GuildPrefix, strings.ToLower(g.Command.Name), g.Command.Usage),
+				Value:  fmt.Sprintf("```%v%v %v```", ctx.GuildPrefix, strings.ToLower(g.Name), g.Command.Usage),
 				Inline: false,
 			},
 			{
