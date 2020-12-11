@@ -1,7 +1,7 @@
 [bot]
 bot_admins = ["0", "0", "0"]
-prefixes = ["c;"]
 allowed_bots = ["204255221017214977"] # list of bots allowed to run commands
+prefixes = ["c;", "c:"] # prefixes used in DMs
 dm_webhook = "" # webhook to send DM messages to
 blocked_users = ["0"] # users blocked from DMing the bot
 log_webhook = "" # webhook to log errors to

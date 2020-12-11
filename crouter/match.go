@@ -9,7 +9,7 @@ import (
 
 // MatchPrefix checks if the message matched any prefix
 func (ctx *Ctx) MatchPrefix() bool {
-	return etc.HasAnyPrefix(strings.ToLower(ctx.Message.Content), ctx.GuildPrefix, "<@"+ctx.BotUser.ID+">", "<@!"+ctx.BotUser.ID+">")
+	return etc.HasAnyPrefix(strings.ToLower(ctx.Message.Content), ctx.Prefixes...)
 }
 
 // Match checks if any of the given command aliases match

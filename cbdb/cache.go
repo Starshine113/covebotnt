@@ -33,7 +33,7 @@ func (db *Db) RemoveFromGuildCache(g string) (err error) {
 // GetDBGuildSettings gets the guild settings from the database
 func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) {
 	var (
-		prefix string
+		prefixes []string
 
 		starboardChannel                 string
 		reactLimit                       int
@@ -52,7 +52,7 @@ func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) 
 	)
 
 	row := db.Pool.QueryRow(context.Background(), `select
-	g.prefix, g.starboard_channel, g.react_limit,
+	g.prefixes, g.starboard_channel, g.react_limit,
 	g.emoji, g.sender_can_react, g.react_to_starboard,
 	g.mod_roles, g.helper_roles, g.mod_log, g.mute_role,
 	g.pause_role, g.gatekeeper_roles, g.member_roles,
@@ -62,7 +62,7 @@ func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) 
 	from public.guild_settings as g, public.yag_import as y
 	where g.guild_id=$1 and y.guild_id = $1`, g)
 
-	err = row.Scan(&prefix, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
+	err = row.Scan(&prefixes, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
 		&modRoles, &helperRoles, &modLog, &muteRole, &pauseRole,
 		&gatekeeperRoles, &memberRoles, &gatekeeperChannel,
 		&gatekeeperMessage, &welcomeChannel, &welcomeMessage, &yagLog, &yagEnabled)
@@ -71,7 +71,7 @@ func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) 
 	}
 
 	s = structs.GuildSettings{
-		Prefix: prefix,
+		Prefixes: prefixes,
 		Starboard: structs.StarboardSettings{
 			StarboardID:      starboardChannel,
 			ReactLimit:       reactLimit,

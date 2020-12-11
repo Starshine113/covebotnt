@@ -125,8 +125,8 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err er
 			}
 			ctx.Cmd = cmd
 			if perms := ctx.Check(r.BotOwners); perms != nil {
-				ctx.CommandError(perms)
-				return nil
+				_, err = ctx.CommandError(perms)
+				return
 			}
 			if cmd.Cooldown != time.Duration(0) {
 				if _, e := r.Cooldowns.Get(fmt.Sprintf("%v-%v-%v", ctx.Channel.ID, ctx.Author.ID, cmd.Name)); e == nil {

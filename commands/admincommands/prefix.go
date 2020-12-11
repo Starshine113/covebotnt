@@ -2,67 +2,95 @@ package admincommands
 
 import (
 	"context"
-	"errors"
+	"strings"
 
 	"github.com/Starshine113/covebotnt/crouter"
 )
 
-// Prefix ...
-func Prefix(ctx *crouter.Ctx) (err error) {
-	gs, err := ctx.Database.GetGuildSettings(ctx.Message.GuildID)
-	if err != nil {
-		return err
+func prefixShow(ctx *crouter.Ctx) (err error) {
+	title := "Prefixes"
+	guild, err := ctx.Session.State.Guild(ctx.Message.GuildID)
+	if err == nil {
+		title += " for " + guild.Name
 	}
 
-	// if there are no arguments, show the current prefix
-	if len(ctx.Args) == 0 {
-		if gs.Prefix == "" {
-			_, err = ctx.Send("The current prefix is `" + ctx.Bot.Config.Bot.Prefixes[0] + "` (default).")
-			if err != nil {
-				return err
-			}
-		} else {
-			_, err = ctx.Send("The current prefix is `" + gs.Prefix + "`.")
-			if err != nil {
-				return err
-			}
+	x := make([]string, 0)
+	for i, p := range ctx.Prefixes {
+		if i == 0 {
+			continue
 		}
-		return nil
+		if strings.HasPrefix(p, "<@") && strings.HasSuffix(p, ">") {
+			x = append(x, p)
+		} else {
+			x = append(x, "`"+p+"`")
+		}
 	}
 
-	// if there's more than 1 argument, error
-	if err = ctx.CheckRequiredArgs(1); err != nil {
+	_, err = ctx.Embed(title, strings.Join(x, "\n"), 0)
+	return err
+}
+
+func prefixAdd(ctx *crouter.Ctx) (err error) {
+	prefix := strings.Join(ctx.Args, " ")
+	var matched bool
+
+	err = ctx.Database.Pool.QueryRow(context.Background(), "select $1 = any(g.prefixes) from (select * from guild_settings where guild_id = $2) as g", prefix, ctx.Message.GuildID).Scan(&matched)
+	if err != nil {
 		_, err = ctx.CommandError(err)
 		return err
 	}
 
-	// otherwise, set prefix to first argument
-	err = setGuildPrefix(ctx, ctx.Args[0], ctx.Message.GuildID)
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
-	}
-	_, err = ctx.Send("Changed prefix to `" + ctx.Args[0] + "`.")
-	if err != nil {
-		return err
+	if matched {
+		_, err = ctx.SendfNoAddXHandler("%v `%v` is already a prefix.", crouter.ErrorEmoji, prefix)
+		return
 	}
 
-	return nil
+	if len(ctx.GuildSettings.Prefixes) > 22 {
+		_, err = ctx.SendNoAddXHandler("This server has too many prefixes. Remove one to add a new prefix.")
+		return
+	}
+
+	_, err = ctx.Database.Pool.Exec(context.Background(), "update public.guild_settings set prefixes = array_append(prefixes, $1) where guild_id = $2", prefix, ctx.Message.GuildID)
+	if err != nil {
+		_, err = ctx.CommandError(err)
+		return
+	}
+
+	if err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID); err != nil {
+		_, err = ctx.CommandError(err)
+		return
+	}
+
+	_, err = ctx.SendfNoAddXHandler("%v Added prefix `%v`.", crouter.SuccessEmoji, prefix)
+	return
 }
 
-func setGuildPrefix(ctx *crouter.Ctx, prefix, guildID string) error {
-	ctx.Bot.Sugar.Infof("Changing prefix for %v", guildID)
-	commandTag, err := ctx.Database.Pool.Exec(context.Background(), "update public.guild_settings set prefix = $1 where guild_id = $2", prefix, guildID)
+func prefixRemove(ctx *crouter.Ctx) (err error) {
+	prefix := strings.Join(ctx.Args, " ")
+	var matched bool
+
+	err = ctx.Database.Pool.QueryRow(context.Background(), "select $1 = any(g.prefixes) from (select * from guild_settings where guild_id = $2) as g", prefix, ctx.Message.GuildID).Scan(&matched)
 	if err != nil {
+		_, err = ctx.CommandError(err)
 		return err
 	}
-	if commandTag.RowsAffected() != 1 {
-		return errors.New("no rows affected")
+
+	if !matched {
+		_, err = ctx.SendfNoAddXHandler("%v `%v` is not a prefix.", crouter.ErrorEmoji, prefix)
+		return
 	}
-	err = ctx.Database.RemoveFromGuildCache(guildID)
+
+	_, err = ctx.Database.Pool.Exec(context.Background(), "update public.guild_settings set prefixes = array_remove(prefixes, $1) where guild_id = $2", prefix, ctx.Message.GuildID)
 	if err != nil {
-		return err
+		_, err = ctx.CommandError(err)
+		return
 	}
-	ctx.Bot.Sugar.Infof("Refreshed the settings for %v", guildID)
-	return nil
+
+	if err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID); err != nil {
+		_, err = ctx.CommandError(err)
+		return
+	}
+
+	_, err = ctx.SendfNoAddXHandler("%v Removed prefix `%v`.", crouter.SuccessEmoji, prefix)
+	return
 }

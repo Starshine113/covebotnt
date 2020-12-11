@@ -33,9 +33,9 @@ func (r *Router) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate)
 	}
 
 	// get prefix for the guild
-	prefix := r.Bot.Prefix(m.GuildID)
+	prefixes := r.Bot.Prefix(m.GuildID)
 
-	ctx, err := Context(prefix, m.Content, m, r.Bot)
+	ctx, err := Context(prefixes, m.Content, m, r.Bot)
 	if err != nil {
 		r.Bot.Sugar.Errorf("Error getting context: %v", err)
 		return
@@ -49,9 +49,8 @@ func (r *Router) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate)
 	// if not, check if the message contains a bot mention, and ends with "hello"
 	content := strings.ToLower(m.Content)
 	match, _ := regexp.MatchString(fmt.Sprintf("<@!?%v>.*hello$", s.State.User.ID), content)
-	match2, _ := regexp.MatchString(fmt.Sprintf("%vhello$", regexp.QuoteMeta(prefix)), content)
-	if match || match2 {
-		ctx, err = Context("--", "--hello", m, r.Bot)
+	if match {
+		ctx, err = Context(prefixes, "--hello", m, r.Bot)
 		if err != nil {
 			r.Bot.Sugar.Errorf("Error getting context: %v", err)
 			return
@@ -62,7 +61,7 @@ func (r *Router) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate)
 
 	match, _ = regexp.MatchString(fmt.Sprintf("^<@!?%v>", s.State.User.ID), content)
 	if match {
-		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current prefix is `%v`", prefix))
+		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current prefixes are `%v`", prefixes))
 		if err != nil {
 			r.Bot.Sugar.Errorf("Error sending message: %v", err)
 			return

@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
@@ -63,14 +64,20 @@ func NewBot(s *discordgo.Session, l *wlog.Wlog, p *cbdb.Db, b *cbdb.BoltDb, c st
 }
 
 // Prefix gets the prefix for the given guild
-func (b *Bot) Prefix(guildID string) string {
-	gs, err := b.Pool.GetGuildSettings(guildID)
-	if err != nil {
-		return b.Config.Bot.Prefixes[0]
+func (b *Bot) Prefix(guildID string) []string {
+	prefixes := []string{fmt.Sprintf("<@%v>", b.Session.State.User.ID), fmt.Sprintf("<@!%v>", b.Session.State.User.ID)}
+
+	if guildID == "" {
+		return append(prefixes, b.Config.Bot.Prefixes...)
 	}
 
-	if gs.Prefix != "" {
-		return gs.Prefix
+	gs, err := b.Pool.GetGuildSettings(guildID)
+	if err != nil {
+		return prefixes
 	}
-	return b.Config.Bot.Prefixes[0]
+
+	if len(gs.Prefixes) == 0 {
+		return prefixes
+	}
+	return append(prefixes, gs.Prefixes...)
 }

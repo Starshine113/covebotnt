@@ -42,16 +42,31 @@ type Ctx struct {
 	AdditionalParams map[string]interface{}
 	GuildSettings    *structs.GuildSettings
 	Cmd              *Command
+
+	Prefixes []string
 }
 
+// Errors when creating Context
+var (
+	ErrorNoBotUser = errors.New("bot user not found in state cache")
+)
+
 // Context creates a new Ctx
-func Context(prefix, messageContent string, m *discordgo.MessageCreate, b *bot.Bot) (ctx *Ctx, err error) {
+func Context(prefixes []string, messageContent string, m *discordgo.MessageCreate, b *bot.Bot) (ctx *Ctx, err error) {
 	botUser := b.Session.State.User
 	if botUser == nil {
-		return
+		return nil, ErrorNoBotUser
 	}
 
-	messageContent = etc.TrimPrefixesSpace(messageContent, prefix, "<@"+botUser.ID+">", "<@!"+botUser.ID+">")
+	var prefix string
+	for _, p := range prefixes {
+		if strings.HasPrefix(messageContent, p) {
+			prefix = p
+			break
+		}
+	}
+
+	messageContent = etc.TrimPrefixesSpace(messageContent, prefixes...)
 	message := strings.Split(messageContent, " ")
 	command := message[0]
 	args := []string{}
@@ -59,7 +74,7 @@ func Context(prefix, messageContent string, m *discordgo.MessageCreate, b *bot.B
 		args = message[1:]
 	}
 
-	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: b.Session, Message: m, Author: m.Author, Database: b.Pool, BoltDb: b.Bolt, Handlers: b.Handlers, Bot: b, RawArgs: strings.Join(args, " ")}
+	ctx = &Ctx{GuildPrefix: prefix, Command: command, Args: args, Session: b.Session, Message: m, Author: m.Author, Database: b.Pool, BoltDb: b.Bolt, Handlers: b.Handlers, Bot: b, RawArgs: strings.Join(args, " "), Prefixes: prefixes}
 
 	channel, err := b.Session.Channel(m.ChannelID)
 	if err != nil {
@@ -69,30 +84,4 @@ func Context(prefix, messageContent string, m *discordgo.MessageCreate, b *bot.B
 	ctx.BotUser = botUser
 
 	return ctx, nil
-}
-
-func combineQuotedItems(in []string) (out []string, err error) {
-	var matchedQuote bool
-	var beginQuote int
-	for i, item := range in {
-		if matchedQuote {
-			if strings.HasSuffix(item, "\"") {
-				item = strings.Join(in[beginQuote:i+1], " ")
-				item = strings.Trim(item, "\"")
-				matchedQuote = false
-				out = append(out, item)
-			}
-			if matchedQuote && i == len(in)-1 {
-				err = errors.New("unexpected end of input")
-			}
-			continue
-		}
-		if strings.HasPrefix(item, "\"") {
-			matchedQuote = true
-			beginQuote = i
-			continue
-		}
-		out = append(out, item)
-	}
-	return out, err
 }

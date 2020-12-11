@@ -15,10 +15,7 @@ func (db *Db) AddToStarboardBlacklist(guildID, channelID string) (err error) {
 		return errors.New("no rows affected")
 	}
 	err = db.RemoveFromGuildCache(guildID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // RemoveFromStarboardBlacklist removes the given channelID from the blacklist for guildID
@@ -31,10 +28,7 @@ func (db *Db) RemoveFromStarboardBlacklist(guildID, channelID string) (err error
 		return errors.New("no rows affected")
 	}
 	err = db.RemoveFromGuildCache(guildID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // InStarboardBlacklist checks if the given channelID is in the blacklist for guildID

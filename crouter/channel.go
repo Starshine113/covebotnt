@@ -11,8 +11,14 @@ import (
 // Send a message to the context channel
 func (ctx *Ctx) Send(arg interface{}) (message *discordgo.Message, err error) {
 	message, err = ctx.SendNoAddXHandler(arg)
+	if err != nil {
+		return
+	}
 	ctx.AddReactionHandlerOnce(message.ID, "❌", func(ctx *Ctx) {
-		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, message.ID)
+		err := ctx.Session.ChannelMessageDelete(ctx.Channel.ID, message.ID)
+		if err != nil {
+			ctx.Bot.Sugar.Errorf("Error deleting message %v: %v", message.ID, err)
+		}
 	})
 	return
 }

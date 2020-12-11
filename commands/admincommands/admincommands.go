@@ -9,14 +9,6 @@ import (
 // Init adds all the commands in this package to the router
 func Init(router *crouter.Router) {
 	router.AddCommand(&crouter.Command{
-		Name:        "Prefix",
-		Description: "Show this server's prefix or change it",
-		Usage:       "[new prefix]",
-		Permissions: crouter.PermLevelAdmin,
-		Command:     Prefix,
-	})
-
-	router.AddCommand(&crouter.Command{
 		Name:            "ModRoles",
 		Aliases:         []string{"ModRole"},
 		Description:     "List/modify this server's mod roles",
@@ -34,6 +26,34 @@ func Init(router *crouter.Router) {
 		Usage:           "[add|remove <role>]",
 		Permissions:     crouter.PermLevelAdmin,
 		Command:         HelperRoles,
+	})
+
+	p := router.AddGroup(&crouter.Group{
+		Name:        "Prefix",
+		Description: "Manage the server's prefixes",
+		Command: &crouter.Command{
+			Name:        "Show",
+			Description: "List the server's prefixes",
+			Permissions: crouter.PermLevelNone,
+			Command:     prefixShow,
+			GuildOnly:   true,
+		},
+	})
+
+	p.AddCommand(&crouter.Command{
+		Name:        "Add",
+		Description: "Add a prefix",
+		Usage:       "<prefix>",
+		Permissions: crouter.PermLevelAdmin,
+		Command:     prefixAdd,
+	})
+
+	p.AddCommand(&crouter.Command{
+		Name:        "Remove",
+		Description: "Remove a prefix",
+		Usage:       "<prefix>",
+		Permissions: crouter.PermLevelAdmin,
+		Command:     prefixRemove,
 	})
 }
 

@@ -44,7 +44,7 @@ func CommandNotes(ctx *crouter.Ctx) (err error) {
 	}
 
 	if len(notes) == 0 {
-		_, err = ctx.SendfNoAddXHandler("**%v** has no log entries.", user.String())
+		_, err = ctx.SendfNoAddXHandler("**%v** has no notes.", user.String())
 		return err
 	}
 

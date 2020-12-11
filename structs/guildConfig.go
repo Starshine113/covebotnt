@@ -2,7 +2,7 @@ package structs
 
 // GuildSettings holds a guild's configuration
 type GuildSettings struct {
-	Prefix     string
+	Prefixes   []string
 	Starboard  StarboardSettings
 	Moderation ModSettings
 	Gatekeeper GatekeeperSettings
