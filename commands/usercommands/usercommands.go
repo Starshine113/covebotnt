@@ -60,6 +60,13 @@ func Init(router *crouter.Router) {
 		GuildOnly:   true,
 	})
 
+	router.AddCommand(&crouter.Command{
+		Name:        "Meow",
+		Description: "Show a random meowmoji",
+		Permissions: crouter.PermLevelNone,
+		Command:     meow,
+	})
+
 	s := router.AddGroup(&crouter.Group{
 		Name:        "Snowflake",
 		Aliases:     []string{"IDTime"},
