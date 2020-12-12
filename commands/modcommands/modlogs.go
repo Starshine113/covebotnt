@@ -101,7 +101,7 @@ func logField(ctx *crouter.Ctx, log *cbdb.ModLogEntry) (field *discordgo.Message
 	}
 
 	return &discordgo.MessageEmbedField{
-		Name:   fmt.Sprintf("#%v | %v | %v", log.ID, log.Type, log.Time.Format("2006-01-02")),
+		Name:   fmt.Sprintf("`%v` | %v | %v", log.Snowflake, log.Type, log.Time.Format("2006-01-02")),
 		Value:  logValue,
 		Inline: false,
 	}

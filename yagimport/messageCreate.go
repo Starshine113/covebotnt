@@ -56,6 +56,7 @@ func (y *yag) process(g string, m *discordgo.MessageCreate, gs structs.GuildSett
 
 	ts, err := discordgo.SnowflakeTimestamp(m.ID)
 	entry.Time = ts
+	entry.Snowflake = y.SnowflakeGen.Get()
 
 	entry, err = y.Pool.AddToModLog(entry)
 	if err != nil {

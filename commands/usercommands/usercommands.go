@@ -60,6 +60,32 @@ func Init(router *crouter.Router) {
 		GuildOnly:   true,
 	})
 
+	s := router.AddGroup(&crouter.Group{
+		Name:        "Snowflake",
+		Aliases:     []string{"IDTime"},
+		Description: "Get a snowflake/ID's timestamp",
+		Command: &crouter.Command{
+			Name: "Discord",
+
+			Description: "Get the timestamps for Discord snowflakes",
+			Usage:       "[...IDs]",
+
+			Permissions: crouter.PermLevelNone,
+			Command:     Snowflake,
+		},
+	})
+
+	s.AddCommand(&crouter.Command{
+		Name:    "CoveBot",
+		Aliases: []string{"CB"},
+
+		Description: "Get the timestamps for CoveBot snowflakes",
+		Usage:       "[...IDs]",
+
+		Permissions: crouter.PermLevelNone,
+		Command:     covebotSnowflake,
+	})
+
 	router.AddCommand(&crouter.Command{
 		Name:        "Snowflake",
 		Aliases:     []string{"IDTime"},

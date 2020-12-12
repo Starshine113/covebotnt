@@ -27,4 +27,19 @@ func Init(router *crouter.Router) {
 		Permissions: crouter.PermLevelOwner,
 		Command:     Guild,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "GetNewID",
+		Aliases:     []string{"GetNewSnowflake", "GetSnowflake"},
+		Description: "Get a new CoveBot snowflake",
+		Permissions: crouter.PermLevelNone,
+		Command:     snowflake,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "FixSnowflakes",
+		Description: "Fix all mod log entries without a snowflake",
+		Permissions: crouter.PermLevelOwner,
+		Command:     fixSnowflakes,
+	})
 }

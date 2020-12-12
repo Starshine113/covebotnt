@@ -13,6 +13,8 @@ github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655 h1:jaOY4gG
 github.com/Starshine113/flagparser v0.0.0-20201102154239-b49fa427b655/go.mod h1:xu7tCzkCWcronW9zn5WQarF/FHplLGEJkAPRNjAOEik=
 github.com/Starshine113/pkgo v0.1.0 h1:1G/kqpbsjZO21L7DgR18U3aVl38rmuwqwCDwmfTA5ic=
 github.com/Starshine113/pkgo v0.1.0/go.mod h1:QCVBagv4HQgZJ0lsTnrejfA1er1iEu5DhKq8gtRyIC0=
+github.com/Starshine113/snowflake v0.2.0 h1:1RFxWvmivFU0rXpAlWXT+CnGpe1ob3Xvu9dzocV/vWs=
+github.com/Starshine113/snowflake v0.2.0/go.mod h1:wF7EwiI447m0O6sCbQ9E8ml1X3CQl4TLy3K72INMh04=
 github.com/burntsushi/toml v0.3.1 h1:XebFhzi1T+XmBZG9aKnQnA50YOydJUYK7g5SM40w+ik=
 github.com/burntsushi/toml v0.3.1/go.mod h1:tCq67G3LEDB9hykA6+KWl2FPEy0nPcvE8TTBhtOtdGs=
 github.com/bwmarrin/discordgo v0.22.0 h1:uBxY1HmlVCsW1IuaPjpCGT6A2DBwRn0nvOguQIxDdFM=

@@ -66,12 +66,13 @@ func LogMute(ctx *crouter.Ctx) (err error) {
 	}
 
 	entry, err := ctx.Database.AddToModLog(&cbdb.ModLogEntry{
-		GuildID: ctx.Message.GuildID,
-		UserID:  member.User.ID,
-		ModID:   ctx.Author.ID,
-		Type:    muteType,
-		Reason:  reason + fmt.Sprintf(" (duration: %v)", duration),
-		Time:    time.Now().UTC(),
+		GuildID:   ctx.Message.GuildID,
+		UserID:    member.User.ID,
+		ModID:     ctx.Author.ID,
+		Type:      muteType,
+		Reason:    reason + fmt.Sprintf(" (duration: %v)", duration),
+		Time:      time.Now().UTC(),
+		Snowflake: ctx.Bot.SnowflakeGen.Get(),
 	})
 	if err != nil {
 		ctx.CommandError(err)

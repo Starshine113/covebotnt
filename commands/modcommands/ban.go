@@ -142,12 +142,13 @@ func Ban(ctx *crouter.Ctx) (err error) {
 	}
 
 	entry, err := ctx.Database.AddToModLog(&cbdb.ModLogEntry{
-		GuildID: ctx.Message.GuildID,
-		UserID:  user.ID,
-		ModID:   ctx.Author.ID,
-		Type:    "ban",
-		Reason:  reason,
-		Time:    time.Now().UTC(),
+		GuildID:   ctx.Message.GuildID,
+		UserID:    user.ID,
+		ModID:     ctx.Author.ID,
+		Type:      "ban",
+		Reason:    reason,
+		Time:      time.Now().UTC(),
+		Snowflake: ctx.Bot.SnowflakeGen.Get(),
 	})
 	if err != nil {
 		ctx.CommandError(err)
