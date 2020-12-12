@@ -31,10 +31,11 @@ func add(ctx *crouter.Ctx) (err error) {
 	}
 
 	t, err := ctx.Database.AddTrigger(&cbdb.Trigger{
-		GuildID:  ctx.Message.GuildID,
-		Creator:  ctx.Author.ID,
-		Trigger:  trigger,
-		Response: response,
+		GuildID:   ctx.Message.GuildID,
+		Creator:   ctx.Author.ID,
+		Trigger:   trigger,
+		Response:  response,
+		Snowflake: ctx.Bot.SnowflakeGen.Get(),
 	})
 	if err != nil {
 		_, err = ctx.CommandError(err)
@@ -46,7 +47,7 @@ func add(ctx *crouter.Ctx) (err error) {
 			Name:    ctx.Author.String(),
 			IconURL: ctx.Author.AvatarURL("128"),
 		},
-		Title:       fmt.Sprintf("Trigger added (ID: %v)", t.ID),
+		Title:       fmt.Sprintf("Trigger added (ID: `%v`)", t.Snowflake),
 		Description: t.Response,
 		Fields: []*discordgo.MessageEmbedField{{
 			Name:   "Trigger",

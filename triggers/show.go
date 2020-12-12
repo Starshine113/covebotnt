@@ -2,7 +2,6 @@ package triggers
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -30,17 +29,16 @@ func show(ctx *crouter.Ctx) (err error) {
 	}
 
 	if len(ctx.Args) > 0 {
-		// try parsing an int
-		if i, err := strconv.Atoi(ctx.Args[0]); err == nil {
-			fmt.Println(i)
+		// check if it's a snowflake
+		if cbdb.Snowflake.MatchString(ctx.Args[0]) {
 			for _, t := range triggers {
-				if t.ID == i {
+				if string(t.Snowflake) == ctx.Args[0] {
 					_, err = ctx.Send(triggerEmbed(t))
 					return err
 				}
 			}
 		}
-		// it's not an int, so...
+		// it's not a snowflake, so...
 		for _, t := range triggers {
 			if strings.ToLower(strings.Join(ctx.Args, " ")) == strings.ToLower(t.Trigger) {
 				_, err = ctx.Send(triggerEmbed(t))
@@ -69,7 +67,7 @@ func show(ctx *crouter.Ctx) (err error) {
 			if t == nil {
 				continue
 			}
-			x = append(x, fmt.Sprintf("%v: `%v`", t.ID, t.Trigger))
+			x = append(x, fmt.Sprintf("`%v`: `%v`", t.Snowflake, t.Trigger))
 		}
 		embeds = append(embeds, &discordgo.MessageEmbed{
 			Title: "Triggers for " + guild.Name,
@@ -98,7 +96,7 @@ func triggerEmbed(t *cbdb.Trigger) *discordgo.MessageEmbed {
 		Color:       0x21a1a8,
 		Timestamp:   t.Modified.UTC().Format(time.RFC3339),
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("ID: %v", t.ID),
+			Text: fmt.Sprintf("ID: %v", t.Snowflake),
 		},
 	}
 }

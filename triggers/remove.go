@@ -1,11 +1,11 @@
 package triggers
 
 import (
-	"fmt"
-	"strconv"
 	"strings"
 
+	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/Starshine113/snowflake"
 )
 
 func remove(ctx *crouter.Ctx) (err error) {
@@ -22,22 +22,25 @@ func remove(ctx *crouter.Ctx) (err error) {
 	}
 
 	var id int
+	var s snowflake.Snowflake
 
-	// try parsing an int
-	if i, err := strconv.Atoi(ctx.Args[0]); err == nil {
-		fmt.Println(i)
+	// check if it's a snowflake
+	if cbdb.Snowflake.MatchString(ctx.Args[0]) {
 		for _, t := range triggers {
-			if t.ID == i {
-				id = i
+			if string(t.Snowflake) == ctx.Args[0] {
+				id = t.ID
+				s = t.Snowflake
 				break
 			}
 		}
-	}
-	// it's not an int, so...
-	for _, t := range triggers {
-		if strings.ToLower(strings.Join(ctx.Args, " ")) == strings.ToLower(t.Trigger) {
-			id = t.ID
-			break
+	} else {
+		// it's not a snowflake, so...
+		for _, t := range triggers {
+			if strings.ToLower(strings.Join(ctx.Args, " ")) == strings.ToLower(t.Trigger) {
+				id = t.ID
+				s = t.Snowflake
+				break
+			}
 		}
 	}
 
@@ -47,6 +50,6 @@ func remove(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	_, err = ctx.Sendf("Removed trigger %v.", id)
+	_, err = ctx.Sendf("Removed trigger `%v`.", s)
 	return
 }

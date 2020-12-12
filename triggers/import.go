@@ -62,7 +62,7 @@ func cmdimport(ctx *crouter.Ctx) (err error) {
 		// check if the trigger replaces one with the same ID
 		var id int
 		for _, x := range triggers {
-			if t.ID == x.ID {
+			if t.Snowflake == x.Snowflake {
 				id = x.ID
 			}
 			if strings.ToLower(t.Trigger) == strings.ToLower(x.Trigger) {
