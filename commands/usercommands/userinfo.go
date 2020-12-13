@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/covebotnt/structs"
 	"github.com/Starshine113/pkgo"
 	"github.com/bwmarrin/discordgo"
 )
@@ -85,8 +84,8 @@ func noMemberInfo(ctx *crouter.Ctx) (err error) {
 func UserInfo(ctx *crouter.Ctx) (err error) {
 	user, err := ctx.ParseMember(ctx.Author.ID)
 	if err != nil {
-		ctx.CommandError(err)
-		return nil
+		_, err = ctx.CommandError(err)
+		return err
 	}
 	if len(ctx.Args) == 1 {
 		user, err = ctx.ParseMember(strings.Join(ctx.Args, " "))
@@ -95,8 +94,8 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 			case *discordgo.RESTError:
 				return noMemberInfo(ctx)
 			default:
-				ctx.CommandError(err)
-				return nil
+				_, err = ctx.CommandError(err)
+				return err
 			}
 		}
 	}
@@ -196,12 +195,9 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 	}
 
 	botPerm := crouter.PermLevelNone
-	botOwners := ctx.AdditionalParams["config"].(structs.BotConfig).Bot.BotOwners
-	helperRoles := ctx.AdditionalParams["guildSettings"].(*structs.GuildSettings).Moderation.HelperRoles
-	modRoles := ctx.AdditionalParams["guildSettings"].(*structs.GuildSettings).Moderation.ModRoles
 
 	for _, r := range rls {
-		for _, helperRole := range helperRoles {
+		for _, helperRole := range ctx.GuildSettings.Moderation.HelperRoles {
 			if r.ID == helperRole {
 				botPerm = crouter.PermLevelHelper
 				break
@@ -209,7 +205,7 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 		}
 	}
 	for _, r := range rls {
-		for _, modRole := range modRoles {
+		for _, modRole := range ctx.GuildSettings.Moderation.ModRoles {
 			if r.ID == modRole {
 				botPerm = crouter.PermLevelHelper
 				break
@@ -219,7 +215,7 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 	if perms&discordgo.PermissionAdministrator == discordgo.PermissionAdministrator {
 		botPerm = crouter.PermLevelAdmin
 	}
-	for _, id := range botOwners {
+	for _, id := range ctx.Cmd.Router.BotOwners {
 		if user.User.ID == id {
 			botPerm = crouter.PermLevelOwner
 		}
@@ -369,7 +365,7 @@ func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName str
 			return highestRoleName, role.Color, perms, rls, nil
 		}
 	}
-	return
+	return highestRoleName, 0, perms, rls, nil
 }
 
 type sortRoleByPos []*discordgo.Role
