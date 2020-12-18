@@ -89,6 +89,14 @@ func (r *Router) Respond(s *discordgo.Session, m *discordgo.MessageCreate) (err 
 
 // Execute actually executes the router
 func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err error) {
+	// handle panics in commands
+	defer func() {
+		if r := recover(); r != nil {
+			ctx.Embed("Panic", fmt.Sprintf("```%v```", r), 0xbf392f)
+			ctx.Bot.Sugar.Errorf("Caught panic in %v (channel ID %v, guild %v): %v", ctx.Command, ctx.Message.ChannelID, ctx.Message.GuildID, r)
+		}
+	}()
+
 	// add the guild settings to the additional parameters
 	ctx.AdditionalParams["guildSettings"] = guildSettings
 	ctx.GuildSettings = guildSettings
