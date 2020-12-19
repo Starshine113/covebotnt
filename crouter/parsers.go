@@ -18,6 +18,14 @@ import (
 
 var idRegex *regexp.Regexp
 
+// Errors for parsing members
+var (
+	ErrMemberNotFound  = errors.New("member not found")
+	ErrChannelNotFound = errors.New("channel not found")
+	ErrRoleNotFound    = errors.New("role not found")
+	ErrNoID            = errors.New("input was not an ID")
+)
+
 func isID(id string) bool {
 	if idRegex == nil {
 		idRegex = regexp.MustCompile("([0-9]{15,})")
@@ -122,4 +130,18 @@ func (ctx *Ctx) ParseMember(member string) (*discordgo.Member, error) {
 	}
 
 	return nil, errors.New("Member not found")
+}
+
+// ParseUser parses a user
+func (ctx *Ctx) ParseUser(user string) (*discordgo.User, error) {
+	if m, err := ctx.ParseMember(user); err == nil {
+		return m.User, nil
+	}
+
+	// try parsing an off-server user
+	if !isID(user) {
+		return nil, ErrNoID
+	}
+
+	return ctx.Session.User(user)
 }
