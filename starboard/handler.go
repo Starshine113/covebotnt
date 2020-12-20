@@ -2,6 +2,7 @@ package starboard
 
 import (
 	"log"
+	"sync"
 
 	"github.com/Starshine113/covebotnt/cbdb"
 	"github.com/Starshine113/covebotnt/wlog"
@@ -12,6 +13,7 @@ import (
 type Sb struct {
 	Sugar *wlog.Wlog
 	Pool  *cbdb.Db
+	mu    sync.Mutex
 }
 
 // ReactionAdd ...
@@ -57,6 +59,10 @@ func (sb *Sb) ReactionAdd(s *discordgo.Session, reaction *discordgo.MessageReact
 	// check reactions
 	for _, messageReaction := range message.Reactions {
 		if messageReaction.Emoji.APIName() == reaction.Emoji.APIName() {
+			// lock mutex to prevent quick starring posting a message twice
+			// do this as late as possible so we don't lock it unneccessarily
+			sb.mu.Lock()
+			defer sb.mu.Unlock()
 			if messageReaction.Count >= gs.Starboard.ReactLimit {
 				err = sb.createOrEditMessage(s, message, reaction.GuildID, messageReaction.Count, messageReaction.Emoji)
 				if err != nil {
@@ -112,6 +118,10 @@ func (sb *Sb) ReactionRemove(s *discordgo.Session, reaction *discordgo.MessageRe
 	// check reactions
 	for _, messageReaction := range message.Reactions {
 		if messageReaction.Emoji.APIName() == reaction.Emoji.APIName() {
+			// lock mutex to prevent quick starring posting a message twice
+			// do this as late as possible so we don't lock it unneccessarily
+			sb.mu.Lock()
+			defer sb.mu.Unlock()
 			if messageReaction.Count >= gs.Starboard.ReactLimit {
 				err = sb.createOrEditMessage(s, message, reaction.GuildID, messageReaction.Count, messageReaction.Emoji)
 				if err != nil {
@@ -131,6 +141,9 @@ func (sb *Sb) ReactionRemove(s *discordgo.Session, reaction *discordgo.MessageRe
 
 // MessageDelete ...
 func (sb *Sb) MessageDelete(s *discordgo.Session, message *discordgo.MessageDelete) {
+	// lock mutex to prevent quick starring posting a message twice
+	sb.mu.Lock()
+	defer sb.mu.Unlock()
 	if m := sb.Pool.GetStarboardEntry(message.ID); m != "" {
 		err := sb.Pool.DeleteStarboardEntry(m)
 		if err != nil {
