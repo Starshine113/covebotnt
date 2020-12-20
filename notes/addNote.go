@@ -27,8 +27,8 @@ func CommandSetNote(ctx *crouter.Ctx) (err error) {
 	}
 
 	note := strings.Join(ctx.Args[1:], " ")
-	if len(note) > 200 {
-		_, err = ctx.Send(fmt.Sprintf("%v This note is too long (maximum 200 characters). Input was %v characters.", crouter.WarnEmoji, len(note)))
+	if len(note) > 800 {
+		_, err = ctx.Send(fmt.Sprintf("%v This note is too long (maximum 800 characters). Input was %v characters.", crouter.WarnEmoji, len(note)))
 		return
 	}
 

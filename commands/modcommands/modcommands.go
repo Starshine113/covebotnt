@@ -48,6 +48,7 @@ func Init(router *crouter.Router) {
 
 	router.AddCommand(&crouter.Command{
 		Name:        "Ban",
+		Aliases:     []string{"HeartfeltConfession"},
 		Description: "Ban users by ID",
 		Usage:       "<user ID> [reason]",
 		Permissions: crouter.PermLevelMod,
