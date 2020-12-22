@@ -67,6 +67,17 @@ func Init(router *crouter.Router) {
 		Command:     meow,
 	})
 
+	router.AddCommand(&crouter.Command{
+		Name:    "Bubble",
+		Aliases: []string{"Pop"},
+
+		Description: "Generate spoilered bubble wrap",
+		Usage:       "[-prepop] [size: 10]",
+
+		Permissions: crouter.PermLevelNone,
+		Command:     bubble,
+	})
+
 	s := router.AddGroup(&crouter.Group{
 		Name:        "Snowflake",
 		Aliases:     []string{"IDTime"},
