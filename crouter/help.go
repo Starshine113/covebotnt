@@ -22,6 +22,10 @@ func (c cmdList) Less(i, j int) bool {
 
 // Invite returns an invite link for the bot
 func (ctx *Ctx) Invite() string {
+	if ctx.Bot.Config.Bot.Invite != "" {
+		return ctx.Bot.Config.Bot.Invite
+	}
+
 	// perms is the list of permissions the bot will be granted by default
 	var perms = discordgo.PermissionReadMessages +
 		discordgo.PermissionReadMessageHistory +
@@ -35,7 +39,7 @@ func (ctx *Ctx) Invite() string {
 		discordgo.PermissionAddReactions +
 		discordgo.PermissionCreateInstantInvite
 
-	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&redirect_uri=https%%3A%%2F%%2Fstarshines.xyz%%2Fcovebot%%2Fsetup.html&response_type=code&scope=bot%%20identify", ctx.BotUser.ID, perms)
+	return fmt.Sprintf("https://discord.com/api/oauth2/authorize?client_id=%v&permissions=%v&response_type=code&scope=bot", ctx.BotUser.ID, perms)
 }
 
 // Help is the help command
