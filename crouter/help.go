@@ -272,10 +272,15 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 
 	embeds := make([]*discordgo.MessageEmbed, 0)
 
+	invite := ctx.Bot.Config.Bot.Invite
+	if invite == "" {
+		invite = fmt.Sprintf("Invite the bot with [this](%v) link", ctx.Invite())
+	}
+
 	fields := []*discordgo.MessageEmbedField{
 		{
 			Name:   "Invite",
-			Value:  fmt.Sprintf("Invite the bot with [this](%v) link.", ctx.Invite()),
+			Value:  invite,
 			Inline: false,
 		},
 		{

@@ -19,6 +19,11 @@ func about(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
+	invite := ctx.Bot.Config.Bot.Invite
+	if invite == "" {
+		invite = fmt.Sprintf("[Invite link](%v)", ctx.Invite())
+	}
+
 	embed := &discordgo.MessageEmbed{
 		Title: "About",
 		Color: 0x21a1a8,
@@ -58,7 +63,7 @@ func about(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Invite",
-				Value:  fmt.Sprintf("[Invite link](%v)", ctx.Invite()),
+				Value:  invite,
 				Inline: true,
 			},
 			{
