@@ -113,11 +113,6 @@ func (r *Router) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err er
 			} else {
 				ctx.Command = ctx.Args[0]
 			}
-			if len(ctx.Args) > 1 {
-				ctx.Args = ctx.Args[1:]
-			} else {
-				ctx.Args = []string{}
-			}
 			err = g.Execute(ctx, guildSettings)
 			return
 		}

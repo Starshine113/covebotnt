@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/Starshine113/covebotnt/etc"
 	"github.com/Starshine113/covebotnt/structs"
 )
 
@@ -122,6 +123,13 @@ func (g *Group) Execute(ctx *Ctx, guildSettings *structs.GuildSettings) (err err
 				if err != nil {
 					return err
 				}
+			}
+			if len(ctx.Args) > 1 {
+				ctx.Args = ctx.Args[1:]
+				ctx.RawArgs = etc.TrimPrefixesSpace(ctx.RawArgs, ctx.Command)
+			} else {
+				ctx.Args = []string{}
+				ctx.RawArgs = ""
 			}
 			err = cmd.Command(ctx)
 			return
