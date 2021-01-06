@@ -16,7 +16,7 @@ func (w *Wlog) Flush() {
 	}
 	if w.urls.DebugURL != "" {
 		w.debugMu.Lock()
-		if len(w.infoBuffer) > 2 {
+		if len(w.infoBuffer) > 0 {
 			w.send(w.urls.DebugURL, "Debug", w.debugBuffer...)
 			w.debugBuffer = make([]dwhook.Embed, 0)
 		}
