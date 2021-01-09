@@ -6,26 +6,22 @@ import (
 	"strings"
 
 	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/flagparser"
 	"github.com/bwmarrin/discordgo"
+	flag "github.com/spf13/pflag"
 )
 
 // Echo says whatever the user inputs through the bot
 func Echo(ctx *crouter.Ctx) (err error) {
-	channelID := ctx.Message.ChannelID
+	fs := flag.NewFlagSet("flags", flag.ContinueOnError)
+	delete := fs.BoolP("delete", "d", false, "Whether or not to automatically delete the command")
+	out := fs.StringP("channel", "c", "", "The channel to send the output to")
 
-	flagParser, err := flagparser.NewFlagParser(flagparser.String("channel", "chan", "ch"))
+	err = fs.Parse(ctx.Args)
 	if err != nil {
-		ctx.CommandError(err)
-		return nil
+		_, err = ctx.CommandError(err)
+		return err
 	}
-
-	processedArgs, err := flagParser.Parse(ctx.Args)
-	if err != nil {
-		ctx.CommandError(err)
-		return nil
-	}
-	ctx.Args = processedArgs["rest"].([]string)
+	ctx.Args = fs.Args()
 
 	if len(ctx.Args) == 0 && len(ctx.Message.Attachments) == 0 {
 		_, err = ctx.CommandError(&crouter.ErrorNotEnoughArgs{
@@ -34,9 +30,13 @@ func Echo(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	// check if the user supplied a -channel argument
-	if processedArgs["channel"].(string) != "" {
-		channel, err := ctx.ParseChannel(processedArgs["channel"].(string))
+	if *delete {
+		ctx.Session.ChannelMessageDelete(ctx.Channel.ID, ctx.Message.ID)
+	}
+
+	// check if the user supplied a channel
+	if *out != "" {
+		channel, err := ctx.ParseChannel(*out)
 		if err != nil {
 			_, err = ctx.CommandError(err)
 			return nil
@@ -45,10 +45,12 @@ func Echo(ctx *crouter.Ctx) (err error) {
 			_, err = ctx.CommandError(errors.New("you cannot echo messages into a channel in a different server"))
 			return nil
 		}
-		channelID = channel.ID
+		*out = channel.ID
+	} else {
+		*out = ctx.Channel.ID
 	}
 
-	err = ctx.Session.ChannelTyping(channelID)
+	err = ctx.Session.ChannelTyping(*out)
 	if err != nil {
 		return err
 	}
@@ -81,7 +83,7 @@ func Echo(ctx *crouter.Ctx) (err error) {
 
 	message := strings.Join(ctx.Args, " ")
 
-	_, err = ctx.Session.ChannelMessageSendComplex(channelID, &discordgo.MessageSend{
+	_, err = ctx.Session.ChannelMessageSendComplex(*out, &discordgo.MessageSend{
 		Content:         message,
 		AllowedMentions: m,
 		Files:           attachments,
@@ -91,8 +93,8 @@ func Echo(ctx *crouter.Ctx) (err error) {
 	}
 
 	ctx.React(crouter.SuccessEmoji)
-	if channelID != ctx.Message.ChannelID {
-		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, crouter.SuccessEmoji+" Sent message to <#"+channelID+">")
+	if *out != ctx.Message.ChannelID {
+		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, crouter.SuccessEmoji+" Sent message to <#"+*out+">")
 		if err != nil {
 			return err
 		}
