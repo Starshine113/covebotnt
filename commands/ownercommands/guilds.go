@@ -44,7 +44,7 @@ func Guild(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	guild, err := ctx.Session.Guild(ctx.Args[0])
+	guild, err := ctx.Session.State.Guild(ctx.Args[0])
 	if err != nil {
 		_, err = ctx.CommandError(err)
 		return err
