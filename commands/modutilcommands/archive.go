@@ -7,8 +7,9 @@ import (
 	"fmt"
 
 	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/flagparser"
 	"github.com/bwmarrin/discordgo"
+
+	flag "github.com/spf13/pflag"
 )
 
 type arc struct {
@@ -40,29 +41,31 @@ type author struct {
 func Archive(ctx *crouter.Ctx) (err error) {
 	archive := arc{InvokedBy: ctx.Author, Channel: ctx.Channel}
 
-	fp, _ := flagparser.NewFlagParser(flagparser.Bool("gzip", "gz"), flagparser.String("out", "o", "output"))
+	fs := flag.NewFlagSet("flags", flag.ContinueOnError)
+	gz := fs.BoolP("gzip", "x", false, "Whether or not to compress the output")
+	out := fs.StringP("output", "o", ctx.Channel.ID, "The channel to send the output to")
 
-	args, err := fp.Parse(ctx.Args)
+	if len(ctx.Args) == 0 {
+		_, err = ctx.SendfNoAddXHandler("```Usage:\n%v```", fs.FlagUsages())
+		return err
+	}
+
+	err = fs.Parse(ctx.Args)
 	if err != nil {
 		_, err = ctx.CommandError(err)
 		return err
 	}
-	var gz bool
-	if args["gzip"].(bool) {
-		gz = true
-	}
-	out := ctx.Channel.ID
-	if args["out"].(string) != "" {
-		channel, err := ctx.ParseChannel(args["out"].(string))
+	if *out != ctx.Channel.ID {
+		c, err := ctx.ParseChannel(*out)
 		if err != nil {
 			_, err = ctx.CommandError(err)
 			return err
 		}
-		out = channel.ID
+		*out = c.ID
 	}
 
 	ctx.Send("Working, please wait...")
-	if err = ctx.Session.ChannelTyping(out); err != nil {
+	if err = ctx.Session.ChannelTyping(*out); err != nil {
 		return err
 	}
 
@@ -108,7 +111,7 @@ func Archive(ctx *crouter.Ctx) (err error) {
 	fn := fmt.Sprintf("export-%v-%v.json", ctx.Channel.Name, ctx.Message.Timestamp)
 
 	var buf *bytes.Buffer
-	if gz {
+	if *gz {
 		buf = new(bytes.Buffer)
 		zw := gzip.NewWriter(buf)
 		zw.Name = fn
@@ -132,7 +135,7 @@ func Archive(ctx *crouter.Ctx) (err error) {
 		Reader: buf,
 	}
 
-	_, err = ctx.Session.ChannelMessageSendComplex(out, &discordgo.MessageSend{
+	_, err = ctx.Session.ChannelMessageSendComplex(*out, &discordgo.MessageSend{
 		Content: fmt.Sprintf("Done!\n> Archive of %v (#%v), invoked by %v at %v.", ctx.Channel.Mention(), ctx.Channel.Name, ctx.Author.String(), ctx.Message.Timestamp),
 		Files:   []*discordgo.File{&file},
 		AllowedMentions: &discordgo.MessageAllowedMentions{

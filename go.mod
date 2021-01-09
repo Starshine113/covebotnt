@@ -14,6 +14,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx/v4 v4.9.0
 	github.com/pelletier/go-toml v1.8.1
+	github.com/spf13/pflag v1.0.5
 	go.etcd.io/bbolt v1.3.5
 	go.uber.org/zap v1.10.0
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect

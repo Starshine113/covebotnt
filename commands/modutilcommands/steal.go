@@ -11,6 +11,9 @@ import (
 	"github.com/Starshine113/covebotnt/crouter"
 )
 
+var emojiMatch = regexp.MustCompile("<(?P<animated>a)?:(?P<name>\\w+):(?P<emoteID>\\d{15,})>")
+var nameRegex = regexp.MustCompile("[\\w\\d]{2,32}")
+
 // Steal adds an emote by URL/ID
 func Steal(ctx *crouter.Ctx) (err error) {
 	if err = ctx.CheckArgRange(1, 2); err != nil {
@@ -21,7 +24,6 @@ func Steal(ctx *crouter.Ctx) (err error) {
 	var url string = ctx.Args[0]
 	var name string
 
-	emojiMatch, _ := regexp.Compile("<(?P<animated>a)?:(?P<name>\\w+):(?P<emoteID>\\d{15,})>")
 	if emojiMatch.MatchString(ctx.Args[0]) {
 		extension := ".png"
 		groups := emojiMatch.FindStringSubmatch(ctx.Args[0])
@@ -34,6 +36,21 @@ func Steal(ctx *crouter.Ctx) (err error) {
 
 	if len(ctx.Args) == 2 {
 		name = ctx.Args[1]
+	}
+
+	if !nameRegex.MatchString(name) {
+		_, err = ctx.UsageEmbed("Name must be between 2 and 32 characters long, and only contain alphanumeric characters and underscores.", "")
+		return
+	}
+
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+		_, err = ctx.UsageEmbed("Invalid URL (or you put the name and URL in the wrong order). A valid URL starts with `http://` or `https://`.", "")
+		return
+	}
+
+	if !strings.Contains(url, ".gif") && !strings.Contains(url, ".png") && !strings.Contains(url, ".jpg") && !strings.Contains(url, ".jpeg") {
+		_, err = ctx.UsageEmbed("The given URL doesn't point to an image (should end with .png or .gif).", "")
+		return
 	}
 
 	resp, err := http.Get(url)

@@ -20,6 +20,13 @@ func updateStatus(s *discordgo.Session) (err error) {
 		err = s.UpdateListeningStatus(config.Bot.CustomStatus.Status)
 	case "playing":
 		err = s.UpdateStatus(0, config.Bot.CustomStatus.Status)
+	case "watching":
+		err = s.UpdateStatusComplex(discordgo.UpdateStatusData{
+			Game: &discordgo.Game{
+				Name: config.Bot.CustomStatus.Status,
+				Type: discordgo.GameTypeWatching,
+			},
+		})
 	default:
 		return nil
 	}

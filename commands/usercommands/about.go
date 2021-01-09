@@ -58,7 +58,7 @@ func about(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Memory usage",
-				Value:  fmt.Sprintf("%v MB", m.TotalAlloc/1024/1024),
+				Value:  fmt.Sprintf("%v MB", (m.Alloc)/1024/1024),
 				Inline: true,
 			},
 			{

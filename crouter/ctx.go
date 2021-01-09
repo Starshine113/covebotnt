@@ -2,6 +2,7 @@ package crouter
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/ReneKroon/ttlcache/v2"
@@ -84,4 +85,30 @@ func Context(prefixes []string, messageContent string, m *discordgo.MessageCreat
 	ctx.BotUser = botUser
 
 	return ctx, nil
+}
+
+// Usage returns the usage string for a command
+func (ctx *Ctx) Usage() string {
+	return ctx.GuildPrefix + ctx.Command + " " + ctx.Cmd.Usage
+}
+
+// UsageEmbed ...
+func (ctx *Ctx) UsageEmbed(msg, usage string) (*discordgo.Message, error) {
+	if usage == "" {
+		usage = ctx.Usage()
+	}
+	s := &discordgo.MessageSend{
+		Content: fmt.Sprintf("%v %v", ErrorEmoji, msg),
+		AllowedMentions: &discordgo.MessageAllowedMentions{
+			Parse: []discordgo.AllowedMentionType{
+				discordgo.AllowedMentionTypeUsers,
+			},
+		},
+		Embed: &discordgo.MessageEmbed{
+			Title:       "Usage",
+			Description: "```" + usage + "```",
+			Color:       0x21a1a8,
+		},
+	}
+	return ctx.SendNoAddXHandler(s)
 }

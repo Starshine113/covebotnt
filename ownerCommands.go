@@ -21,10 +21,12 @@ func commandSetStatus(ctx *crouter.Ctx) (err error) {
 
 	// check the first arg
 	switch ctx.Args[0] {
-	case "listening", "listening to":
+	case "listening":
 		config.Bot.CustomStatus.Type = "listening"
 	case "playing":
 		config.Bot.CustomStatus.Type = "playing"
+	case "watching":
+		config.Bot.CustomStatus.Type = "watching"
 	default:
 		fallthrough
 	case "clear":
