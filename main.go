@@ -21,6 +21,7 @@ import (
 	"github.com/Starshine113/covebotnt/starboard"
 	"github.com/Starshine113/covebotnt/structs"
 	"github.com/Starshine113/covebotnt/triggers"
+	"github.com/Starshine113/covebotnt/watchlist"
 	"github.com/Starshine113/covebotnt/wlog"
 	"github.com/Starshine113/covebotnt/yagimport"
 	"github.com/bwmarrin/discordgo"
@@ -140,6 +141,7 @@ func main() {
 	notes.Init(router)
 	triggers.Init(router)
 	yagimport.Init(router)
+	watchlist.Init(router, pool, sugar)
 
 	addStarboardCommands()
 	addGkCommands()

@@ -5,3 +5,4 @@ covebotnt
 *.db
 *.pgsql
 export-*
+.idea

@@ -47,6 +47,8 @@ func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) 
 		gatekeeperChannel, welcomeChannel string
 		gatekeeperMessage, welcomeMessage string
 
+		watchlistChannel string
+
 		yagLog     string
 		yagEnabled bool
 	)
@@ -58,14 +60,14 @@ func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) 
 	g.pause_role, g.gatekeeper_roles, g.member_roles,
 	g.gatekeeper_channel, g.gatekeeper_message,
 	g.welcome_channel, g.welcome_message,
-	y.log_channel, y.enabled
+	y.log_channel, y.enabled, g.watchlist_channel
 	from public.guild_settings as g, public.yag_import as y
 	where g.guild_id=$1 and y.guild_id = $1`, g)
 
 	err = row.Scan(&prefixes, &starboardChannel, &reactLimit, &emoji, &senderCanReact, &reactToStarboard,
 		&modRoles, &helperRoles, &modLog, &muteRole, &pauseRole,
 		&gatekeeperRoles, &memberRoles, &gatekeeperChannel,
-		&gatekeeperMessage, &welcomeChannel, &welcomeMessage, &yagLog, &yagEnabled)
+		&gatekeeperMessage, &welcomeChannel, &welcomeMessage, &yagLog, &yagEnabled, &watchlistChannel)
 	if err != nil {
 		return s, err
 	}
@@ -93,6 +95,7 @@ func (db *Db) GetDBGuildSettings(g string) (s structs.GuildSettings, err error) 
 			GatekeeperMessage: gatekeeperMessage,
 			WelcomeChannel:    welcomeChannel,
 			WelcomeMessage:    welcomeMessage,
+			WatchlistChannel:  watchlistChannel,
 		},
 		YAG: structs.YAGImport{
 			Channel: yagLog,

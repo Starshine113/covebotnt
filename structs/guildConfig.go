@@ -41,4 +41,6 @@ type GatekeeperSettings struct {
 	GatekeeperMessage string
 	WelcomeChannel    string
 	WelcomeMessage    string
+
+	WatchlistChannel string
 }

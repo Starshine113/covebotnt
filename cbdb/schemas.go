@@ -1,7 +1,7 @@
 package cbdb
 
 // DBVersion is the current database version
-const DBVersion = 11
+const DBVersion = 12
 
 // DBVersions is a slice of schemas for every database version
 var DBVersions []string = []string{
@@ -77,6 +77,11 @@ var DBVersions []string = []string{
 	`alter table public.triggers add column snowflake text unique;
 
 	update public.info set schema_version = 11;`,
+
+	`alter table public.guild_settings add column watchlist text[] not null default array[]::text[];
+	alter table public.guild_settings add column watchlist_channel text not null default '';
+	
+	update public.info set schema_version = 12`,
 }
 
 // initDBSql is the initial SQL database schema
