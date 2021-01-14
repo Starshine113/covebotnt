@@ -14,6 +14,11 @@ var meows = []string{"350320411617263618", "350401541066194954", "35045277592426
 func meow(ctx *crouter.Ctx) (err error) {
 	r := meows[rand.Intn(len(meows)-1)]
 
+	// :fortheloveofgodfiremenow:
+	if n := rand.Intn(10000); n == 500 {
+		r = "770361452975489146"
+	}
+
 	url := fmt.Sprintf("https://cdn.discordapp.com/emojis/%v.png", r)
 	resp, err := http.Get(url)
 	if err != nil {
