@@ -99,10 +99,10 @@ func watchlist(ctx *crouter.Ctx) (err error) {
 		x += fmt.Sprintf("<@%v>\n", c)
 	}
 	if len(b) == 0 {
-		x = "No channels are blacklisted."
+		x = "There are no users on the watch list."
 	}
 	_, err = ctx.Send(&discordgo.MessageEmbed{
-		Title:       "Channel blacklist",
+		Title:       "Users on watch list",
 		Description: x,
 	})
 	return err

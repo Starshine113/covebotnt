@@ -23,9 +23,9 @@ func (uh *uh) onJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 
 	if guildConf.Gatekeeper.WatchlistChannel != "" {
 		_, err = s.ChannelMessageSendEmbed(guildConf.Gatekeeper.WatchlistChannel, &discordgo.MessageEmbed{
-			Title:       "Person on watchlist joined",
+			Title:       "⚠ Person on watchlist joined",
 			Description: fmt.Sprintf("%v (%v/%v) just joined the server and is on the watchlist.", m.User.Mention(), m.User.String(), m.User.ID),
-			Color:       0xc1321f,
+			Color:       0xeaa402,
 		})
 		if err != nil {
 			uh.sugar.Errorf("Error sending message: %v", err)
