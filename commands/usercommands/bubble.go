@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/flagparser"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/flagparser"
 )
 
 func bubble(ctx *crouter.Ctx) (err error) {

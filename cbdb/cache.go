@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/structs"
 )
 
 // GetGuildSettings gets the guild settings for a specific guild

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 	flag "github.com/spf13/pflag"
 )

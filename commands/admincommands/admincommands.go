@@ -3,7 +3,7 @@ package admincommands
 import (
 	"fmt"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 // Init adds all the commands in this package to the router

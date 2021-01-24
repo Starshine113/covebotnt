@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 func commandKill(ctx *crouter.Ctx) (err error) {

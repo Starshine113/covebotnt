@@ -1,6 +1,6 @@
 package modcommands
 
-import "github.com/Starshine113/covebotnt/crouter"
+import "github.com/starshine-sys/covebotnt/crouter"
 
 // Init adds all the commands from this package to the router
 func Init(router *crouter.Router) {

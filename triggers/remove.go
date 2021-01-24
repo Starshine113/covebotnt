@@ -3,9 +3,9 @@ package triggers
 import (
 	"strings"
 
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/snowflake"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/snowflake"
 )
 
 func remove(ctx *crouter.Ctx) (err error) {

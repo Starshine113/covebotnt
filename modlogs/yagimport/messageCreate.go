@@ -3,8 +3,8 @@ package yagimport
 import (
 	"regexp"
 
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 

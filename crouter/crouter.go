@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/covebotnt/bot"
+	"github.com/starshine-sys/covebotnt/bot"
 	"github.com/bwmarrin/discordgo"
 )
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 func cmdimport(ctx *crouter.Ctx) (err error) {

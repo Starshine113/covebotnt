@@ -1,8 +1,8 @@
 package yagimport
 
 import (
-	"github.com/Starshine113/covebotnt/bot"
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/bot"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 type yag struct {

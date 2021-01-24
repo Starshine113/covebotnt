@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 

@@ -1,7 +1,7 @@
 package modcommands
 
 import (
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 // BGC is a combination command that runs UserInfo, Notes, and ModLogs for the specified user

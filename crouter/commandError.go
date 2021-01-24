@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"codeberg.org/eviedelta/dwhook"
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
 )

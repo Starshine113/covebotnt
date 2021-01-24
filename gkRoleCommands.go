@@ -1,6 +1,6 @@
 package main
 
-import "github.com/Starshine113/covebotnt/crouter"
+import "github.com/starshine-sys/covebotnt/crouter"
 
 func commandGkRoles(ctx *crouter.Ctx) (err error) {
 	if len(ctx.Args) < 1 {

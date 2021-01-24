@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -290,7 +290,7 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 		},
 		{
 			Name:   "Source code",
-			Value:  "CoveBotn't is licensed under the GNU AGPLv3. The source code can be found [here](https://github.com/Starshine113/covebotnt).",
+			Value:  "CoveBotn't is licensed under the GNU AGPLv3. The source code can be found [here](https://github.com/starshine-sys/covebotnt).",
 			Inline: false,
 		},
 	}

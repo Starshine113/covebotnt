@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/commands/usercommands"
-	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/covebotnt/structs"
-	"github.com/Starshine113/flagparser"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/commands/usercommands"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/structs"
+	"github.com/starshine-sys/flagparser"
 	"github.com/bwmarrin/discordgo"
 )
 

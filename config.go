@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/structs"
 )
 
 func getConfig() (config structs.BotConfig, err error) {

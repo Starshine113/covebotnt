@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Starshine113/snowflake"
+	"github.com/starshine-sys/snowflake"
 )
 
 // Trigger ...

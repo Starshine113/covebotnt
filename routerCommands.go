@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Starshine113/covebotnt/commands/modcommands"
-	"github.com/Starshine113/covebotnt/commands/modutilcommands"
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/commands/modcommands"
+	"github.com/starshine-sys/covebotnt/commands/modutilcommands"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 func addStarboardCommands() {

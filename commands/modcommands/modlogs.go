@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/crouter"
 
 	"github.com/bwmarrin/discordgo"
 )

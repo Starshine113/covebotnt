@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 func prefixShow(ctx *crouter.Ctx) (err error) {

@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/structs"
-	"github.com/Starshine113/covebotnt/wlog"
-	"github.com/Starshine113/snowflake"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/wlog"
+	"github.com/starshine-sys/snowflake"
 	"github.com/bwmarrin/discordgo"
 )
 

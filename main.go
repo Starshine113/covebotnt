@@ -9,21 +9,22 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/covebotnt/bot"
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/commands/admincommands"
-	"github.com/Starshine113/covebotnt/commands/modcommands"
-	"github.com/Starshine113/covebotnt/commands/modutilcommands"
-	"github.com/Starshine113/covebotnt/commands/ownercommands"
-	"github.com/Starshine113/covebotnt/commands/usercommands"
-	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/covebotnt/notes"
-	"github.com/Starshine113/covebotnt/starboard"
-	"github.com/Starshine113/covebotnt/structs"
-	"github.com/Starshine113/covebotnt/triggers"
-	"github.com/Starshine113/covebotnt/watchlist"
-	"github.com/Starshine113/covebotnt/wlog"
-	"github.com/Starshine113/covebotnt/yagimport"
+	"github.com/starshine-sys/covebotnt/bot"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/commands/admincommands"
+	"github.com/starshine-sys/covebotnt/commands/modcommands"
+	"github.com/starshine-sys/covebotnt/commands/modutilcommands"
+	"github.com/starshine-sys/covebotnt/commands/ownercommands"
+	"github.com/starshine-sys/covebotnt/commands/usercommands"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/modlogs/carl"
+	"github.com/starshine-sys/covebotnt/modlogs/yagimport"
+	"github.com/starshine-sys/covebotnt/notes"
+	"github.com/starshine-sys/covebotnt/starboard"
+	"github.com/starshine-sys/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/triggers"
+	"github.com/starshine-sys/covebotnt/watchlist"
+	"github.com/starshine-sys/covebotnt/wlog"
 	"github.com/bwmarrin/discordgo"
 	bolt "go.etcd.io/bbolt"
 )
@@ -141,6 +142,7 @@ func main() {
 	notes.Init(router)
 	triggers.Init(router)
 	yagimport.Init(router)
+	carl.Init(router)
 	watchlist.Init(router, pool, sugar)
 
 	addStarboardCommands()

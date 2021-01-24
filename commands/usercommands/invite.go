@@ -1,7 +1,7 @@
 package usercommands
 
 import (
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 // Invite sends an invite link for the bot

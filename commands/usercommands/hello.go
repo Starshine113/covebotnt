@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 const pkAPIversion = 1

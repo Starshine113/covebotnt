@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Starshine113/covebotnt/etc"
+	"github.com/starshine-sys/covebotnt/etc"
 )
 
 // MatchPrefix checks if the message matched any prefix

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/covebotnt/etc"
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/etc"
+	"github.com/starshine-sys/covebotnt/structs"
 )
 
 // Group is a group of subcommands

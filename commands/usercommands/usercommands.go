@@ -3,7 +3,7 @@ package usercommands
 import (
 	"time"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 // Init adds all the commands from this package to the router

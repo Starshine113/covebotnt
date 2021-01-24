@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/Starshine113/covebotnt/bot"
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/etc"
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/bot"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/etc"
+	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 

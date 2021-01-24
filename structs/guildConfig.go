@@ -7,12 +7,20 @@ type GuildSettings struct {
 	Moderation ModSettings
 	Gatekeeper GatekeeperSettings
 	YAG        YAGImport
+	Carl       CarlImport
 }
 
 // YAGImport holds the settings for importing mod logs from YAGPDB
 type YAGImport struct {
 	Channel string
 	Enabled bool
+}
+
+// CarlImport ...
+type CarlImport struct {
+	LogChannel string
+	Enabled    bool
+	Prefix     string
 }
 
 // StarboardSettings holds the starboard settings

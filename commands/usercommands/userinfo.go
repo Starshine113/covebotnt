@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/crouter"
-	"github.com/Starshine113/pkgo"
 	"github.com/bwmarrin/discordgo"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/pkgo"
 )
 
 // PKUserInfo runs UserInfo with the user ID returned by
@@ -23,14 +23,12 @@ func PKUserInfo(ctx *crouter.Ctx) (err error) {
 
 	msg, err := s.GetMessage(ctx.Args[0])
 	if err != nil {
-		switch err.(type) {
-		case *pkgo.ErrMsgNotFound:
+		if err == pkgo.ErrMsgNotFound {
 			_, err = ctx.Sendf("%v Message with ID `%v` not found by PK. Are you sure this message was proxied and hasn't been deleted?", crouter.ErrorEmoji, ctx.Args[0])
 			return err
-		default:
-			_, err = ctx.CommandError(err)
-			return err
 		}
+		_, err = ctx.CommandError(err)
+		return err
 	}
 
 	ctx.Args = []string{msg.Sender}
@@ -139,6 +137,9 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 	}
 	if perms&discordgo.PermissionManageChannels == discordgo.PermissionManageChannels {
 		permStrings = append(permStrings, "Manage Channels")
+	}
+	if perms&discordgo.PermissionManageWebhooks == discordgo.PermissionManageWebhooks {
+		permStrings = append(permStrings, "Manage Webhooks")
 	}
 	if perms&discordgo.PermissionManageRoles == discordgo.PermissionManageRoles {
 		permStrings = append(permStrings, "Manage Roles")

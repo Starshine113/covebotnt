@@ -1,7 +1,7 @@
 package crouter
 
 import (
-	"github.com/Starshine113/covebotnt/structs"
+	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
 )
 

@@ -4,7 +4,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 // MajorityOf gives the majority of the given number, with optional abstains

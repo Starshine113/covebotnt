@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
 )
 

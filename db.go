@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Starshine113/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/cbdb"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 

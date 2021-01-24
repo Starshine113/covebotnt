@@ -1,6 +1,6 @@
 package modutilcommands
 
-import "github.com/Starshine113/covebotnt/crouter"
+import "github.com/starshine-sys/covebotnt/crouter"
 
 // StarboardSenderCanReactToggle ...
 func StarboardSenderCanReactToggle(ctx *crouter.Ctx) (err error) {

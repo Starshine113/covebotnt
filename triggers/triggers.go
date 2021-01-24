@@ -1,6 +1,6 @@
 package triggers
 
-import "github.com/Starshine113/covebotnt/crouter"
+import "github.com/starshine-sys/covebotnt/crouter"
 
 // Init adds this package's commands to the router
 func Init(router *crouter.Router) {

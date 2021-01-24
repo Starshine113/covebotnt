@@ -3,7 +3,7 @@ package ownercommands
 import (
 	"context"
 
-	"github.com/Starshine113/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/jackc/pgx/v4"
 )
 

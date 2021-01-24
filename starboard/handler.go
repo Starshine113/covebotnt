@@ -4,8 +4,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/Starshine113/covebotnt/cbdb"
-	"github.com/Starshine113/covebotnt/wlog"
+	"github.com/starshine-sys/covebotnt/cbdb"
+	"github.com/starshine-sys/covebotnt/wlog"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -68,15 +68,26 @@ func (sb *Sb) ReactionAdd(s *discordgo.Session, reaction *discordgo.MessageReact
 				if err != nil {
 					sb.Sugar.Errorf("Error creating/editing starboard message for %v: %v", message.ID, err)
 				}
+				return
 			} else if messageReaction.Count < gs.Starboard.ReactLimit {
 				if m := sb.Pool.GetStarboardEntry(message.ID); m != "" {
 					err := sb.deleteStarboardMessage(s, m, reaction.GuildID)
 					if err != nil {
 						sb.Sugar.Errorf("Error deleting message: %v", err)
 					}
+					return
 				}
 			}
 		}
+	}
+
+	// there were no star reacts, so delete the message
+	if m := sb.Pool.GetStarboardEntry(message.ID); m != "" {
+		err := sb.deleteStarboardMessage(s, m, reaction.GuildID)
+		if err != nil {
+			sb.Sugar.Errorf("Error deleting message: %v", err)
+		}
+		return
 	}
 }
 
@@ -127,15 +138,26 @@ func (sb *Sb) ReactionRemove(s *discordgo.Session, reaction *discordgo.MessageRe
 				if err != nil {
 					sb.Sugar.Errorf("Error creating/editing starboard message for %v: %v", message.ID, err)
 				}
+				return
 			} else if messageReaction.Count < gs.Starboard.ReactLimit {
 				if m := sb.Pool.GetStarboardEntry(message.ID); m != "" {
 					err := sb.deleteStarboardMessage(s, m, reaction.GuildID)
 					if err != nil {
 						sb.Sugar.Errorf("Error deleting message: %v", err)
 					}
+					return
 				}
 			}
 		}
+	}
+
+	// there were no star reacts, so delete the message
+	if m := sb.Pool.GetStarboardEntry(message.ID); m != "" {
+		err := sb.deleteStarboardMessage(s, m, reaction.GuildID)
+		if err != nil {
+			sb.Sugar.Errorf("Error deleting message: %v", err)
+		}
+		return
 	}
 }
 
