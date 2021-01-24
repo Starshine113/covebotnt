@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 func commandGkChannel(ctx *crouter.Ctx) (err error) {
@@ -19,6 +19,20 @@ func commandGkChannel(ctx *crouter.Ctx) (err error) {
 		})
 		return
 	}
+	if ctx.Args[0] == "-clear" {
+		err = ctx.Database.SetGatekeeperChannel(ctx.Message.GuildID, "")
+		if err != nil {
+			ctx.CommandError(err)
+			return nil
+		}
+		err = ctx.Database.RemoveFromGuildCache(ctx.Message.GuildID)
+		if err != nil {
+			return err
+		}
+		_, err = ctx.Send("Cleared the gatekeeper channel.")
+		return
+	}
+
 	channel, err := ctx.ParseChannel(strings.Join(ctx.Args, " "))
 	if err != nil {
 		ctx.CommandError(err)
