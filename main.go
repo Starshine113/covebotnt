@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/bwmarrin/discordgo"
 	"github.com/starshine-sys/covebotnt/bot"
 	"github.com/starshine-sys/covebotnt/cbdb"
 	"github.com/starshine-sys/covebotnt/commands/admincommands"
@@ -17,7 +18,6 @@ import (
 	"github.com/starshine-sys/covebotnt/commands/ownercommands"
 	"github.com/starshine-sys/covebotnt/commands/usercommands"
 	"github.com/starshine-sys/covebotnt/crouter"
-	"github.com/starshine-sys/covebotnt/modlogs/carl"
 	"github.com/starshine-sys/covebotnt/modlogs/yagimport"
 	"github.com/starshine-sys/covebotnt/notes"
 	"github.com/starshine-sys/covebotnt/starboard"
@@ -25,7 +25,6 @@ import (
 	"github.com/starshine-sys/covebotnt/triggers"
 	"github.com/starshine-sys/covebotnt/watchlist"
 	"github.com/starshine-sys/covebotnt/wlog"
-	"github.com/bwmarrin/discordgo"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -142,7 +141,6 @@ func main() {
 	notes.Init(router)
 	triggers.Init(router)
 	yagimport.Init(router)
-	carl.Init(router)
 	watchlist.Init(router, pool, sugar)
 
 	addStarboardCommands()
