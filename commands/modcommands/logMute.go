@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/starshine-sys/covebotnt/cbdb"
-	"github.com/starshine-sys/covebotnt/commands/usercommands"
 	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/etc"
 	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/starshine-sys/flagparser"
-	"github.com/bwmarrin/discordgo"
 )
 
 // LogMute adds a mute to the mute log
@@ -62,7 +62,7 @@ func LogMute(ctx *crouter.Ctx) (err error) {
 	if args["d"].(time.Duration) == defaultDuration {
 		duration = "none"
 	} else {
-		duration = usercommands.PrettyDurationString(args["d"].(time.Duration))
+		duration = etc.HumanizeDuration(etc.DurationPrecisionSeconds, args["d"].(time.Duration))
 	}
 
 	entry, err := ctx.Database.AddToModLog(&cbdb.ModLogEntry{

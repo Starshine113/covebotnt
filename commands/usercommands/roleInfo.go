@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/etc"
 )
 
 // RoleInfo shows information about a role
@@ -93,7 +94,7 @@ func RoleInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Created",
-				Value:  fmt.Sprintf("%v ago", PrettyDurationString(time.Since(created))),
+				Value:  fmt.Sprintf("%v ago", etc.HumanizeDuration(etc.DurationPrecisionSeconds, time.Since(created))),
 				Inline: true,
 			},
 		},

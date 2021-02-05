@@ -5,8 +5,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/etc"
 )
 
 func about(ctx *crouter.Ctx) (err error) {
@@ -53,7 +54,7 @@ func about(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Uptime",
-				Value:  fmt.Sprintf("%v (since %v)", PrettyDurationString(time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
+				Value:  fmt.Sprintf("%v (since %v)", etc.HumanizeDuration(etc.DurationPrecisionSeconds, time.Since(startTime)), startTime.Format("Jan _2 2006, 15:04:05 MST")),
 				Inline: false,
 			},
 			{

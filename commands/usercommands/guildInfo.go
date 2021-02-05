@@ -5,8 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/bwmarrin/discordgo"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/etc"
 )
 
 // GuildInfo command shows information about the current guild
@@ -102,7 +103,7 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Created at",
-				Value:  fmt.Sprintf("%v\n(%v ago)", guildCreated.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(guildCreated))),
+				Value:  fmt.Sprintf("%v\n(%v ago)", guildCreated.Format("Jan _2 2006, 15:04:05 MST"), etc.HumanizeDuration(etc.DurationPrecisionSeconds, time.Since(guildCreated))),
 				Inline: true,
 			},
 			{

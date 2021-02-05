@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/starshine-sys/covebotnt/etc"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/starshine-sys/pkgo"
@@ -67,7 +69,7 @@ func noMemberInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Created",
-				Value:  fmt.Sprintf("%v\n(%v ago)", ts.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(ts))),
+				Value:  fmt.Sprintf("%v\n(%v ago)", ts.Format("Jan _2 2006, 15:04:05 MST"), etc.HumanizeDuration(etc.DurationPrecisionSeconds, time.Since(ts))),
 				Inline: true,
 			},
 		},
@@ -283,12 +285,12 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Created at",
-				Value:  fmt.Sprintf("%v\n(%v ago)", createdTime.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(createdTime))),
+				Value:  fmt.Sprintf("%v\n(%v ago)", createdTime.Format("Jan _2 2006, 15:04:05 MST"), etc.HumanizeDuration(etc.DurationPrecisionSeconds, time.Since(createdTime))),
 				Inline: true,
 			},
 			{
 				Name:   "Joined at",
-				Value:  fmt.Sprintf("%v\n(%v ago)\n%v days after the server was created", joinedTime.Format("Jan _2 2006, 15:04:05 MST"), PrettyDurationString(time.Since(joinedTime)), days),
+				Value:  fmt.Sprintf("%v\n(%v ago)\n%v days after the server was created", joinedTime.Format("Jan _2 2006, 15:04:05 MST"), etc.HumanizeDuration(etc.DurationPrecisionSeconds, time.Since(joinedTime)), days),
 				Inline: false,
 			},
 			{
@@ -309,30 +311,6 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 		Content: &content,
 		Embed:   embed,
 	})
-	return
-}
-
-// PrettyDurationString ...
-func PrettyDurationString(duration time.Duration) (out string) {
-	var days, hours, hoursFrac, minutes float64
-
-	hours = duration.Hours()
-	hours, hoursFrac = math.Modf(hours)
-	minutes = hoursFrac * 60
-
-	hoursFrac = math.Mod(hours, 24)
-	days = (hours - hoursFrac) / 24
-	hours = hours - (days * 24)
-	minutes = minutes - math.Mod(minutes, 1)
-
-	if days != 0 {
-		out += fmt.Sprintf("%v days, ", days)
-	}
-	if hours != 0 {
-		out += fmt.Sprintf("%v hours, ", hours)
-	}
-	out += fmt.Sprintf("%v minutes", minutes)
-
 	return
 }
 
