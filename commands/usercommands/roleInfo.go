@@ -47,6 +47,14 @@ func RoleInfo(ctx *crouter.Ctx) (err error) {
 		}
 	}
 
+	permString := strings.Join(etc.PermStrings(role.Permissions), ", ")
+	if len(permString) > 1000 {
+		permString = permString[:1000] + "..."
+	}
+	if len(permString) == 0 {
+		permString = "None"
+	}
+
 	embed := &discordgo.MessageEmbed{
 		Title:       "Role info",
 		Description: "`<@&" + role.ID + ">`",
@@ -97,9 +105,21 @@ func RoleInfo(ctx *crouter.Ctx) (err error) {
 				Value:  fmt.Sprintf("%v ago", etc.HumanizeDuration(etc.DurationPrecisionSeconds, time.Since(created))),
 				Inline: true,
 			},
+			{
+				Name:   "Permissions",
+				Value:  "```" + permString + "```",
+				Inline: false,
+			},
 		},
 	}
 
 	_, err = ctx.Send(embed)
 	return
+}
+
+func trinaryOperationThing(b bool, t, f string) string {
+	if b {
+		return t
+	}
+	return f
 }

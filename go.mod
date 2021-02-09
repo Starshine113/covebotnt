@@ -7,7 +7,7 @@ require (
 	codeberg.org/eviedelta/dwhook v0.0.0-20201015021046-043084b306b3
 	github.com/BurntSushi/toml v0.3.1
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
-	github.com/bwmarrin/discordgo v0.22.0
+	github.com/bwmarrin/discordgo v0.23.2
 	github.com/diamondburned/arikawa v1.3.14 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx/v4 v4.10.1

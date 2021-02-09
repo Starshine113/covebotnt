@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/starshine-sys/covebotnt/crouter"
 	"github.com/pelletier/go-toml"
+	"github.com/starshine-sys/covebotnt/crouter"
 )
 
 func commandSetStatus(ctx *crouter.Ctx) (err error) {
@@ -35,7 +35,7 @@ func commandSetStatus(ctx *crouter.Ctx) (err error) {
 	}
 
 	if config.Bot.CustomStatus.Type == "" {
-		err = dg.UpdateStatus(0, "")
+		err = dg.UpdateGameStatus(0, "")
 		if err != nil {
 			ctx.CommandError(err)
 			return err

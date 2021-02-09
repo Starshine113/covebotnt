@@ -129,52 +129,13 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 			perms = discordgo.PermissionAll
 		}
 	}
-
-	if perms&discordgo.PermissionAdministrator == discordgo.PermissionAdministrator {
-		permStrings = append(permStrings, "Administrator")
-		perms = discordgo.PermissionAll
+	permStrings = append(permStrings, etc.PermStrings(perms)...)
+	permString := strings.Join(permStrings, ", ")
+	if len(permString) > 1000 {
+		permString = permString[:1000] + "..."
 	}
-	if perms&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
-		permStrings = append(permStrings, "Manage Server")
-	}
-	if perms&discordgo.PermissionManageChannels == discordgo.PermissionManageChannels {
-		permStrings = append(permStrings, "Manage Channels")
-	}
-	if perms&discordgo.PermissionManageWebhooks == discordgo.PermissionManageWebhooks {
-		permStrings = append(permStrings, "Manage Webhooks")
-	}
-	if perms&discordgo.PermissionManageRoles == discordgo.PermissionManageRoles {
-		permStrings = append(permStrings, "Manage Roles")
-	}
-	if perms&discordgo.PermissionBanMembers == discordgo.PermissionBanMembers {
-		permStrings = append(permStrings, "Ban Members")
-	}
-	if perms&discordgo.PermissionKickMembers == discordgo.PermissionKickMembers {
-		permStrings = append(permStrings, "Kick Members")
-	}
-	if perms&discordgo.PermissionViewAuditLogs == discordgo.PermissionViewAuditLogs {
-		permStrings = append(permStrings, "View Audit Log")
-	}
-	if perms&discordgo.PermissionMentionEveryone == discordgo.PermissionMentionEveryone {
-		permStrings = append(permStrings, "Mention @everyone")
-	}
-	if perms&discordgo.PermissionManageNicknames == discordgo.PermissionManageNicknames {
-		permStrings = append(permStrings, "Manage Nicknames")
-	}
-	if perms&discordgo.PermissionManageEmojis == discordgo.PermissionManageEmojis {
-		permStrings = append(permStrings, "Manage Emojis")
-	}
-	if perms&discordgo.PermissionVoiceMoveMembers == discordgo.PermissionVoiceMoveMembers {
-		permStrings = append(permStrings, "Voice Move Members")
-	}
-	if perms&discordgo.PermissionVoiceMuteMembers == discordgo.PermissionVoiceMuteMembers {
-		permStrings = append(permStrings, "Voice Mute Members")
-	}
-	if perms&discordgo.PermissionManageMessages == discordgo.PermissionManageMessages {
-		permStrings = append(permStrings, "Manage Messages")
-	}
-	if len(permStrings) == 0 {
-		permStrings = []string{"No special permissions"}
+	if len(permString) == 0 {
+		permString = "None"
 	}
 
 	var rolesSlice []string
@@ -189,12 +150,6 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 	}
 	if len(roles) >= 1000 {
 		roles = "Too many to list"
-	}
-
-	permString := strings.Join(permStrings, ", ")
-	if len(permString) >= 950 {
-		permString = permString[:950]
-		permString += "..."
 	}
 
 	botPerm := crouter.PermLevelNone
@@ -314,7 +269,7 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 	return
 }
 
-func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName string, highestRoleColour, perms int, roles sortRoleByPos, err error) {
+func getPerms(s *discordgo.Session, guildID, userID string) (highestRoleName string, highestRoleColour int, perms int64, roles sortRoleByPos, err error) {
 	// get the member
 	member, err := s.GuildMember(guildID, userID)
 	if err != nil {
