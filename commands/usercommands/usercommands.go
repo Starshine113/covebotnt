@@ -179,7 +179,8 @@ func Init(router *crouter.Router) {
 
 	router.AddCommand(&crouter.Command{
 		Name:        "Poll",
-		Description: "Create a poll",
+		Description: "Create a poll, either yes/no or with a number of options",
+		Usage:       "[--options <num>]",
 		Permissions: crouter.PermLevelNone,
 		Command:     poll,
 	})

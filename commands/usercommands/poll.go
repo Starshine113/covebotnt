@@ -7,6 +7,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/starshine-sys/covebotnt/crouter"
+
+	flag "github.com/spf13/pflag"
 )
 
 var keycaps = []string{"1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"}
@@ -65,6 +67,21 @@ func poll(ctx *crouter.Ctx) (err error) {
 }
 
 func quickpoll(ctx *crouter.Ctx) (err error) {
+	var reacts int
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+	fs.IntVarP(&reacts, "options", "o", -1, "How many options to have")
+	fs.Parse(ctx.Args)
+	ctx.Args = fs.Args()
+
+	// i cant be bothered to write actual error messages so well just do this
+	if reacts < 2 {
+		_, err = ctx.Send("less than 2 options? do you really think i can do something with that?")
+		return err
+	} else if reacts > 10 {
+		_, err = ctx.Send("look buddy i can't help you with that, that's way too many choices, i can only count to 10 smh")
+		return err
+	}
+
 	// indicate that were processing
 	ctx.React("🔄")
 	id := ctx.Message.ID
@@ -79,13 +96,22 @@ func quickpoll(ctx *crouter.Ctx) (err error) {
 		ctx.Session.MessageReactionRemove(ctx.Channel.ID, ctx.Message.ID, "🔄", "@me")
 	}
 
-	err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, id, "👍")
-	if err != nil {
-		return err
-	}
-	err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, id, "👎")
-	if err != nil {
-		return err
+	if reacts < 2 || reacts > 10 {
+		err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, id, ":greentick:754647778390442025")
+		if err != nil {
+			return err
+		}
+		err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, id, ":redtick:754647803837415444")
+		if err != nil {
+			return err
+		}
+	} else {
+		for i := 0; i < reacts; i++ {
+			err = ctx.Session.MessageReactionAdd(ctx.Channel.ID, id, keycaps[i])
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return
 }
