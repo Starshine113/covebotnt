@@ -168,4 +168,19 @@ func Init(router *crouter.Router) {
 		Permissions: crouter.PermLevelNone,
 		Command:     about,
 	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "Quickpoll",
+		Aliases:     []string{"qp"},
+		Description: "Start a poll on the triggering message",
+		Permissions: crouter.PermLevelNone,
+		Command:     quickpoll,
+	})
+
+	router.AddCommand(&crouter.Command{
+		Name:        "Poll",
+		Description: "Create a poll",
+		Permissions: crouter.PermLevelNone,
+		Command:     poll,
+	})
 }

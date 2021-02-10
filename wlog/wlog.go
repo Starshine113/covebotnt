@@ -53,7 +53,7 @@ func Logger(c URLs, level string) *Wlog {
 	wlog.debugBuffer = make([]dwhook.Embed, 0)
 	wlog.infoBuffer = make([]dwhook.Embed, 0)
 
-	wlog.sugar = log.Sugar()
+	wlog.sugar = log.WithOptions(zap.AddCallerSkip(1)).Sugar()
 	wlog.urls = &c
 	wlog.logLevel = stringToLevel(level)
 	wlog.Name = "Bot"

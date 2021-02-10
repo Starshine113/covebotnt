@@ -8,7 +8,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/ReneKroon/ttlcache/v2 v2.1.0
 	github.com/bwmarrin/discordgo v0.23.2
-	github.com/diamondburned/arikawa v1.3.14 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/lib/pq v1.4.0 // indirect
@@ -16,7 +15,7 @@ require (
 	github.com/shopspring/decimal v0.0.0-20200419222939-1884f454f8ea // indirect
 	github.com/spf13/pflag v1.0.5
 	github.com/starshine-sys/flagparser v0.0.0-20210124143059-34a529193b12
-	github.com/starshine-sys/pkgo v0.2.1
+	github.com/starshine-sys/pkgo v0.3.0
 	github.com/starshine-sys/snowflake v0.3.0
 	go.etcd.io/bbolt v1.3.5
 	go.uber.org/zap v1.16.0

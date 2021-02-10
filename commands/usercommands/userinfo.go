@@ -14,6 +14,8 @@ import (
 	"github.com/starshine-sys/pkgo"
 )
 
+var pk = pkgo.NewSession(nil)
+
 // PKUserInfo runs UserInfo with the user ID returned by
 func PKUserInfo(ctx *crouter.Ctx) (err error) {
 	if err = ctx.CheckRequiredArgs(1); err != nil {
@@ -21,9 +23,7 @@ func PKUserInfo(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
-	s := pkgo.NewSession(nil)
-
-	msg, err := s.GetMessage(ctx.Args[0])
+	msg, err := pk.GetMessage(ctx.Args[0])
 	if err != nil {
 		if err == pkgo.ErrMsgNotFound {
 			_, err = ctx.Sendf("%v Message with ID `%v` not found by PK. Are you sure this message was proxied and hasn't been deleted?", crouter.ErrorEmoji, ctx.Args[0])
