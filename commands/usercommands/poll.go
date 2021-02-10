@@ -74,10 +74,10 @@ func quickpoll(ctx *crouter.Ctx) (err error) {
 	ctx.Args = fs.Args()
 
 	// i cant be bothered to write actual error messages so well just do this
-	if reacts < 2 {
+	if reacts != -1 && reacts < 2 {
 		_, err = ctx.Send("less than 2 options? do you really think i can do something with that?")
 		return err
-	} else if reacts > 10 {
+	} else if reacts != -1 && reacts > 10 {
 		_, err = ctx.Send("look buddy i can't help you with that, that's way too many choices, i can only count to 10 smh")
 		return err
 	}
