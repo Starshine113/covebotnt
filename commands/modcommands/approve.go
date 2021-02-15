@@ -6,9 +6,10 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/starshine-sys/covebotnt/crouter"
-	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
+	"github.com/starshine-sys/covebotnt/crouter"
+	"github.com/starshine-sys/covebotnt/etc"
+	"github.com/starshine-sys/covebotnt/structs"
 )
 
 // GkApprove approves the given member, giving them the member roles
@@ -64,13 +65,42 @@ func GkApprove(ctx *crouter.Ctx) (err error) {
 		return
 	}
 
+	joined, err := member.JoinedAt.Parse()
+	if err != nil {
+		joined = time.Now().UTC()
+	}
+
+	guild, _ := ctx.Session.State.Guild(ctx.Message.GuildID)
+	guildIcon := ""
+	if guild != nil {
+		guildIcon = guild.IconURL()
+	}
+
 	logEmbed := &discordgo.MessageEmbed{
-		Title:       "User approved",
-		Description: fmt.Sprintf("%v (%v) was approved by %v (%v).", member.User.String(), member.User.ID, ctx.Author.String(), ctx.Author.ID),
-		Footer: &discordgo.MessageEmbedFooter{
-			Text: "Moderator ID: " + ctx.Author.ID,
+		Author: &discordgo.MessageEmbedAuthor{
+			Name:    "User Approved",
+			IconURL: guildIcon,
 		},
+		Color:     0x0154C6,
 		Timestamp: time.Now().Format(time.RFC3339),
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:  "Moderator",
+				Value: fmt.Sprintf("**%s** (%v)", ctx.Author, ctx.Author.Mention()),
+			},
+			{
+				Name:  "Target",
+				Value: fmt.Sprintf("**%s** (%v)", member.User, member.User.Mention()),
+			},
+			{
+				Name:  "Target joined at",
+				Value: fmt.Sprintf("%v UTC (%v)", joined.Format("Jan 02 2006, 15:04:05"), etc.HumanizeTime(etc.DurationPrecisionMinutes, joined)),
+			},
+		},
+		Footer: &discordgo.MessageEmbedFooter{
+			Text:    fmt.Sprintf("Mod: %s (%v)", ctx.Author, ctx.Author.ID),
+			IconURL: ctx.Author.AvatarURL("128"),
+		},
 	}
 
 	_, err = ctx.Session.ChannelMessageSendEmbed(guildConf.Moderation.ModLog, logEmbed)
