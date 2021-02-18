@@ -17,6 +17,12 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 		return err
 	}
 
+	prefixes := "None"
+	gs, err := ctx.Database.GetGuildSettings(ctx.Message.GuildID)
+	if err == nil && len(gs.Prefixes) > 0 {
+		prefixes = strings.Join(gs.Prefixes, ", ")
+	}
+
 	msg, err := ctx.Send("Working, please wait...")
 	if err != nil {
 		return err
@@ -29,18 +35,25 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 	}
 	guildCreated = guildCreated.UTC()
 
-	var categoryCount, totalChanCount, textChanCount, voiceChanCount int
+	var (
+		categoryCount, totalChanCount, textChanCount, voiceChanCount int
+		lockedTextCount, lockedVoiceCount                            int
+	)
 	for _, channel := range guild.Channels {
 		if channel.Type == discordgo.ChannelTypeGuildCategory {
 			categoryCount++
+		} else if channel.Type == discordgo.ChannelTypeGuildVoice {
+			totalChanCount++
+			voiceChanCount++
+			if isPrivate(ctx.Message.GuildID, channel) {
+				lockedVoiceCount++
+			}
 		} else {
 			totalChanCount++
-		}
-		if channel.Type == discordgo.ChannelTypeGuildVoice {
-			voiceChanCount++
-		}
-		if channel.Type != discordgo.ChannelTypeGuildCategory && channel.Type != discordgo.ChannelTypeGuildVoice {
 			textChanCount++
+			if isPrivate(ctx.Message.GuildID, channel) {
+				lockedTextCount++
+			}
 		}
 	}
 
@@ -87,8 +100,8 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 				Inline: true,
 			},
 			{
-				Name:   "Prefix",
-				Value:  "`" + ctx.GuildPrefix + "`",
+				Name:   "Prefixes",
+				Value:  "`" + prefixes + "`",
 				Inline: true,
 			},
 			{
@@ -98,7 +111,7 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 			},
 			{
 				Name:   "Channels",
-				Value:  fmt.Sprintf("%v (in %v categories)\n<:textchannel:770274583223336990> %v | <:voicechannel:770274509012992020> %v", totalChanCount, categoryCount, textChanCount, voiceChanCount),
+				Value:  fmt.Sprintf("%v (in %v categories)\n<:textchannel:770274583223336990> %v (%v locked)\n<:voicechannel:770274509012992020> %v (%v locked)", totalChanCount, categoryCount, textChanCount, lockedTextCount, voiceChanCount, lockedVoiceCount),
 				Inline: true,
 			},
 			{
@@ -120,4 +133,13 @@ func GuildInfo(ctx *crouter.Ctx) (err error) {
 		Embed:   embed,
 	})
 	return
+}
+
+func isPrivate(guildID string, channel *discordgo.Channel) bool {
+	for _, o := range channel.PermissionOverwrites {
+		if o.ID == guildID && o.Deny&discordgo.PermissionViewChannel != 0 {
+			return true
+		}
+	}
+	return false
 }
