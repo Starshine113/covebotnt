@@ -165,7 +165,7 @@ func UserInfo(ctx *crouter.Ctx) (err error) {
 	for _, r := range rls {
 		for _, modRole := range ctx.GuildSettings.Moderation.ModRoles {
 			if r.ID == modRole {
-				botPerm = crouter.PermLevelHelper
+				botPerm = crouter.PermLevelMod
 				break
 			}
 		}
