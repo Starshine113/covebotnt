@@ -8,13 +8,16 @@ type BotConfig struct {
 		BoltPath    string `toml:"bolt_path"`
 	} `toml:"auth"`
 	Bot struct {
-		Prefixes     []string `toml:"prefixes"`
-		BotOwners    []string `toml:"bot_owners"`
-		Invite       string   `toml:"invite"`
-		AllowedBots  []string `toml:"allowed_bots"`
-		DMWebhook    string   `toml:"dm_webhook"`
-		BlockedUsers []string `toml:"blocked_users"`
-		LogWebhook   string   `toml:"log_webhook"`
+		Prefixes    []string `toml:"prefixes"`
+		BotOwners   []string `toml:"bot_owners"`
+		Invite      string   `toml:"invite"`
+		AllowedBots []string `toml:"allowed_bots"`
+		DMWebhook   string   `toml:"dm_webhook"`
+
+		BlockedUsers  []string `toml:"blocked_users"`
+		BannedServers []string `toml:"banned_servers"`
+
+		LogWebhook   string `toml:"log_webhook"`
 		CustomStatus struct {
 			Type   string `toml:"type"`
 			Status string `toml:"status"`
