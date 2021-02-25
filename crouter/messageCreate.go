@@ -26,6 +26,12 @@ func (r *Router) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate)
 			return
 		}
 	}
+	// banned users can't do anything
+	for _, id := range r.Bot.Config.Bot.BannedUsers {
+		if id == m.Author.ID {
+			return
+		}
+	}
 
 	err = r.Respond(s, m)
 	if err != nil {

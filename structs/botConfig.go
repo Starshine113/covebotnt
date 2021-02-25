@@ -14,7 +14,9 @@ type BotConfig struct {
 		AllowedBots []string `toml:"allowed_bots"`
 		DMWebhook   string   `toml:"dm_webhook"`
 
-		BlockedUsers  []string `toml:"blocked_users"`
+		BlockedUsers []string `toml:"blocked_users"`
+
+		BannedUsers   []string `toml:"banned_users"`
 		BannedServers []string `toml:"banned_servers"`
 
 		LogWebhook   string `toml:"log_webhook"`
