@@ -24,6 +24,9 @@ func about(ctx *crouter.Ctx) (err error) {
 	if invite == "" {
 		invite = fmt.Sprintf("[Invite link](%v)", ctx.Invite())
 	}
+	if !ctx.Bot.Config.Bot.Public {
+		invite = fmt.Sprintf("None, see `%vinvite` for details.", ctx.GuildPrefix)
+	}
 
 	embed := &discordgo.MessageEmbed{
 		Title: "About",

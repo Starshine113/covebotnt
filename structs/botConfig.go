@@ -8,6 +8,8 @@ type BotConfig struct {
 		BoltPath    string `toml:"bolt_path"`
 	} `toml:"auth"`
 	Bot struct {
+		Public bool
+
 		Prefixes    []string `toml:"prefixes"`
 		BotOwners   []string `toml:"bot_owners"`
 		Invite      string   `toml:"invite"`

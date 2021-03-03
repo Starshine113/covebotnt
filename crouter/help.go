@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/starshine-sys/covebotnt/structs"
 	"github.com/bwmarrin/discordgo"
+	"github.com/starshine-sys/covebotnt/structs"
 )
 
 type cmdList []*Command
@@ -277,12 +277,17 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 		invite = fmt.Sprintf("Invite the bot with [this](%v) link", ctx.Invite())
 	}
 
-	fields := []*discordgo.MessageEmbedField{
-		{
+	var fields []*discordgo.MessageEmbedField
+
+	if ctx.Bot.Config.Bot.Public {
+		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   "Invite",
 			Value:  invite,
 			Inline: false,
-		},
+		})
+	}
+
+	fields = append(fields, []*discordgo.MessageEmbedField{
 		{
 			Name:   "Setup",
 			Value:  "For help setting up the bot, check out the [docs](https://starshines.xyz/covebot/setup.html).",
@@ -293,7 +298,7 @@ func (r *Router) details(ctx *Ctx, p PermLevel) (err error) {
 			Value:  "CoveBotn't is licensed under the GNU AGPLv3. The source code can be found [here](https://github.com/starshine-sys/covebotnt).",
 			Inline: false,
 		},
-	}
+	}...)
 
 	startTime := ctx.Bot.StartTime.UTC()
 	botAuthor, err := ctx.Session.User("694563574386786314")
