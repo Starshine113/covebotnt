@@ -1,4 +1,8 @@
-# CoveBot
+# Deprecated
+
+**This code base is deprecated, CoveBot now runs the same code as [Tribble](https://github.com/starshine-sys/tribble).**
+
+## CoveBot
 
 CoveBot(n't) is a general purpose custom-built Discord bot.
 It currently has:
